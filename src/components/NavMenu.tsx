@@ -3,8 +3,9 @@ import Button from '@mui/material/Button';
 import { Settings as SettingsIcon, Edit as EditIcon, Logout as LogoutIcon } from '@mui/icons-material'
 import MenuItem from '@mui/material/MenuItem';
 import Divider from '@mui/material/Divider';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { PopoverMenu } from '../containers/PopoverMenu'
+import { MenuStyled } from '../styles/MenuStyled'
+import { FormControlLabel, Switch } from '@mui/material';
+import { Menu as MenuIcon, SaveAlt as SaveAltIcon } from '@mui/icons-material'
 
 export const NavMenu = () => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -26,11 +27,11 @@ export const NavMenu = () => {
         variant="contained"
         disableElevation
         onClick={handleClick}
-        endIcon={<KeyboardArrowDownIcon />}
+        sx={{mx: 1}}
       >
-        Opciones
+        <MenuIcon/>
       </Button>
-      <PopoverMenu
+      <MenuStyled
         id="demo-customized-menu"
         MenuListProps={{
           'aria-labelledby': 'demo-customized-button',
@@ -43,16 +44,24 @@ export const NavMenu = () => {
           <EditIcon/>
           Agregar escuela
         </MenuItem>
+        <MenuItem onClick={handleClose}>
+          <SaveAltIcon/>
+          Respaldar todo
+        </MenuItem>
         <MenuItem onClick={handleClose} disableRipple>
           <SettingsIcon/>
           Ajustes
+        </MenuItem>
+        <Divider sx={{ my: 0.5 }} />
+        <MenuItem disableRipple disableTouchRipple>
+          <FormControlLabel control={<Switch defaultChecked />} label="Modo offline" />
         </MenuItem>
         <Divider sx={{ my: 0.5 }} />
         <MenuItem onClick={handleClose} disableRipple>
           <LogoutIcon/>
           Cerrar sesión
         </MenuItem>
-      </PopoverMenu>
+      </MenuStyled>
     </div>
   );
 }

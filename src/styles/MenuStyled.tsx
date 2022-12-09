@@ -2,7 +2,7 @@ import * as React from 'react';
 import Menu, { MenuProps } from '@mui/material/Menu';
 import { styled, alpha } from '@mui/material/styles';
 
-export const PopoverMenu = styled((props: MenuProps) => (
+export const MenuStyled = styled((props: MenuProps) => (
   <Menu
     elevation={0}
     anchorOrigin={{

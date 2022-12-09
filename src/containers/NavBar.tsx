@@ -1,14 +1,18 @@
 import * as React from 'react';
-import { AppBar, Toolbar, Typography } from '@mui/material';
+import { AppBar, Toolbar, Typography, IconButton } from '@mui/material';
 import { NavMenu } from '../components/NavMenu'
+import Icon from '../assets/icon.png'
 
-export const NavBar = () => {
+export const NavBar = ({children}:{children?: JSX.Element[] | JSX.Element}) => {
   return (
     <AppBar position='sticky' component='nav'>
       <Toolbar>
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Escuelas
-        </Typography>
+        <p style={{ flexGrow: 1, margin: 0}} >
+          <IconButton>
+            <img src={Icon} width='40' alt='icon'/>
+          </IconButton>
+        </p>
+        { children }
         <div>
           <NavMenu/>
         </div>

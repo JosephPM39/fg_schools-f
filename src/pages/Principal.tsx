@@ -1,6 +1,7 @@
 import { Grid, Box } from '@mui/material'
 import { ImgMediaCard } from "../components/ImgMediaCard"
 import { NavBar } from '../containers/NavBar'
+import { SearchField } from '../components/SearchField'
 
 export const Principal = () => {
   const data = [...Array(50)]
@@ -14,7 +15,10 @@ export const Principal = () => {
 
   return (
     <>
-      <NavBar/>
+      <NavBar>
+        <SearchField/>
+      </NavBar>
+
       <br/>
       <Grid container justifyContent='center' spacing={2} >
         {Cards()}
