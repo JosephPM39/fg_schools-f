@@ -1,13 +1,12 @@
-import { Grid } from '@mui/material'
-import { Container } from '@mui/system'
+import { Grid, Box } from '@mui/material'
 import { ImgMediaCard } from "../components/ImgMediaCard"
 import { NavBar } from '../containers/NavBar'
 
 export const Principal = () => {
-  const data = [...Array(10)]
+  const data = [...Array(50)]
   const Cards = () => (
     data.map((d, index)=> (
-      <Grid item xs={2} sm={4} md={4} key={index}>
+      <Grid item key={index}>
         <ImgMediaCard></ImgMediaCard>
       </Grid>
     ))
@@ -17,11 +16,9 @@ export const Principal = () => {
     <>
       <NavBar/>
       <br/>
-      <Container fixed>
-        <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
-          {Cards()}
-        </Grid>
-      </Container>
+      <Grid container justifyContent='center' spacing={2} >
+        {Cards()}
+      </Grid>
       <br/>
     </>
   )
