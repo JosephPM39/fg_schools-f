@@ -1,7 +1,6 @@
 import { ValidateIdOptions, ValidateDtoOptions } from '../types'
 import { ClassConstructor, plainToInstance } from 'class-transformer'
 import { validate, ValidationError } from 'class-validator'
-import Boom from '@hapi/boom'
 import { IQuery, Query } from './query'
 
 export const validateIdBy = async <Model extends {}>(params: ValidateIdOptions<Model>) => {
@@ -22,12 +21,12 @@ export const validateIdBy = async <Model extends {}>(params: ValidateIdOptions<M
   const rejectedProperties = dtoProperties.filter((p) => !propertiesAllowed.includes(p))
 
   if (rejectedProperties.length > 0) {
-    const error = Boom.badRequest('Invalid Search Object or id')
-    error.output.payload = {
-      ...error.output.payload,
+    const error = new Error('Invalid Search Object or id')
+    error.cause = {
       propertiesAllowed,
       rejectedProperties
     }
+    delete error.stack
     throw error
   }
 
@@ -43,11 +42,11 @@ export const validateDto = async <Model extends {}>(params: ValidateDtoOptions<M
   )
   const errors = await validate(instance, params.validatorOptions)
   if (errors.length > 0) {
-    const boomError = Boom.badRequest('Invalid data')
-    boomError.output.payload = {
-      ...boomError.output.payload,
+    const boomError = new Error('Invalid data')
+    boomError.cause = {
       details: formatValidationError(errors)
     }
+    delete boomError.stack
     throw boomError
   }
   return instance

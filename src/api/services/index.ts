@@ -7,12 +7,8 @@ import { filter, queryFilter } from './utils'
 
 interface BaseParams<Model> {
   path: string
-  token: string
+  token?: string
   offline: boolean
-  hook: {
-    data: Model[]
-    set: React.Dispatch<React.SetStateAction<Model[]>>
-  }
 }
 
 export interface CreateParams<Model> extends BaseParams<Model> {
@@ -37,13 +33,13 @@ export const create = async <Model extends IBaseModel>(params: CreateParams<Mode
   if (!params.offline) {
     const res = await post<Model>({ path, token, data })
     if (!res) throw new Error('Falló la operación')
-    params.hook.data.push(res[0])
+    return res[0]
   }
 
   if (params.offline) {
-    params.hook.data.push(data)
     window.localStorage.removeItem(path)
-    window.localStorage.setItem(path, JSON.stringify(params.hook.data))
+    window.localStorage.setItem(path, JSON.stringify(data))
+    return data
   }
 }
 
@@ -54,7 +50,7 @@ export const read = async <Model extends IBaseModel>(params: ReadParams<Model>) 
 
   if (!params.offline) {
     const res = await get<Model>({ query, searchBy, path, token})
-    params.hook.set(res)
+    return res
   }
 
   if (params.offline) {
@@ -69,6 +65,6 @@ export const read = async <Model extends IBaseModel>(params: ReadParams<Model>) 
     if (query) {
       json = [...queryFilter(json, query)]
     }
-    params.hook.set(json)
+    return json
   }
 }

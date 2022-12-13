@@ -28,7 +28,7 @@ export const addOfflineFlag = <Model extends IBaseModel>(data: Data<Model>, offl
   }))
 }
 
-export const getHeaders = (token: string) => new Headers({
+export const getHeaders = (token?: string) => new Headers({
   'Content-Type': 'application/json',
   Authorization: `Bearer ${token}`
 })
