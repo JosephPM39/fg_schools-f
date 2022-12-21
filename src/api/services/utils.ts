@@ -14,14 +14,17 @@ export const removeOfflineFlag = <Model extends IBaseModel>(data: Data<Model>): 
   })
 }
 
-export const addOfflineFlag = <Model extends IBaseModel>(data: Data<Model>, offlineFlagValue: boolean = false): Model[] => {
+export const addOfflineFlag = <Model extends IBaseModel>(data: Data<Model>, offlineFlagValue: boolean = false): Model[] | undefined => {
+  if (!data) return undefined
   if (!Array.isArray(data)) {
+    if (Object.values(data).length < 1) return []
     return [{
       ...data,
       offline: offlineFlagValue
     }]
   }
 
+  if (data.length < 1) return []
   return data.map((dto) => ({
     ...dto,
     offline: offlineFlagValue

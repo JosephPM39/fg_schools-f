@@ -1,8 +1,8 @@
-import { Grid, Box } from '@mui/material'
+import { Grid } from '@mui/material'
 import { ImgMediaCard } from "../components/ImgMediaCard"
 import { NavBar } from '../containers/NavBar'
 import { SearchField } from '../components/SearchField'
-import { useContext, useEffect } from 'react'
+import { useContext } from 'react'
 import { ApiContext } from '../context/ApiContext'
 import { SessionContext } from '../context/SessionContext'
 
@@ -11,7 +11,7 @@ export const Principal = () => {
   const school = useContext(ApiContext)?.useSchool
   const session = useContext(SessionContext)
 
-  console.log(school?.schools, "escuelas")
+  console.log(school?.data, "escuelas")
 
   const Cards = () => (
     data.map((d, index)=> (

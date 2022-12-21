@@ -16,12 +16,26 @@ export const post = async <Model extends IBaseModel>(params: PostParams<Model>) 
 }
 
 export const get = async <Model extends IBaseModel>(params: GetParams) => {
-  const { id, body } = searchByHandler(params.searchBy)
+  const { id } = searchByHandler(params.searchBy)
   const searchParams = new URLSearchParams(params.query)
   const path = `${CONFIG.schoolsApiUrl}${params.path}${id}${searchParams}`
 
+  const headers = getHeaders(params.token)
   const res = await fetch(path, {
-    method: 'GET',
+    headers: getHeaders(params.token),
+  })
+
+  return addOfflineFlag<Model>(await res.json())
+}
+
+export const getFiltered = async <Model extends IBaseModel>(params: GetParams) => {
+  const { body } = searchByHandler(params.searchBy)
+  const searchParams = new URLSearchParams(params.query)
+  const path = `${CONFIG.schoolsApiUrl}${params.path}/get-filtered${searchParams}`
+
+  const headers = getHeaders(params.token)
+  const res = await fetch(path, {
+    method: 'POST',
     headers: getHeaders(params.token),
     body
   })
