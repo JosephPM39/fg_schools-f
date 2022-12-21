@@ -19,6 +19,21 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
     }
   })
 
+  const findOne = async ({ id }:{ id: string }) => {
+    if (!data) return undefined
+    if (data.length < 1) return undefined
+    const local = data.find((e) => e.id === id) ?? null
+    if (!local) {
+      const remote = await read<Model>({
+        searchBy: id,
+        ...params
+      })
+      if (!remote) return undefined
+      data.push(...remote)
+      return remote[0]
+    }
+  }
+
   const create = async ({data: dto, token}: Pick<CreateParams<Model>, 'data' | 'token'>) => {
     const res = await apiCreate<Model>({
       data: dto,
@@ -45,6 +60,7 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
   return {
     data,
     create,
-    fetch
+    fetch,
+    findOne
   }
 }
