@@ -11,23 +11,23 @@ import { Title } from './title.model'
 export class Prom extends BaseModel {
   @Expose({ since: EV.UPDATE, until: EV.GET })
   @IsUUID()
-    group: Group
+    group: Group | string
 
   @Expose({ since: EV.UPDATE, until: EV.GET })
   @IsUUID()
-    title: Title
+    title: Title | string
 
   @Expose({ since: EV.UPDATE, until: EV.GET })
   @IsUUID()
-    profesor: EmployeePosition
+    profesor: EmployeePosition | string
 
   @Expose({ since: EV.UPDATE, until: EV.GET })
   @IsUUID()
-    principal: EmployeePosition
+    principal: EmployeePosition | string
 
   @Expose({ since: EV.UPDATE, until: EV.GET })
   @IsUUID()
-    school: School
+    school: School | string
 
   @Expose({ since: EV.UPDATE, until: EV.DELETE })
   @IsInt()

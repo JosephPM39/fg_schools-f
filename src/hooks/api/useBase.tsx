@@ -19,7 +19,8 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
     }
   })
 
-  const findOne = async ({ id }:{ id: string }) => {
+  const findOne = async ({ id }:{ id: string | Model }): Promise<Model | undefined> => {
+    if (typeof id !== 'string') return id
     if (!data) return undefined
     if (data.length < 1) return undefined
     const local = data.find((e) => e.id === id) ?? null

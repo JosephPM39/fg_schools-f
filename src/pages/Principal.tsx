@@ -5,18 +5,16 @@ import { SearchField } from '../components/SearchField'
 import { useContext } from 'react'
 import { ApiContext } from '../context/ApiContext'
 import { SessionContext } from '../context/SessionContext'
+import { SchoolCard } from '../components/SchoolCard'
 
 export const Principal = () => {
-  const data = [...Array(50)]
-  const school = useContext(ApiContext)?.useSchool
+  const proms = useContext(ApiContext)?.useProm
   const session = useContext(SessionContext)
 
-  console.log(school?.data, "escuelas")
-
   const Cards = () => (
-    data.map((d, index)=> (
+    proms?.data?.map((prom, index)=> (
       <Grid item key={index}>
-        <ImgMediaCard></ImgMediaCard>
+        <SchoolCard prom={prom}/>
       </Grid>
     ))
   )
