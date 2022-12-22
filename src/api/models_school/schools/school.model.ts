@@ -5,22 +5,22 @@ import { IsString, Length } from 'class-validator'
 
 @Exclude()
 export class School extends BaseModel {
-  @Expose({ since: EV.UPDATE, until: EV.DELETE })
+  @Expose({ since: EV.UPDATE, until: EV.CREATE_NESTED })
   @IsString()
   @Length(1, 100)
     name: string
 
-  @Expose({ since: EV.UPDATE, until: EV.DELETE })
+  @Expose({ since: EV.UPDATE, until: EV.CREATE_NESTED })
   @IsString()
   @Length(1, 254)
     location: string
 
-  @Expose({ since: EV.UPDATE, until: EV.DELETE })
+  @Expose({ since: EV.UPDATE, until: EV.CREATE_NESTED })
   @IsString()
   @Length(1, 30)
     code: string
 
-  @Expose({ since: EV.UPDATE, until: EV.DELETE })
+  @Expose({ since: EV.UPDATE, until: EV.CREATE_NESTED })
   @IsString()
   @Length(1, 100)
     icon: string

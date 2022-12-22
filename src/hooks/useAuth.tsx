@@ -11,7 +11,9 @@ export const useAuth = () => {
       ...config,
       headers: {
         ...config?.headers,
-        Authorization: `Bearer ${user.token}`
+        Authorization: `Bearer ${user.token}`,
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
       }
     }
     const response = await originalFetch(resource, config);

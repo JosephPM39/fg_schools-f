@@ -1,39 +1,67 @@
 import { Exclude, Expose } from 'class-transformer'
 import { BaseModel } from '../base.model'
+import { IsInt, IsUUID, Max, Min, ValidateIf, ValidateNested } from 'class-validator'
 import { EXPOSE_VERSIONS as EV } from '../../types'
-import { IsInt, IsUUID, Max, Min } from 'class-validator'
-import { School } from './school.model'
-import { Group } from './group.model'
-import { EmployeePosition } from './employee-position.model'
-import { Title } from './title.model'
+import { ISchool, School } from './school.model'
+import { Group, IGroup } from './group.model'
+import { EmployeePosition, IEmployeePosition } from './employee-position.model'
+import { ITitle, Title } from './title.model'
 
 @Exclude()
 export class Prom extends BaseModel {
-  @Expose({ since: EV.UPDATE, until: EV.GET })
+  @Expose({ since: EV.UPDATE, until: EV.CREATE_NESTED })
   @IsUUID()
-    group: Group | string
+    groupId: IGroup['id']
 
-  @Expose({ since: EV.UPDATE, until: EV.GET })
+  @Expose({ since: EV.UPDATE, until: EV.CREATE_NESTED })
   @IsUUID()
-    title: Title | string
+    titleId: ITitle['id']
 
-  @Expose({ since: EV.UPDATE, until: EV.GET })
+  @Expose({ since: EV.UPDATE, until: EV.CREATE_NESTED })
   @IsUUID()
-    profesor: EmployeePosition | string
+    profesorId: IEmployeePosition['id']
 
-  @Expose({ since: EV.UPDATE, until: EV.GET })
+  @Expose({ since: EV.UPDATE, until: EV.CREATE_NESTED })
   @IsUUID()
-    principal: EmployeePosition | string
+    principalId: IEmployeePosition['id']
 
-  @Expose({ since: EV.UPDATE, until: EV.GET })
+  @Expose({ since: EV.UPDATE, until: EV.CREATE_NESTED })
   @IsUUID()
-    school: School | string
+    schoolId: ISchool['id']
 
   @Expose({ since: EV.UPDATE, until: EV.DELETE })
   @IsInt()
   @Max(9999)
   @Min(1900)
     year: number
+
+  // RELATIONS
+
+  @Expose({ since: EV.CREATE_NESTED, until: EV.DELETE })
+  @ValidateIf(o => !o.groupId)
+  @ValidateNested()
+    group: Group
+
+  @Expose({ since: EV.CREATE_NESTED, until: EV.DELETE })
+  @ValidateIf(o => !o.titleId)
+  @ValidateNested()
+    title: Title
+
+  @Expose({ since: EV.CREATE_NESTED, until: EV.DELETE })
+  @ValidateIf(o => !o.profesorId)
+  @ValidateNested()
+    profesor: EmployeePosition
+
+  @Expose({ since: EV.CREATE_NESTED, until: EV.DELETE })
+  @ValidateIf(o => !o.principalId)
+  @ValidateNested()
+    principal: EmployeePosition
+
+  @Expose({ since: EV.CREATE_NESTED, until: EV.DELETE })
+  @ValidateIf(o => !o.schoolId)
+  @ValidateNested()
+    school: School
+
 }
 
 export interface IProm extends Prom {}

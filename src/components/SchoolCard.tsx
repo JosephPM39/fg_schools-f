@@ -15,7 +15,7 @@ export const SchoolCard = (params: Params) => {
 
   useEffect(() => {
     const getData = async () => {
-      const school = await api?.useSchool.findOne({ id: params.prom.school })
+      const school = await api?.useSchool.findOne({ id: params.prom.schoolId })
       if (school) {
         setObj({
           school
@@ -24,24 +24,23 @@ export const SchoolCard = (params: Params) => {
     }
     if (!obj?.school) getData()
   })
-  console.log(params.prom, 'prom')
-  console.log(obj, 'school')
 
   return (
     <Card sx={{ maxWidth: 345 }}>
       <CardMedia
         component="img"
-        alt="green iguana"
+        alt={obj?.school?.name}
         height="140"
-        image="/static/images/cards/contemplative-reptile.jpg"
+        image={obj?.school?.icon}
       />
       <CardContent>
         <Typography gutterBottom variant="h5" component="div">
           {obj?.school?.name ?? 'Lizard d'}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Lizards are a widespread group of squamate reptiles, with over 6,000
-          species, ranging across all continents except Antarctica
+          Dirección: {obj?.school?.location}
+          <br/>
+          Código: {obj?.school?.code}
         </Typography>
       </CardContent>
       <CardActions>

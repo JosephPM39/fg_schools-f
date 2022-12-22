@@ -7,7 +7,7 @@ import { IsString, Length } from 'class-validator'
 export class Title extends BaseModel {
   @Expose({
     since: EV.UPDATE,
-    until: EV.DELETE
+    until: EV.CREATE_NESTED
   })
   @IsString()
   @Length(1, 100)

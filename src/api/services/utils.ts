@@ -31,11 +31,6 @@ export const addOfflineFlag = <Model extends IBaseModel>(data: Data<Model>, offl
   }))
 }
 
-export const getHeaders = (token?: string) => new Headers({
-  'Content-Type': 'application/json',
-  Authorization: `Bearer ${token}`
-})
-
 export const searchByHandler = (sby?: string | object) => {
   const baseRes = { id: '', body: undefined }
 

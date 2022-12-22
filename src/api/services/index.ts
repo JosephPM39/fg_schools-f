@@ -7,7 +7,6 @@ import { filter, queryFilter } from './utils'
 
 interface BaseParams<Model> {
   path: string
-  token?: string
   offline: boolean
 }
 
@@ -23,7 +22,7 @@ export interface ReadParams<Model> extends BaseParams<Model> {
 }
 
 export const create = async <Model extends IBaseModel>(params: CreateParams<Model>) => {
-  const { data: dto, model, path, token } = params
+  const { data: dto, model, path } = params
   const data = await validateDto<Model>({
     dto: dto,
     model: model,
@@ -31,7 +30,7 @@ export const create = async <Model extends IBaseModel>(params: CreateParams<Mode
   })
 
   if (!params.offline) {
-    const res = await post<Model>({ path, token, data })
+    const res = await post<Model>({ path, data })
     if (!res) throw new Error('Falló la operación')
     return res[0]
   }
@@ -50,7 +49,7 @@ export const goOffline = () => {}
 export const goOnline = () => {}
 
 export const read = async <Model extends IBaseModel>(params: ReadParams<Model>) => {
-  const { query: dto, searchBy: idBy, model, path, token } = params
+  const { query: dto, searchBy: idBy, model, path } = params
   const query = dto ? await validateQuery(dto) : undefined
   const id = (
     typeof idBy === 'string' ? idBy : undefined
@@ -61,14 +60,11 @@ export const read = async <Model extends IBaseModel>(params: ReadParams<Model>) 
     }) : undefined
   )
 
-  console.log('searchBy: ', searchBy)
-  console.log('id', id)
   if (!params.offline) {
     if (searchBy) {
-      console.log('obj')
-      return await getFiltered<Model>({ query, searchBy, path, token})
+      return await getFiltered<Model>({ query, searchBy, path })
     }
-    return await get<Model>({ query, searchBy: id, path, token})
+    return await get<Model>({ query, searchBy: id, path })
   }
 
   if (params.offline) {

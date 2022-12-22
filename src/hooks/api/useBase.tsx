@@ -19,7 +19,8 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
     }
   })
 
-  const findOne = async ({ id }:{ id: string | Model }): Promise<Model | undefined> => {
+  const findOne = async ({ id }:{ id: string | Model | undefined}): Promise<Model | undefined> => {
+    if (!id) return undefined
     if (typeof id !== 'string') return id
     if (!data) return undefined
     if (data.length < 1) return undefined
@@ -35,10 +36,9 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
     }
   }
 
-  const create = async ({data: dto, token}: Pick<CreateParams<Model>, 'data' | 'token'>) => {
+  const create = async ({data: dto }: Pick<CreateParams<Model>, 'data'>) => {
     const res = await apiCreate<Model>({
       data: dto,
-      token,
       ...params
     })
     if (res) {
@@ -47,11 +47,10 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
     return !!res
   }
 
-  const fetch = async ({query, searchBy, token}: Pick<ReadParams<Model>, 'query' | 'searchBy' | 'token'>) => {
+  const fetch = async ({query, searchBy }: Pick<ReadParams<Model>, 'query' | 'searchBy'>) => {
     const res = await read<Model>({
       query,
       searchBy,
-      token,
       ...params
     })
     setData(res)

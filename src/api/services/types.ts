@@ -4,7 +4,6 @@ export type Data<Model> = Model | Model[]
 
 export interface BaseApiParams {
   path: string,
-  token?: string
 }
 
 export interface PostParams<Model> extends BaseApiParams {
