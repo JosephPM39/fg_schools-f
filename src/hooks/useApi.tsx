@@ -1,6 +1,11 @@
 import { useState } from "react"
-import { useSchools } from "./api/schools/useSchools"
-import { useProms } from './api/schools/useProms'
+import { useSchool } from "./api/schools/useSchool"
+import { useProm } from './api/schools/useProm'
+import { useEmployeePosition } from "./api/schools/useEmployeePosition"
+import { useEmployee } from "./api/schools/useEmployee"
+import { useTitle } from "./api/schools/useTitle"
+import { useGroup } from "./api/schools/useGroup"
+import { usePosition } from "./api/schools/usePosition"
 
 export const useApi = () => {
   const [offlineMode, setOfflineMode] = useState(Boolean(localStorage.getItem('offline')))
@@ -24,14 +29,16 @@ export const useApi = () => {
     setNetOnline(true)
   })
 
-  const useSchool = useSchools({offline: offlineMode})
-  const useProm = useProms({offline: offlineMode})
-
   return {
     netOnline,
     goOffline,
     goOnline,
-    useSchool,
-    useProm
+    useSchool: useSchool({offline: offlineMode}),
+    useProm: useProm({offline: offlineMode}),
+    useEmployee: useEmployee({offline: offlineMode}),
+    useTitle: useTitle({offline: offlineMode}),
+    useGroup: useGroup({offline: offlineMode}),
+    useEmployeePosition: useEmployeePosition({offline: offlineMode}),
+    usePosition: usePosition({offline: offlineMode})
   }
 }

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { IProm, Prom } from '../../../api/models_school'
 import { useBase } from '../useBase'
 
-export const useProms = ({offline}: {offline: boolean}) => {
+export const useProm = ({offline}: {offline: boolean}) => {
   const [year, setYear] = useState<number>(new Date().getFullYear())
 
   const hook = useBase<IProm>({

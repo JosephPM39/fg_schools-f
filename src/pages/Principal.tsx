@@ -1,20 +1,33 @@
 import { Grid } from '@mui/material'
-import { ImgMediaCard } from "../components/ImgMediaCard"
 import { NavBar } from '../containers/NavBar'
 import { SearchField } from '../components/SearchField'
 import { useContext } from 'react'
 import { ApiContext } from '../context/ApiContext'
 import { SessionContext } from '../context/SessionContext'
 import { SchoolCard } from '../components/SchoolCard'
+import { IProm } from '../api/models_school'
 
 export const Principal = () => {
   const proms = useContext(ApiContext)?.useProm
   const session = useContext(SessionContext)
 
+  const promsWithUniqueSchool = proms?.data?.reduce((sum: IProm[], current: IProm) => {
+    if (sum.filter((e) => e.schoolId === current.schoolId).length < 1) {
+      sum.push(current)
+    }
+    return sum
+  }, [])
+
+  const schoolsWithProms = promsWithUniqueSchool?.map((e, i) => {
+    const res = proms?.data?.filter((p) => p.schoolId === e.schoolId)
+    if(!res) return []
+    return res
+  })
+
   const Cards = () => (
-    proms?.data?.map((prom, index)=> (
+    schoolsWithProms?.map((proms, index)=> (
       <Grid item key={index}>
-        <SchoolCard prom={prom}/>
+        <SchoolCard proms={proms}/>
       </Grid>
     ))
   )

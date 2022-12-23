@@ -34,6 +34,7 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
       data.push(...remote)
       return remote[0]
     }
+    return local
   }
 
   const create = async ({data: dto }: Pick<CreateParams<Model>, 'data'>) => {

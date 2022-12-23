@@ -19,7 +19,7 @@ function App() {
   return (<>
     <SessionContext.Provider value={session}>
       <ApiContext.Provider value={api}>
-        <Principal/>;
+        <Principal/>
       </ApiContext.Provider>
     </SessionContext.Provider>
   </>)

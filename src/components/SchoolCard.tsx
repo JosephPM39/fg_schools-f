@@ -1,24 +1,40 @@
 import { Card, CardActions, CardContent,CardMedia,Button, Typography} from '@mui/material'
 import { useContext, useEffect, useState } from 'react';
-import { IProm, ISchool } from '../api/models_school';
+import { IEmployee, IEmployeePosition, IPosition, IProm, ISchool } from '../api/models_school';
 import { ApiContext } from '../context/ApiContext';
 
 interface Params {
-  prom: IProm
+  proms: IProm[]
 }
 
 export const SchoolCard = (params: Params) => {
+  const [showSections, setShowSections] = useState(false)
   const [obj, setObj] = useState<{
     school?: ISchool
+    principal?: {
+      position?: IPosition
+      employee?: IEmployee
+      relation?: IEmployeePosition
+    }
   } | undefined>()
   const api = useContext(ApiContext)
 
+  console.log(params.proms)
+
   useEffect(() => {
     const getData = async () => {
-      const school = await api?.useSchool.findOne({ id: params.prom.schoolId })
+      const school = await api?.useSchool.findOne({ id: params.proms[0].schoolId })
+      const principal = await api?.useEmployeePosition.findOne({ id: params.proms[0].principalId })
+      const employee = await api?.useEmployee.findOne({ id: principal?.employeeId })
+      const position = await api?.usePosition.findOne({ id: principal?.positionId })
       if (school) {
         setObj({
-          school
+          school,
+          principal: {
+            relation: principal,
+            position,
+            employee
+          }
         })
       }
     }
@@ -38,13 +54,20 @@ export const SchoolCard = (params: Params) => {
           {obj?.school?.name ?? 'Lizard d'}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Dirección: {obj?.school?.location}
-          <br/>
-          Código: {obj?.school?.code}
+          <>
+            Dirección: {obj?.school?.location}
+            <br/>
+            Código: {obj?.school?.code}
+            <br/>
+            {`${obj?.principal?.position?.name}: `}
+            {`${obj?.principal?.employee?.profesion} `}
+            {`${obj?.principal?.employee?.firstName} `}
+            {`${obj?.principal?.employee?.lastName} `}
+          </>
         </Typography>
       </CardContent>
       <CardActions>
-        <Button size="small">Share</Button>
+        <Button size="small">Listados</Button>
         <Button size="small">Share</Button>
         <Button size="small">Learn More</Button>
       </CardActions>
