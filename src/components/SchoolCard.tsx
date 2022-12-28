@@ -2,21 +2,15 @@ import { Card, CardActions, CardContent,CardMedia,Button, Typography} from '@mui
 import { useContext, useEffect, useState } from 'react';
 import { IEmployee, IEmployeePosition, IPosition, IProm, ISchool } from '../api/models_school';
 import { ApiContext } from '../context/ApiContext';
+import { SectionsModal } from './SectionsModal';
+import { SchoolsCardData } from './types';
 
 interface Params {
   proms: IProm[]
 }
 
 export const SchoolCard = (params: Params) => {
-  const [showSections, setShowSections] = useState(false)
-  const [obj, setObj] = useState<{
-    school?: ISchool
-    principal?: {
-      position?: IPosition
-      employee?: IEmployee
-      relation?: IEmployeePosition
-    }
-  } | undefined>()
+  const [obj, setObj] = useState<SchoolsCardData | undefined>()
   const api = useContext(ApiContext)
 
   console.log(params.proms)
@@ -67,7 +61,7 @@ export const SchoolCard = (params: Params) => {
         </Typography>
       </CardContent>
       <CardActions>
-        <Button size="small">Listados</Button>
+        <SectionsModal initOpen={false} prom={params.proms} cardData={obj} />
         <Button size="small">Share</Button>
         <Button size="small">Learn More</Button>
       </CardActions>
