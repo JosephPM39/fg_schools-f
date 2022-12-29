@@ -6,10 +6,25 @@ import Divider from '@mui/material/Divider';
 import { MenuStyled } from '../styles/MenuStyled'
 import { FormControlLabel, Switch } from '@mui/material';
 import { Menu as MenuIcon, SaveAlt as SaveAltIcon } from '@mui/icons-material'
+import { ApiContext } from '../context/ApiContext';
+import { SchoolFormModal } from './SchoolFormModal';
 
 export const NavMenu = () => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const api = React.useContext(ApiContext)
+
+  const postSchool = () => {
+    api?.useSchool.create({
+      data: {
+        "name": "aasdf",
+        "code": "75289-5897",
+        "icon": "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/540.jpg",
+        "location": "aaaaaaaaaaaaaaaaaa"
+      }
+    })
+  }
+
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -40,9 +55,9 @@ export const NavMenu = () => {
         open={open}
         onClose={handleClose}
       >
-        <MenuItem onClick={handleClose}>
+        <MenuItem>
           <EditIcon/>
-          Agregar escuela
+          <SchoolFormModal/>
         </MenuItem>
         <MenuItem onClick={handleClose}>
           <SaveAltIcon/>
