@@ -10,20 +10,18 @@ interface Params {
 }
 
 export const SchoolCard = (params: Params) => {
-  const [obj, setObj] = useState<SchoolsCardData | undefined>()
+  const [obj, setObj] = useState<SchoolsCardData | undefined>(undefined)
   const api = useContext(ApiContext)
-
-  console.log(params.proms)
 
   useEffect(() => {
     const getData = async () => {
-      const school = await api?.useSchool.findOne({ id: params.proms[0].schoolId })
       const principal = await api?.useEmployeePosition.findOne({ id: params.proms[0].principalId })
+      const school = await api?.useSchool.findOne({ id: params.proms[0].schoolId })
       const employee = await api?.useEmployee.findOne({ id: principal?.employeeId })
       const position = await api?.usePosition.findOne({ id: principal?.positionId })
       if (school) {
         setObj({
-          school,
+          school: {...school},
           principal: {
             relation: principal,
             position,
@@ -34,6 +32,8 @@ export const SchoolCard = (params: Params) => {
     }
     if (!obj?.school) getData()
   })
+
+  if (!obj) return <>Without Data</>
 
   return (
     <Card sx={{ maxWidth: 345 }}>
@@ -49,6 +49,8 @@ export const SchoolCard = (params: Params) => {
         </Typography>
         <Typography variant="body2" color="text.secondary">
           <>
+
+            {console.error('Render card', obj.school?.name)}
             Dirección: {obj?.school?.location}
             <br/>
             Código: {obj?.school?.code}

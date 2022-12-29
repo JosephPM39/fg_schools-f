@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { create as apiCreate, read, CreateParams, ReadParams } from '../../api/services'
 import { IBaseModel } from '../../api/models_school/base.model'
 import { ModelClassType } from '../../api/types'
@@ -12,12 +12,7 @@ interface BaseParams<Model extends IBaseModel> {
 
 export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => {
   const [data, setData] = useState<Model[] | undefined>([])
-
-  useEffect(() => {
-    if (data && data.length < 1 && params.autoFetch !== false) {
-      fetch({})
-    }
-  })
+  const [needFetching, setNeedFetching] = useState(false)
 
   const findOne = async ({ id }:{ id: string | Model | undefined}): Promise<Model | undefined> => {
     if (!id) return undefined
@@ -48,15 +43,27 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
     return !!res
   }
 
-  const fetch = async ({query, searchBy }: Pick<ReadParams<Model>, 'query' | 'searchBy'>) => {
+  const fetch = useCallback(async ({query, searchBy }: Pick<ReadParams<Model>, 'query' | 'searchBy'>) => {
     const res = await read<Model>({
       query,
       searchBy,
       ...params
     })
     setData(res)
+    setNeedFetching(false)
     return !!res
-  }
+  }, [params])
+
+  useEffect(() => {
+    if (data && data.length < 1 && params.autoFetch !== false) {
+      setNeedFetching(true)
+    }
+  }, [data, params.autoFetch])
+
+  useEffect(() => {
+    if (!needFetching) return
+    fetch({})
+  }, [needFetching, fetch])
 
   return {
     data,
