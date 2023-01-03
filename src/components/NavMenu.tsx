@@ -55,26 +55,28 @@ export const NavMenu = () => {
         open={open}
         onClose={handleClose}
       >
-        <MenuItem>
-          <EditIcon/>
-          <SchoolFormModal/>
-        </MenuItem>
+        <SchoolFormModal btn={
+          <MenuItem>
+            <EditIcon/>&#8288;Agregar escuela
+          </MenuItem>
+        }
+        />
         <MenuItem onClick={handleClose}>
           <SaveAltIcon/>
-          Respaldar todo
+           &#8288;Respaldar todo
         </MenuItem>
         <MenuItem onClick={handleClose} disableRipple>
           <SettingsIcon/>
-          Ajustes
+          &#8288;Ajustes
         </MenuItem>
         <Divider sx={{ my: 0.5 }} />
         <MenuItem disableRipple disableTouchRipple>
-          <FormControlLabel control={<Switch defaultChecked />} label="Modo offline" />
+          <FormControlLabel control={<Switch defaultChecked />} label="&#8288;Modo offline" />
         </MenuItem>
         <Divider sx={{ my: 0.5 }} />
         <MenuItem onClick={handleClose} disableRipple>
           <LogoutIcon/>
-          Cerrar sesión
+          &#8288;Cerrar sesión
         </MenuItem>
       </MenuStyled>
     </div>

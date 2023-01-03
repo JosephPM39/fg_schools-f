@@ -1,6 +1,6 @@
 import { Card, CardActions, CardContent,CardMedia,Button, Typography} from '@mui/material'
 import { useContext, useEffect, useState } from 'react';
-import { IEmployee, IEmployeePosition, IPosition, IProm, ISchool } from '../api/models_school';
+import { IProm } from '../api/models_school';
 import { ApiContext } from '../context/ApiContext';
 import { SectionsModal } from './SectionsModal';
 import { SchoolsCardData } from './types';
@@ -50,7 +50,7 @@ export const SchoolCard = (params: Params) => {
         <Typography variant="body2" color="text.secondary">
           <>
 
-            {console.error('Render card', obj.school?.name)}
+            {/* console.error('Render card', obj.school?.name)*/ }
             Dirección: {obj?.school?.location}
             <br/>
             Código: {obj?.school?.code}

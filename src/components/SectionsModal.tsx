@@ -14,7 +14,7 @@ export const SectionsModal = (params: Params) => {
   if (!params.prom) return <></>
 
   return (
-    <Modal fullScreen btnLabel='Listados' title={`Escuela: ${params.cardData?.school?.name}`}>
+    <Modal fullScreen btnProps={{ children: 'Listados' }} title={`Escuela: ${params.cardData?.school?.name}`}>
       <SectionsTabs proms={params.prom} />
     </Modal>
   );

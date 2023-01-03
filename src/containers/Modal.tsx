@@ -9,6 +9,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import Slide from '@mui/material/Slide';
 import { TransitionProps } from '@mui/material/transitions';
 import { useShow } from '../hooks/useShow';
+import { MenuItem } from '@mui/material';
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -19,26 +20,39 @@ const Transition = React.forwardRef(function Transition(
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-interface Params {
+export type ModalParams = {
   initOpen?: boolean,
-  btnLabel: string
   title: string
   children: JSX.Element | JSX.Element[]
   fullScreen?: boolean
 }
 
+type Params = ModalParams & (BtnProps | Btn)
+
+export type BtnProps = { btnProps: Omit<Parameters<typeof Button>[0], 'onClick'> }
+export type Btn = { btn: NonNullable<React.ReactNode> }
+
+function isBtnCmp(params: Params): params is ModalParams & Btn {
+  return !!(params as Btn & ModalParams).btn
+}
+
 export const Modal = (params: Params) => {
   const {show, setShow} = useShow(params.initOpen ?? false)
 
+  const Btn = () => {
+    if (isBtnCmp(params)) {
+      const Btn = params.btn
+      return <div onClick={() => setShow(true)}> {Btn} </div>
+    }
+    return <Button {...params.btnProps} onClick={() => setShow(true)} />
+  }
+
   return (
-    <div>
-      <Button variant="outlined" onClick={() => setShow(true)}>
-        {params.btnLabel}
-      </Button>
+    <>
+      {Btn()}
       <Dialog
         fullScreen={params.fullScreen}
         open={show}
-        onClose={() => setShow(false)}
         TransitionComponent={Transition}
       >
         <AppBar sx={{ position: 'relative' }}>
@@ -58,6 +72,6 @@ export const Modal = (params: Params) => {
         </AppBar>
         {params.children}
       </Dialog>
-    </div>
+    </>
   );
 }
