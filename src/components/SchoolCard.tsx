@@ -1,12 +1,12 @@
 import { Card, CardActions, CardContent,CardMedia,Button, Typography} from '@mui/material'
 import { useContext, useEffect, useState } from 'react';
-import { IProm } from '../api/models_school';
+import { ISchoolProm } from '../api/models_school';
 import { ApiContext } from '../context/ApiContext';
 import { SectionsModal } from './SectionsModal';
 import { SchoolsCardData } from './types';
 
 interface Params {
-  proms: IProm[]
+  schoolProm: ISchoolProm
 }
 
 export const SchoolCard = (params: Params) => {
@@ -15,8 +15,8 @@ export const SchoolCard = (params: Params) => {
 
   useEffect(() => {
     const getData = async () => {
-      const principal = await api?.useEmployeePosition.findOne({ id: params.proms[0].principalId })
-      const school = await api?.useSchool.findOne({ id: params.proms[0].schoolId })
+      const principal = await api?.useEmployeePosition.findOne({ id: params.schoolProm.principalId })
+      const school = await api?.useSchool.findOne({ id: params.schoolProm.schoolId })
       const employee = await api?.useEmployee.findOne({ id: principal?.employeeId })
       const position = await api?.usePosition.findOne({ id: principal?.positionId })
       if (school) {
@@ -63,7 +63,7 @@ export const SchoolCard = (params: Params) => {
         </Typography>
       </CardContent>
       <CardActions>
-        <SectionsModal initOpen={false} prom={params.proms} cardData={obj} />
+        <SectionsModal initOpen={false} schoolProm={params.schoolProm} cardData={obj} />
         <Button size="small">Share</Button>
         <Button size="small">Learn More</Button>
       </CardActions>

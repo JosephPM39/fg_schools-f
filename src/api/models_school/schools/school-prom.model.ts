@@ -8,19 +8,7 @@ import { EmployeePosition, IEmployeePosition } from './employee-position.model'
 import { ITitle, Title } from './title.model'
 
 @Exclude()
-export class Prom extends BaseModel {
-  @Expose({ since: EV.UPDATE, until: EV.CREATE_NESTED })
-  @IsUUID()
-    groupId: IGroup['id']
-
-  @Expose({ since: EV.UPDATE, until: EV.CREATE_NESTED })
-  @IsUUID()
-    titleId: ITitle['id']
-
-  @Expose({ since: EV.UPDATE, until: EV.CREATE_NESTED })
-  @IsUUID()
-    profesorId: IEmployeePosition['id']
-
+export class SchoolProm extends BaseModel {
   @Expose({ since: EV.UPDATE, until: EV.CREATE_NESTED })
   @IsUUID()
     principalId: IEmployeePosition['id']
@@ -38,21 +26,6 @@ export class Prom extends BaseModel {
   // RELATIONS
 
   @Expose({ since: EV.CREATE_NESTED, until: EV.DELETE })
-  @ValidateIf(o => !o.groupId)
-  @ValidateNested()
-    group: Group
-
-  @Expose({ since: EV.CREATE_NESTED, until: EV.DELETE })
-  @ValidateIf(o => !o.titleId)
-  @ValidateNested()
-    title: Title
-
-  @Expose({ since: EV.CREATE_NESTED, until: EV.DELETE })
-  @ValidateIf(o => !o.profesorId)
-  @ValidateNested()
-    profesor: EmployeePosition
-
-  @Expose({ since: EV.CREATE_NESTED, until: EV.DELETE })
   @ValidateIf(o => !o.principalId)
   @ValidateNested()
     principal: EmployeePosition
@@ -64,4 +37,4 @@ export class Prom extends BaseModel {
 
 }
 
-export interface IProm extends Prom {}
+export interface ISchoolProm extends SchoolProm {}

@@ -64,13 +64,12 @@ export const queryFilter = <Model extends IBaseModel>(json: Model[], query: IQue
   return json
 }
 
-export const filter = <Model extends IBaseModel>(json: Model[], searchBy: Model) => {
+export const filterBy = <Model extends IBaseModel>(json: Model[], searchBy: Partial<Model>) => {
   return json.filter((obj) => {
     const keys = Object.keys(searchBy)
     const res = keys.filter(
       (key) => {
-        if(key in obj) return !!obj[key as keyof typeof obj]
-        return false
+        return obj[key as keyof typeof obj] === searchBy[key as keyof typeof searchBy]
       }
     )
     return res.length === keys.length

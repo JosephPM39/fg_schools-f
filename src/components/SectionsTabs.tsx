@@ -1,14 +1,14 @@
 import * as React from 'react';
-import { IProm, ITitle, IGroup } from '../api/models_school';
+import { ITitle, IGroup, ISectionProm } from '../api/models_school';
 import { Tabs } from '../containers/Tabs';
 import { ApiContext } from '../context/ApiContext';
 
 interface Params {
-  proms: IProm[]
+  sectionProms: ISectionProm[]
 }
 
 interface Section {
-  promId?: IProm['id']
+  sectionPromId?: ISectionProm['id']
   title?: ITitle
   group?: IGroup
 }
@@ -21,9 +21,9 @@ export const SectionsTabs = (params: Params) => {
   React.useEffect(() => {
     const getData = async () => {
       const sectionsBuilt = await Promise.all(
-        params.proms.map(
+        params.sectionProms.map(
           async (prom) => ({
-            promId: prom.id,
+            sectionPromId: prom.id,
             title: await api?.useTitle.findOne({id: prom.titleId}),
             group: await api?.useGroup.findOne({id: prom.groupId})
           })
@@ -37,8 +37,8 @@ export const SectionsTabs = (params: Params) => {
   })
 
   React.useEffect(() => {
-    const getSection = (prom: IProm) => {
-      return sections.find((s) => s.promId === prom.id)
+    const getSection = (prom: ISectionProm) => {
+      return sections.find((s) => s.sectionPromId === prom.id)
     }
 
     const getSectionName = (section?: Section) => {
@@ -46,14 +46,14 @@ export const SectionsTabs = (params: Params) => {
     }
 
     const fillTabsData = () => {
-      return params.proms.map((prom) => ({
+      return params.sectionProms.map((prom) => ({
         label: getSectionName(getSection(prom)),
         content: <>{prom.id}</>
       }))
     }
     const res = fillTabsData()
     setList(res)
-  }, [sections, params.proms])
+  }, [sections, params.sectionProms])
 
   return <Tabs data={list} orientation='vertical' idPrefix='sections' />
 }

@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react'
-import { IProm, Prom } from '../../../api/models_school'
+import { ISchoolProm, SchoolProm } from '../../../api/models_school'
 import { useBase } from '../useBase'
 
-export const useProm = ({offline}: {offline: boolean}) => {
+export const useSchoolProm = ({offline}: {offline: boolean}) => {
   const [year, setYear] = useState<number>(new Date().getFullYear())
 
-  const hook = useBase<IProm>({
-    path: 'schools/prom',
+  const hook = useBase<ISchoolProm>({
+    path: 'schools/school-prom',
     offline,
-    model: Prom,
+    model: SchoolProm,
     autoFetch: false
   })
 

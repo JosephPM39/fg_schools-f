@@ -1,8 +1,29 @@
 import { Tabs } from '../containers/Tabs';
 import { Modal, Btn, BtnProps } from '../containers/Modal'
 import { SchoolFormInputs } from './SchoolFormInputs';
+import { FormEvent, useRef } from 'react';
 
 export const SchoolFormModal = ({btn}:{btn?: React.ReactNode}) => {
+
+  const form = useRef<HTMLFormElement | null>(null)
+
+  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    if (form.current) {
+      const data = new FormData(form.current)
+      console.log(form, 'form')
+      console.log(data.get('name'), 'data')
+    }
+  }
+
+  const Form = () => {
+    return <>
+      <form ref={form} onSubmit={onSubmit}>
+        <SchoolFormInputs/>
+        <input type='submit'/>
+      </form>
+    </>
+  }
 
   const list = [
     {
@@ -11,7 +32,7 @@ export const SchoolFormModal = ({btn}:{btn?: React.ReactNode}) => {
     },
     {
       label: 'Nueva',
-      content: <SchoolFormInputs />
+      content: <Form/>
     }
   ]
   const mBtn = (): Btn | BtnProps => {

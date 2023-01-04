@@ -3,7 +3,7 @@ import {validateDto, validateIdBy, validateQuery} from '../validations'
 import { EXPOSE_VERSIONS as EV, ModelClassType } from '../types'
 import { post, get, getFiltered } from "./apiRequest";
 import { IQuery } from "../validations/query"
-import { filter, queryFilter } from './utils'
+import { filterBy, queryFilter } from './utils'
 
 interface BaseParams<Model> {
   path: string
@@ -73,7 +73,7 @@ export const read = async <Model extends IBaseModel>(params: ReadParams<Model>) 
     let json : Model[] = JSON.parse(res)
 
     if (searchBy) {
-      json = [...filter(json, searchBy) ]
+      json = [...filterBy(json, searchBy) ]
     }
 
     if (query) {

@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react"
 import { useSchool } from "./api/schools/useSchool"
-import { useProm } from './api/schools/useProm'
 import { useEmployeePosition } from "./api/schools/useEmployeePosition"
 import { useEmployee } from "./api/schools/useEmployee"
 import { useTitle } from "./api/schools/useTitle"
 import { useGroup } from "./api/schools/useGroup"
 import { usePosition } from "./api/schools/usePosition"
+import { useSectionProm } from "./api/schools/useSectionProm"
+import { useSchoolProm } from "./api/schools/useSchoolProm"
 
 export const useApi = () => {
   const [status, setStatus] = useState({
@@ -43,7 +44,8 @@ export const useApi = () => {
     goOffline,
     goOnline,
     useSchool: useSchool({offline: status.offlineMode}),
-    useProm: useProm({offline: status.offlineMode}),
+    useSchoolProm: useSchoolProm({offline: status.offlineMode}),
+    useSectionProm: useSectionProm({offline: status.offlineMode}),
     useEmployee: useEmployee({offline: status.offlineMode}),
     useTitle: useTitle({offline: status.offlineMode}),
     useGroup: useGroup({offline: status.offlineMode}),
