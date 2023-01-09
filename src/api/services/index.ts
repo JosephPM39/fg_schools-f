@@ -1,6 +1,6 @@
 import { IBaseModel } from "../models_school/base.model";
 import {validateDto, validateIdBy, validateQuery} from '../validations'
-import { EXPOSE_VERSIONS as EV, ModelClassType } from '../types'
+import { EXPOSE_VERSIONS as EV, ModelClassType, QueryUsed } from '../types'
 import { post, get, getFiltered } from "./apiRequest";
 import { IQuery } from "../validations/query"
 import { filterBy, queryFilter } from './utils'
@@ -70,14 +70,14 @@ export const read = async <Model extends IBaseModel>(params: ReadParams<Model>) 
   if (params.offline) {
     const res = window.localStorage.getItem(path)
     if (!res) return
-    let json : Model[] = JSON.parse(res)
+    let json : { data: Model[], queryUsed: QueryUsed } = JSON.parse(res)
 
     if (searchBy) {
-      json = [...filterBy(json, searchBy) ]
+      json.data = [...filterBy(json.data, searchBy) ]
     }
 
     if (query) {
-      json = [...queryFilter(json, query)]
+      json.data = [...queryFilter(json.data, query)]
     }
     return json
   }

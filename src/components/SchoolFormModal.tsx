@@ -2,6 +2,7 @@ import { Tabs } from '../containers/Tabs';
 import { Modal, Btn, BtnProps } from '../containers/Modal'
 import { SchoolFormInputs } from './SchoolFormInputs';
 import { FormEvent, useRef } from 'react';
+import { EmployeePositionFormInputs } from './EmployeePositionFormInputs';
 
 export const SchoolFormModal = ({btn}:{btn?: React.ReactNode}) => {
 
@@ -20,6 +21,7 @@ export const SchoolFormModal = ({btn}:{btn?: React.ReactNode}) => {
     return <>
       <form ref={form} onSubmit={onSubmit}>
         <SchoolFormInputs/>
+        <EmployeePositionFormInputs/>
         <input type='submit'/>
       </form>
     </>

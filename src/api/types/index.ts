@@ -1,5 +1,5 @@
 import { ValidatorOptions } from 'class-validator'
-import { ClassConstructor } from 'class-transformer'
+import { ClassConstructor, ClassTransformOptions } from 'class-transformer'
 import { IQuery } from '../validations/query'
 
 export enum EXPOSE_VERSIONS {
@@ -32,9 +32,11 @@ export interface DeleteParams {
   softDelete?: boolean
 }
 
+export type QueryUsed = Partial<IQuery> & { count: number }
+
 export interface IController<Model> {
   create: (params: CreateParams) => Promise<boolean | Model[]>
-  read: (params: ReadParams) => Promise<null | Model[]>
+  read: (params: ReadParams) => Promise<{ data: null | Model[], queryUsed: QueryUsed}>
   update: (params: UpdateParams) => Promise<boolean>
   delete: (params: DeleteParams) => Promise<boolean>
 }
@@ -46,6 +48,7 @@ export interface ValidateDtoOptions<Model> {
   model: ModelClassType<Model>
   version?: EXPOSE_VERSIONS
   validatorOptions?: ValidatorOptions
+  transformOptions?: ClassTransformOptions
 }
 
 export interface ValidateIdOptions<Model> {

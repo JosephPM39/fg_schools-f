@@ -25,9 +25,9 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
       searchBy: id,
       ...params
     })
-    if (!remote) return undefined
-    data.push(...remote)
-    return remote[0]
+    if (!remote?.data) return undefined
+    data.push(...remote.data)
+    return remote.data?.[0]
   }
 
   const findBy = async (searchBy: Partial<Model> | undefined): Promise<Model[] | undefined> => {
@@ -40,9 +40,9 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
       searchBy,
       ...params
     })
-    if (!remote) return undefined
-    data.push(...remote)
-    return remote
+    if (!remote?.data) return undefined
+    data.push(...remote.data)
+    return remote.data
   }
 
   const create = async ({data: dto }: Pick<CreateParams<Model>, 'data'>) => {
@@ -62,7 +62,7 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
       searchBy,
       ...params
     })
-    setData(res)
+    setData(res?.data)
     setNeedFetching(false)
     return !!res
   }, [params])

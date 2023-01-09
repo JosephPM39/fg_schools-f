@@ -1,5 +1,6 @@
 import { CONFIG } from '../../config'
 import { IBaseModel } from '../models_school/base.model'
+import { QueryUsed } from '../types'
 import { PostParams, GetParams, PatchParams, DeleteParams } from './types'
 import { removeOfflineFlag, addOfflineFlag, searchByHandler } from './utils'
 
@@ -20,8 +21,11 @@ export const get = async <Model extends IBaseModel>(params: GetParams) => {
   const path = `${CONFIG.schoolsApiUrl}${params.path}/${id}${searchParams}`
 
   const res = await fetch(path)
-
-  return addOfflineFlag<Model>(await res.json())
+  const json = await res.json()
+  return {
+    data: addOfflineFlag<Model>(json.data),
+    queryUsed: json.queryUsed as QueryUsed
+  }
 }
 
 export const getFiltered = async <Model extends IBaseModel>(params: GetParams) => {
@@ -34,7 +38,11 @@ export const getFiltered = async <Model extends IBaseModel>(params: GetParams) =
     body
   })
 
-  return addOfflineFlag<Model>(await res.json())
+  const json = await res.json()
+  return {
+    data: addOfflineFlag<Model>(json.data),
+    queryUsed: json.queryUsed as QueryUsed
+  }
 }
 
 export const patch = async <Model>(params: PatchParams<Model>) => {
