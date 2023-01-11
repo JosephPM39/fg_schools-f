@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { ITitle, IGroup, ISectionProm } from '../api/models_school';
 import { Tabs } from '../containers/Tabs';
-import { ApiContext } from '../context/ApiContext';
+import { GroupContext, TitleContext } from '../context/api/schools';
 
 interface Params {
   sectionProms: ISectionProm[]
@@ -16,7 +16,8 @@ interface Section {
 export const SectionsTabs = (params: Params) => {
   const [sections, setSections] = React.useState<Array<Section>>([])
   const [list, setList] = React.useState<Array<{label: string, content: JSX.Element}>>([])
-  const api = React.useContext(ApiContext)
+  const useTitle = React.useContext(TitleContext)
+  const useGroup = React.useContext(GroupContext)
 
   React.useEffect(() => {
     const getData = async () => {
@@ -24,8 +25,8 @@ export const SectionsTabs = (params: Params) => {
         params.sectionProms.map(
           async (prom) => ({
             sectionPromId: prom.id,
-            title: await api?.useTitle.findOne({id: prom.titleId}),
-            group: await api?.useGroup.findOne({id: prom.groupId})
+            title: await useTitle?.findOne({id: prom.titleId}),
+            group: await useGroup?.findOne({id: prom.groupId})
           })
         )
       )
@@ -34,7 +35,7 @@ export const SectionsTabs = (params: Params) => {
       }
     }
     if (sections?.length < 1) getData()
-  })
+  }, [useGroup, useTitle, useGroup?.data, useTitle?.data, params.sectionProms, sections?.length])
 
   React.useEffect(() => {
     const getSection = (prom: ISectionProm) => {

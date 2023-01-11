@@ -43,13 +43,13 @@ export const useApi = () => {
     status,
     goOffline,
     goOnline,
-    useSchool: useSchool({offline: status.offlineMode}),
-    useSchoolProm: useSchoolProm({offline: status.offlineMode}),
-    useSectionProm: useSectionProm({offline: status.offlineMode}),
-    useEmployee: useEmployee({offline: status.offlineMode}),
-    useTitle: useTitle({offline: status.offlineMode}),
-    useGroup: useGroup({offline: status.offlineMode}),
-    useEmployeePosition: useEmployeePosition({offline: status.offlineMode}),
-    usePosition: usePosition({offline: status.offlineMode})
+    useSchool: useSchool(),
+    useSchoolProm: useSchoolProm(),
+    useSectionProm: useSectionProm(),
+    useEmployee: useEmployee(),
+    useTitle: useTitle(),
+    useGroup: useGroup(),
+    useEmployeePosition: useEmployeePosition(),
+    usePosition: usePosition()
   }
 }

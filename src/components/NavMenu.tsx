@@ -1,4 +1,4 @@
-import * as React from 'react';
+import {useContext, useState} from 'react';
 import Button from '@mui/material/Button';
 import { Settings as SettingsIcon, Edit as EditIcon, Logout as LogoutIcon } from '@mui/icons-material'
 import MenuItem from '@mui/material/MenuItem';
@@ -6,16 +6,16 @@ import Divider from '@mui/material/Divider';
 import { MenuStyled } from '../styles/MenuStyled'
 import { FormControlLabel, Switch } from '@mui/material';
 import { Menu as MenuIcon, SaveAlt as SaveAltIcon } from '@mui/icons-material'
-import { ApiContext } from '../context/ApiContext';
 import { SchoolFormModal } from './SchoolFormModal';
+import { SchoolContext } from '../context/api/schools';
 
 export const NavMenu = () => {
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const api = React.useContext(ApiContext)
+  const useSchool = useContext(SchoolContext)
 
   const postSchool = () => {
-    api?.useSchool.create({
+    useSchool?.create({
       data: {
         "name": "aasdf",
         "code": "75289-5897",

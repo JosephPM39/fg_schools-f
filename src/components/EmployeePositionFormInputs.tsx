@@ -1,12 +1,12 @@
 import { TextField, Box, Typography, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent } from "@mui/material"
 import { useContext, useEffect, useState } from "react"
 import { IEmployeePosition, IPosition } from "../api/models_school"
-import { ApiContext } from "../context/ApiContext"
+import { EmployeeContext, PositionContext } from "../context/api/schools"
 
 export const EmployeePositionFormInputs = (params?: Partial<IEmployeePosition>) => {
   const [obj, setObj] = useState<Partial<IEmployeePosition>>()
-  const api = useContext(ApiContext)
-  const usePosition = api?.usePosition
+  const usePosition = useContext(PositionContext)
+  const useEmployee = useContext(EmployeeContext)
   const [positionId, setPositionId] = useState<IPosition['id'] | undefined>()
 
   useEffect(() => {
@@ -14,8 +14,8 @@ export const EmployeePositionFormInputs = (params?: Partial<IEmployeePosition>) 
       return setObj(params)
     }
     const getData = async () => {
-      const employee = await api?.useEmployee.findOne({ id: params?.employeeId })
-      const position = await api?.usePosition.findOne({ id: params?.positionId })
+      const employee = await useEmployee?.findOne({ id: params?.employeeId })
+      const position = await usePosition?.findOne({ id: params?.positionId })
       setObj({
         employee,
         position
@@ -25,7 +25,7 @@ export const EmployeePositionFormInputs = (params?: Partial<IEmployeePosition>) 
     if (params && !obj) {
       getData()
     }
-  }, [params, api?.useEmployee, api?.usePosition, obj])
+  }, [params, useEmployee, usePosition, obj])
 
   const handleChange = (event: SelectChangeEvent) => {
     setPositionId(event?.target?.value as IPosition['id'])

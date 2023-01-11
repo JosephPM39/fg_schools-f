@@ -1,7 +1,7 @@
 import { Card, CardActions, CardContent,CardMedia,Button, Typography} from '@mui/material'
 import { useContext, useEffect, useState } from 'react';
 import { ISchoolProm } from '../api/models_school';
-import { ApiContext } from '../context/ApiContext';
+import { EmployeeContext, EmployeePositionContext, PositionContext, SchoolContext } from '../context/api/schools';
 import { SectionsModal } from './SectionsModal';
 import { SchoolsCardData } from './types';
 
@@ -11,14 +11,17 @@ interface Params {
 
 export const SchoolCard = (params: Params) => {
   const [obj, setObj] = useState<SchoolsCardData | undefined>(undefined)
-  const api = useContext(ApiContext)
+  const useEmployeePosition = useContext(EmployeePositionContext)
+  const useSchool = useContext(SchoolContext)
+  const useEmployee = useContext(EmployeeContext)
+  const usePosition = useContext(PositionContext)
 
   useEffect(() => {
     const getData = async () => {
-      const principal = await api?.useEmployeePosition.findOne({ id: params.schoolProm.principalId })
-      const school = await api?.useSchool.findOne({ id: params.schoolProm.schoolId })
-      const employee = await api?.useEmployee.findOne({ id: principal?.employeeId })
-      const position = await api?.usePosition.findOne({ id: principal?.positionId })
+      const principal = await useEmployeePosition?.findOne({ id: params.schoolProm.principalId })
+      const school = await useSchool?.findOne({ id: params.schoolProm.schoolId })
+      const employee = await useEmployee?.findOne({ id: principal?.employeeId })
+      const position = await usePosition?.findOne({ id: principal?.positionId })
       if (school) {
         setObj({
           school: {...school},
@@ -31,7 +34,7 @@ export const SchoolCard = (params: Params) => {
       }
     }
     if (!obj?.school) getData()
-  })
+  }, [useSchool, useEmployee, usePosition, useEmployeePosition, params.schoolProm, obj?.school])
 
   if (!obj) return <>Without Data</>
 

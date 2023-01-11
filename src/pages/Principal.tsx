@@ -1,12 +1,19 @@
 import { Grid } from '@mui/material'
 import { NavBar } from '../containers/NavBar'
 import { SearchField } from '../components/SearchField'
-import { useContext } from 'react'
-import { ApiContext } from '../context/ApiContext'
 import { SchoolCard } from '../components/SchoolCard'
+import { useContext } from 'react'
+import { SchoolPromContext } from '../context/api/schools/'
+import { SessionContext } from '../context/SessionContext'
+import { Unauthorized } from './Unauthorized'
 
 export const Principal = () => {
-  const schoolProms = useContext(ApiContext)?.useSchoolProm
+  const schoolProms = useContext(SchoolPromContext)
+  const useSession = useContext(SessionContext)
+
+  if (!useSession?.user.token) {
+    return <Unauthorized/>
+  }
 
   const Cards = () => {
     return schoolProms?.data?.map((prom, index)=> (
