@@ -17,7 +17,7 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
   const offline = false
 
   const findOneLocal = ({id}: {id?: Model['id']}) => {
-    const local = data?.find((e) => e.id === id) ?? null
+    const local = data?.find((e) => e.id === id) ?? undefined
     if (local) return local
   }
 
@@ -31,13 +31,23 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
       ...params,
       offline
     }))
-    if (!remote?.data) return undefined
+
+    /* if (!remote) {
+      const coldown = new Promise<Model | undefined>((res, rej) => {
+        setTimeout(() => {
+          res(findOneLocal({id}))
+        }, 500)
+      })
+      return await coldown
+    } */
+
+    if (!remote?.data || remote?.data?.length < 1) return undefined
 
     if (!findOneLocal({id})){
       data.push(...remote.data)
     }
 
-    return remote.data?.[0]
+    return remote.data[0]
   }
 
   const findBy = async (searchBy: Partial<Model> | undefined): Promise<Model[] | undefined> => {
@@ -68,25 +78,6 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
     }
     return !!res
   }
-
-  /* const fetch = useCallback(({query, searchBy }: Pick<ReadParams<Model>, 'query' | 'searchBy'>) => new Promise<boolean>((resolve, reject) => {
-    debounce(() => {
-      read<Model>({
-        query,
-        searchBy,
-        ...params,
-        offline
-      }).then((res) => {
-        setData(res?.data)
-        setNeedFetching(false)
-        resolve(!!res)
-      }).catch((_) => {
-        reject(false)
-      })
-    })
-  })
-  , [params, offline, debounce])
-*/
 
   const fetch = useCallback(async ({
     query,

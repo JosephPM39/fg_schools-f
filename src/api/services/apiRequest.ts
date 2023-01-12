@@ -3,6 +3,7 @@ import { IBaseModel } from '../models_school/base.model'
 import { QueryUsed } from '../types'
 import { PostParams, GetParams, PatchParams, DeleteParams } from './types'
 import { removeOfflineFlag, addOfflineFlag, searchByHandler } from './utils'
+import { fetchOnce } from './utils'
 
 export const post = async <Model extends IBaseModel>(params: PostParams<Model>) => {
   const data = removeOfflineFlag<Model>(params.data)
@@ -15,27 +16,13 @@ export const post = async <Model extends IBaseModel>(params: PostParams<Model>) 
   return addOfflineFlag<Model>(await res.json())
 }
 
-const requests: Array<string> = []
-
 export const get = async <Model extends IBaseModel>(params: GetParams) => {
-
   const { id } = searchByHandler(params.searchBy)
   const searchParams = new URLSearchParams(params.query)
   const path = `${CONFIG.schoolsApiUrl}${params.path}/${id}${searchParams}`
 
-  if (requests.includes(path)) {
-    // console.log('Errors, ', requests)
-    return undefined
-  }
-  requests.push(path)
-
-  const res = await fetch(path)
-
-  const index = requests.findIndex((e) => e === path)
-  // console.log('elemetns to delete ', requests[index])
-  delete requests[index]
-  // console.log('elemetns deleted', requests[index])
-
+  const res = await fetchOnce(path)
+  if (!res) return
   const json = await res.json()
 
   return {
@@ -49,22 +36,13 @@ export const getFiltered = async <Model extends IBaseModel>(params: GetParams) =
   const searchParams = new URLSearchParams(params.query)
   const path = `${CONFIG.schoolsApiUrl}${params.path}/get-filtered${searchParams}`
 
-  if (requests.includes(path)) {
-    // console.log('Errors, ', requests)
-    return undefined
-  }
-  requests.push(path)
-
-  const res = await fetch(path, {
+  const res = await fetchOnce(path, {
     method: 'POST',
     body
   })
-  const index = requests.findIndex((e) => e === path)
-  // console.log('elemetns to delete ', requests[index])
-  delete requests[index]
-  // console.log('elemetns deleted', requests[index])
-
+  if (!res) return
   const json = await res.json()
+
   return {
     data: addOfflineFlag<Model>(json.data),
     queryUsed: json.queryUsed as QueryUsed

@@ -33,8 +33,18 @@ export const SchoolCard = (params: Params) => {
         })
       }
     }
-    if (!obj?.school) getData()
-  }, [useSchool, useEmployee, usePosition, useEmployeePosition, params.schoolProm, obj?.school])
+    getData()
+  }, [
+    useSchool,
+    useEmployee,
+    usePosition,
+    useEmployeePosition,
+    useSchool?.data?.length,
+    useEmployee?.data?.length,
+    usePosition?.data?.length,
+    useEmployeePosition?.data?.length,
+    params.schoolProm,
+  ])
 
   if (!obj) return <>Without Data</>
 

@@ -2,6 +2,22 @@ import { IBaseModel } from '../models_school/base.model'
 import { IQuery } from '../validations/query'
 import { Data } from './types'
 
+const requests: Array<string> = []
+
+export const fetchOnce = async (input: RequestInfo, init?: RequestInit) => {
+  const request = `${input.toString()}${init?.toString()}`
+  if (requests.includes(request)) {
+    return undefined
+  }
+  requests.push(request)
+
+  const response = await fetch(input, init)
+
+  const index = requests.findIndex((e) => e === request)
+  delete requests[index]
+  return response
+}
+
 export const removeOfflineFlag = <Model extends IBaseModel>(data: Data<Model>): Model[] | Model => {
   if (!Array.isArray(data)) {
     delete data.offline

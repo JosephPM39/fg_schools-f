@@ -34,8 +34,8 @@ export const SectionsTabs = (params: Params) => {
         setSections(sectionsBuilt)
       }
     }
-    if (sections?.length < 1) getData()
-  }, [useGroup, useTitle, useGroup?.data, useTitle?.data, params.sectionProms, sections?.length])
+    getData()
+  }, [useGroup, useTitle, useGroup?.data?.length, useTitle?.data?.length, params.sectionProms])
 
   React.useEffect(() => {
     const getSection = (prom: ISectionProm) => {
