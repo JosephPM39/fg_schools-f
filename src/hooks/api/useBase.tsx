@@ -32,15 +32,6 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
       offline
     }))
 
-    /* if (!remote) {
-      const coldown = new Promise<Model | undefined>((res, rej) => {
-        setTimeout(() => {
-          res(findOneLocal({id}))
-        }, 500)
-      })
-      return await coldown
-    } */
-
     if (!remote?.data || remote?.data?.length < 1) return undefined
 
     if (!findOneLocal({id})){

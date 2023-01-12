@@ -1,21 +1,34 @@
 import { TextField, Box, Typography, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent } from "@mui/material"
 import { useContext, useEffect, useState } from "react"
-import { IEmployeePosition, IPosition } from "../api/models_school"
-import { EmployeeContext, PositionContext } from "../context/api/schools"
+import { IEmployeePosition, IPosition } from "../../api/models_school"
+import { EmployeeContext, PositionContext } from "../../context/api/schools"
 
-export const EmployeePositionFormInputs = (params?: Partial<IEmployeePosition>) => {
+interface EPFIParams {
+  type?: IPosition['type']
+  initData?: Partial<IEmployeePosition>
+}
+
+export const EmployeePositionFormInputs = (params?: EPFIParams) => {
   const [obj, setObj] = useState<Partial<IEmployeePosition>>()
   const usePosition = useContext(PositionContext)
   const useEmployee = useContext(EmployeeContext)
   const [positionId, setPositionId] = useState<IPosition['id'] | undefined>()
+  const [positions, setPositions] = useState<Array<IPosition> | undefined>([])
 
   useEffect(() => {
-    if (params?.employee && params.position && !obj) {
-      return setObj(params)
+    if (params?.initData?.employee && params?.initData?.position && !obj) {
+      setObj(params.initData)
+      setPositionId(params.initData.position.id)
     }
     const getData = async () => {
-      const employee = await useEmployee?.findOne({ id: params?.employeeId })
-      const position = await usePosition?.findOne({ id: params?.positionId })
+      const employee = await useEmployee?.findOne({ id: params?.initData?.employeeId })
+      const position = await usePosition?.findOne({ id: params?.initData?.positionId })
+      if (params?.type) {
+        setPositions(await usePosition?.findBy({type: params.type}))
+      }
+      if (!params?.type) {
+        setPositions(usePosition?.data)
+      }
       setObj({
         employee,
         position
@@ -32,16 +45,15 @@ export const EmployeePositionFormInputs = (params?: Partial<IEmployeePosition>) 
   }
 
   return <>
-    <Typography>Encargado:</Typography>
     <Box
       sx={{
         '& > :not(style)': { m: 1 },
       }}
     >
-      <TextField value={obj?.employee?.firstName} name="first_name" label="Nombre(s)" variant="filled" required/>
-      <TextField value={obj?.employee?.lastName} name="last_name" label="Apellido(s)" variant="filled" required/>
-      <TextField value={obj?.employee?.contact} name="contact" label="Contacto" variant="filled" required/>
-      <TextField value={obj?.employee?.profesion} name="profesion" label="Profesión" variant="filled" required/>
+      <TextField value={obj?.employee?.firstName} name="first_name" label="Nombre(s)" variant="outlined" required/>
+      <TextField value={obj?.employee?.lastName} name="last_name" label="Apellido(s)" variant="outlined" required/>
+      <TextField value={obj?.employee?.contact} name="contact" label="Contacto" variant="outlined" required/>
+      <TextField value={obj?.employee?.profesion} name="profesion" label="Profesión" variant="outlined" required/>
       <FormControl>
         <InputLabel id="demo-simple-select-label">Cargo</InputLabel>
         <Select
@@ -52,7 +64,7 @@ export const EmployeePositionFormInputs = (params?: Partial<IEmployeePosition>) 
           onChange={handleChange}
         >
           <MenuItem value={'null'} key={`menu-item-position-null`}>No seleccionado</MenuItem>
-          {usePosition?.data?.map(
+          {positions?.map(
             (position, index) => <MenuItem value={position.id} key={`menu-item-position-${index}`}> {position.name} </MenuItem>
           )}
           <MenuItem value='new' key={`menu-item-position-new`}>Nuevo</MenuItem>

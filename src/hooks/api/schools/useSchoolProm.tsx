@@ -12,10 +12,8 @@ export const useSchoolProm = () => {
   })
 
   useEffect(() => {
-    if (hook.data && hook.data.length < 1) {
-      hook.fetch({searchBy: { year }})
-    }
-  })
+    hook.fetch({searchBy: { year }})
+  }, [year])
 
   return {
     ...hook,

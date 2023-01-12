@@ -1,18 +1,20 @@
-import {useContext, useState} from 'react';
+import { useContext, useState} from 'react';
 import Button from '@mui/material/Button';
 import { Settings as SettingsIcon, Edit as EditIcon, Logout as LogoutIcon } from '@mui/icons-material'
 import MenuItem from '@mui/material/MenuItem';
 import Divider from '@mui/material/Divider';
 import { MenuStyled } from '../styles/MenuStyled'
-import { FormControlLabel, Switch } from '@mui/material';
+import { FormControl, FormControlLabel, InputLabel, Select, SelectChangeEvent, Switch } from '@mui/material';
 import { Menu as MenuIcon, SaveAlt as SaveAltIcon } from '@mui/icons-material'
-import { SchoolFormModal } from './SchoolFormModal';
-import { SchoolContext } from '../context/api/schools';
+import { SchoolFormModal } from './forms/SchoolFormModal';
+import { SchoolContext, SchoolPromContext } from '../context/api/schools';
+import { isNumber } from 'class-validator';
 
 export const NavMenu = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const useSchool = useContext(SchoolContext)
+  const useSchoolProm = useContext(SchoolPromContext)
 
   const postSchool = () => {
     useSchool?.create({
@@ -23,6 +25,35 @@ export const NavMenu = () => {
         "location": "aaaaaaaaaaaaaaaaaa"
       }
     })
+  }
+
+  const handleChange = (event: SelectChangeEvent) => {
+    const year = parseInt(String(event?.target?.value))
+    if (isNumber(year)) {
+      useSchoolProm?.setYear(year)
+    }
+  }
+
+  const years = [...new Array(111)].map((_, i) => i + 1990)
+
+  const YearSelect = () => {
+    return (
+      <FormControl fullWidth size='small'>
+        <InputLabel id="year-select-label">&#8288;Año</InputLabel>
+        <Select
+          fullWidth
+          labelId="year-select-label"
+          id="year-select"
+          value={String(useSchoolProm?.year) ?? 'null'}
+          label="&#8288;Año"
+          onChange={handleChange}
+        >
+          {years.map(
+            (year, index) => <MenuItem value={year} key={`menu-item-position-${index}`}> {year} </MenuItem>
+          )}
+        </Select>
+      </FormControl>
+    )
   }
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -55,6 +86,9 @@ export const NavMenu = () => {
         open={open}
         onClose={handleClose}
       >
+        <MenuItem disableRipple>
+          <YearSelect/>
+        </MenuItem>
         <SchoolFormModal btn={
           <MenuItem>
             <EditIcon/>&#8288;Agregar escuela
@@ -78,6 +112,8 @@ export const NavMenu = () => {
           <LogoutIcon/>
           &#8288;Cerrar sesión
         </MenuItem>
+
+
       </MenuStyled>
     </div>
   );
