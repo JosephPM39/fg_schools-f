@@ -14,7 +14,7 @@ const Form = () => {
   const [schoolOrigin, setSchoolOrigin] = useState<string>('new')
   const [principalOrigin, setPrincipalOrigin] = useState<string>('new')
   const [schoolSelected, setSchoolSelected] = useState<ISchoolProm>()
-  const employeePositionSelectHook = useState<Partial<IEmployeePosition>>()
+  const [epSelected, setEPSelected] = useState<Partial<IEmployeePosition>>()
 
   const [schoolInput, setSchoolInput] = useState<ReactNode>(<>Loading</>)
   const [principalInput, setPrincipalInput] = useState<ReactNode>(<>Loading</>)
@@ -37,6 +37,12 @@ const Form = () => {
     }
   }
 
+  useEffect(() => {
+    if (!schoolSelected && principalOrigin === 'previous') {
+      setPrincipalOrigin('new')
+    }
+  }, [schoolSelected, principalOrigin])
+
   const onChangePrincipalOrigin = (e: ChangeEvent<HTMLInputElement>) => {
     setPrincipalOrigin(e.target.value)
   }
@@ -47,13 +53,14 @@ const Form = () => {
       inputs = <EmployeePositionFormInputs type={PositionType.PRINCIPAL} />
     }
     if (principalOrigin === 'previous') {
-      inputs = <SelectEmployeePosition schoolProm={schoolSelected} hook={employeePositionSelectHook} type={PositionType.PRINCIPAL} />
+      console.log(schoolSelected,'Escuela seleccionada')
+      inputs = <SelectEmployeePosition schoolProm={schoolSelected} hook={[epSelected, setEPSelected]} type={PositionType.PRINCIPAL} />
     }
     if (principalOrigin === 'all') {
-      inputs = <SelectEmployeePosition hook={employeePositionSelectHook} type={PositionType.PRINCIPAL} />
+      inputs = <SelectEmployeePosition hook={[epSelected, setEPSelected]} type={PositionType.PRINCIPAL} />
     }
     setPrincipalInput(inputs)
-  }, [principalOrigin, schoolSelected])
+  }, [principalOrigin, schoolSelected, epSelected])
 
   useEffect(() => {
     let inputs = <></>
@@ -82,7 +89,7 @@ const Form = () => {
       <RadioGroup row onChange={onChangePrincipalOrigin} value={principalOrigin}>
         <FormControlLabel value='new' control={<Radio/>} label='Nuevo' />
         {
-          schoolOrigin === 'previous' &&
+          (schoolOrigin === 'previous' && schoolSelected) &&
             <FormControlLabel value='previous' control={<Radio/>} label='Escuela seleccionada' />
         }
         <FormControlLabel value='all' control={<Radio/>} label='De otras escuelas' />

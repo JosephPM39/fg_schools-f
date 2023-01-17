@@ -16,13 +16,14 @@ export const SelectSchool = ({hook}: params) => {
     data: Array<ISchoolProm> | undefined
     queryUsed: QueryUsed | undefined
   }>()
-  const useSchoolProms = useSchoolProm()
   const useSchoolPromsContext = useContext(SchoolPromContext)
   const useSchool = useContext(SchoolContext)
   const [year, setYear] = useState<number>((useSchoolPromsContext?.year ?? new Date().getFullYear()) - 1)
+  const useSchoolProms = useSchoolProm({autoFetch: false})
 
   useEffect(() => {
-    useSchoolProms.setYear(year)
+    console.log(year, 'init year')
+    useSchoolProms.fetch({searchBy: {year}})
   }, [year])
 
   useEffect(() => {
@@ -67,6 +68,7 @@ export const SelectSchool = ({hook}: params) => {
     if (prom) {
       return prom.id
     }
+    setSchoolPromSelected(undefined)
     return 'null'
   }
 

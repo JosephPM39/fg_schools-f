@@ -1,6 +1,7 @@
 import { FormControl, Grid, InputLabel, MenuItem, Select, SelectChangeEvent } from "@mui/material"
 import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import { IEmployeePosition, IPosition, ISchoolProm } from "../../api/models_school"
+import { PositionType } from "../../api/models_school/schools/position.model"
 import { useEmployee } from "../../hooks/api/schools/useEmployee"
 import { useEmployeePosition } from "../../hooks/api/schools/useEmployeePosition"
 import { usePosition } from "../../hooks/api/schools/usePosition"
@@ -19,7 +20,7 @@ export const SelectEmployeePosition = ({hook, schoolProm, type}: params) => {
   const useEmployeePositions = useEmployeePosition()
   const useEmployees = useEmployee()
   const usePositions = usePosition()
-  const useSchoolProms = useSchoolProm()
+  const useSchoolProms = useSchoolProm({autoFetch: false})
 
   useEffect(() => {
     const getData = async () => {
@@ -37,10 +38,11 @@ export const SelectEmployeePosition = ({hook, schoolProm, type}: params) => {
           }
         })
       }
+      console.log('Fetch', useSchoolProms.data)
     }
 
     getData()
-  }, [year, schoolProm])
+  }, [year, schoolProm?.id])
 
   useEffect(() => {
     const getData = async () => {
@@ -62,9 +64,13 @@ export const SelectEmployeePosition = ({hook, schoolProm, type}: params) => {
     getData()
   }, [
     useSchoolProms.data,
+    useSchoolProms.data?.length,
     useEmployeePositions.data,
+    useEmployeePositions.data?.length,
     usePositions.data,
-    useEmployees.data
+    usePositions.data?.length,
+    useEmployees.data,
+    useEmployees.data?.length
   ])
 
   const findEPName = (id: IEmployeePosition['id']) => {
@@ -90,17 +96,23 @@ export const SelectEmployeePosition = ({hook, schoolProm, type}: params) => {
     return 'null'
   }
 
+  const getLabel = (type: PositionType) => {
+    if (type === PositionType.PRINCIPAL) return 'Director'
+    if (type === PositionType.PROFESOR) return 'Docente'
+    return 'Encargado'
+  }
+
   return <>
     <Grid container spacing={2}>
       <Grid item xs={12} sm={schoolProm ? 12 : 6}>
         <FormControl fullWidth>
-          <InputLabel id="demo-simple-select-label">Escuela</InputLabel>
+          <InputLabel id="demo-simple-select-label">{getLabel(type)}</InputLabel>
           <Select
             labelId="demo-simple-select-label"
             id="demo-simple-select"
             value={getDefaultEP(epSelected?.id)}
             fullWidth
-            label="Escuela"
+            label={getLabel(type)}
             onChange={handleChange}
           >
             <MenuItem value={'null'} key={`menu-item-position-null`}>
