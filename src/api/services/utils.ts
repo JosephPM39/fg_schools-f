@@ -1,5 +1,6 @@
 import { IBaseModel } from '../models_school/base.model'
-import { IQuery } from '../validations/query'
+import { QueryUsed } from '../types'
+import { ByOperator, IQuery, Order } from '../validations/query'
 import { Data } from './types'
 
 const requests: Array<string> = []
@@ -64,20 +65,30 @@ export const searchByHandler = (sby?: string | object) => {
   }
 }
 
-export const queryFilter = <Model extends IBaseModel>(json: Model[], query: IQuery | undefined) => {
-  if (query && query.limit !== 'NONE') {
-    const { offset, limit } = query
-    if (offset && limit) {
-      return json.slice(parseInt(offset), (parseInt(limit) + parseInt(offset)))
-    }
-    if (offset) {
-      return json.slice(parseInt(offset))
-    }
-    if (limit) {
-      return json.slice(0, parseInt(limit))
+export const queryFilter = <Model extends IBaseModel>(json: Model[], query?: IQuery): {
+  data: Model[] | undefined,
+  queryUsed: QueryUsed
+} => {
+  const filt: Required<IQuery> = {
+    limit: query?.limit ?? '10',
+    offset: query?.offset ?? '0',
+    byoperator: query?.byoperator ?? ByOperator.equal,
+    order: query?.order ?? Order.desc
+  }
+  const queryUsed = {
+    ...filt,
+    count: json.length
+  }
+  if (filt.limit === 'NONE') {
+    return {
+      data: json.slice(parseInt(filt.offset)),
+      queryUsed
     }
   }
-  return json
+  return {
+    data: json.slice(parseInt(filt.offset), (parseInt(filt.limit) + parseInt(filt.offset))),
+    queryUsed
+  }
 }
 
 export const filterBy = <Model extends IBaseModel>(json: Model[], searchBy: Partial<Model>) => {

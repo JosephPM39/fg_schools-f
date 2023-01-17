@@ -16,7 +16,7 @@ interface params {
 export const SelectEmployeePosition = ({hook, schoolProm, type}: params) => {
   const [epSelected, setEPSelected] = hook
   const [employeePositions, setEmployeePositions] = useState<Array<Partial<IEmployeePosition>>>()
-  const [year, setYear] = useState<number>((schoolProm?.year ?? new Date().getFullYear()))
+  const [year, setYear] = useState<number>(schoolProm?.year ?? (new Date().getFullYear() -1))
   const useEmployeePositions = useEmployeePosition()
   const useEmployees = useEmployee()
   const usePositions = usePosition()

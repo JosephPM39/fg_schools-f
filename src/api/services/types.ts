@@ -1,25 +1,29 @@
+import { IBaseModel } from "../models_school/base.model"
 import { IQuery } from "../validations/query"
-
-export type Data<Model> = Model | Model[]
 
 export interface BaseApiParams {
   path: string,
 }
 
 export interface PostParams<Model> extends BaseApiParams {
-  data: Data<Model>
+  data: Model[] | Model
 }
 
-export interface GetParams extends BaseApiParams {
+export interface GetParams<Model extends IBaseModel> extends BaseApiParams {
   query?: IQuery
-  searchBy?: string | object
+  searchBy?: Pick<Model, 'id'>
 }
 
-export interface PatchParams<Model> extends BaseApiParams {
-  data: Data<Model>,
-  id: string
+export interface GetFilteredParams<Model extends IBaseModel> extends BaseApiParams {
+  query?: IQuery
+  searchBy?: Omit<Partial<Model>, 'id'>
 }
 
-export interface DeleteParams extends BaseApiParams {
-  id: string
+export interface PatchParams<Model extends IBaseModel> extends BaseApiParams {
+  data: Omit<Partial<Model>, 'id'>
+  id: Model['id']
+}
+
+export interface DeleteParams<Model extends IBaseModel> extends BaseApiParams {
+  id: Model['id']
 }
