@@ -10,7 +10,6 @@ interface params {
   hook: [ISchoolProm | undefined, Dispatch<SetStateAction<ISchoolProm | undefined>>]
 }
 export const SelectSchool = ({hook}: params) => {
-  const [schoolPromSelected, setSchoolPromSelected] = hook
   const [schools, setSchools] = useState<Array<ISchool>>([])
   const [schoolPromsFetch, setSchoolPromsFetch] = useState<{
     data: Array<ISchoolProm> | undefined
@@ -20,9 +19,9 @@ export const SelectSchool = ({hook}: params) => {
   const useSchool = useContext(SchoolContext)
   const [year, setYear] = useState<number>((useSchoolPromsContext?.year ?? new Date().getFullYear()) - 1)
   const useSchoolProms = useSchoolProm({autoFetch: false})
+  const [schoolPromSelected, setSchoolPromSelected] = hook
 
   useEffect(() => {
-    console.log(year, 'init year')
     useSchoolProms.fetch({searchBy: {year}})
   }, [year])
 
@@ -48,6 +47,11 @@ export const SelectSchool = ({hook}: params) => {
     getData()
   }, [schoolPromsFetch, useSchool, useSchool?.data?.length, useSchoolProms?.data?.length])
 
+  useEffect(() => {
+    const res = schoolPromsFetch?.data?.find((e) => e.id === schoolPromSelected?.id)
+    if (!res) setSchoolPromSelected(undefined)
+  }, [schoolPromSelected, schoolPromsFetch])
+
   const findSchoolName = (id: ISchool['id']) => {
     const school = schools.find((e) => e.id === id)
     if (!school) return 'Desconocido'
@@ -57,19 +61,14 @@ export const SelectSchool = ({hook}: params) => {
   const handleChange = (e: SelectChangeEvent) => {
     const prom = schoolPromsFetch?.data?.find((p) => p.id === e.target.value)
     if (prom) {
-      console.log(prom, 'Prom selec')
       setSchoolPromSelected(prom)
-      console.log(schoolPromSelected, 'in hook')
     }
   }
 
   const getDefaultSP = (id: ISchoolProm['id']) => {
     const prom = schoolPromsFetch?.data?.find((p) => p.id === id)
-    if (prom) {
-      return prom.id
-    }
-    setSchoolPromSelected(undefined)
-    return 'null'
+    if (!prom?.id) return 'null'
+    return prom.id
   }
 
   return <>

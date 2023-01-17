@@ -5,7 +5,6 @@ import DefaultPreview from '../../assets/signature.png'
 
 export const SchoolFormInputs = (params?: Partial<ISchool>) => {
   const [icon, setIcon] = useState<File | null>(null)
-  console.log('change, ', icon)
 
   const onSelectIcon = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {

@@ -32,7 +32,6 @@ const Form = () => {
   const onChangeSchoolOrigin = (e: ChangeEvent<HTMLInputElement>) => {
     setSchoolOrigin(e.target.value)
     if (e.target.value === 'new' && principalOrigin === 'previous') {
-      console.log('principal', principalOrigin)
       setPrincipalOrigin('new')
     }
   }
@@ -53,7 +52,6 @@ const Form = () => {
       inputs = <EmployeePositionFormInputs type={PositionType.PRINCIPAL} />
     }
     if (principalOrigin === 'previous') {
-      console.log(schoolSelected,'Escuela seleccionada')
       inputs = <SelectEmployeePosition schoolProm={schoolSelected} hook={[epSelected, setEPSelected]} type={PositionType.PRINCIPAL} />
     }
     if (principalOrigin === 'all') {
@@ -118,7 +116,7 @@ export const SchoolFormModal = ({btn}:{btn?: React.ReactNode}) => {
   }
 
   return (
-    <Modal {...mBtn()} title={`Agregar escuela`}>
+    <Modal fullScreen {...mBtn()} title={`Agregar escuela`}>
       <Box
         marginY={4}
         marginX={4}

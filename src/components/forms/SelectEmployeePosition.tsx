@@ -38,7 +38,6 @@ export const SelectEmployeePosition = ({hook, schoolProm, type}: params) => {
           }
         })
       }
-      console.log('Fetch', useSchoolProms.data)
     }
 
     getData()
@@ -73,6 +72,12 @@ export const SelectEmployeePosition = ({hook, schoolProm, type}: params) => {
     useEmployees.data?.length
   ])
 
+  useEffect(() => {
+    const res = employeePositions?.find((e) => e.id === epSelected?.id)
+    if (!res) setEPSelected(undefined)
+  }, [epSelected, employeePositions])
+
+
   const findEPName = (id: IEmployeePosition['id']) => {
     const ep = employeePositions?.find((e) => e.id === id)
     if (!ep) return 'Desconocido'
@@ -82,18 +87,14 @@ export const SelectEmployeePosition = ({hook, schoolProm, type}: params) => {
   const handleChange = (e: SelectChangeEvent) => {
     const ep = employeePositions?.find((p) => p.id === e.target.value)
     if (ep) {
-      console.log(ep, 'Prom selec')
       setEPSelected(ep)
-      console.log(epSelected, 'in hook')
     }
   }
 
   const getDefaultEP = (id: IEmployeePosition['id']) => {
     const ep = employeePositions?.find((p) => p.id === id)
-    if (ep) {
-      return ep.id
-    }
-    return 'null'
+    if (!ep || !ep.id) return 'null'
+    return ep.id
   }
 
   const getLabel = (type: PositionType) => {
