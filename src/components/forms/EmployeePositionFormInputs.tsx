@@ -1,4 +1,4 @@
-import { TextField, Box, Typography, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent } from "@mui/material"
+import { TextField, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Grid } from "@mui/material"
 import { useContext, useEffect, useState } from "react"
 import { IEmployeePosition, IPosition } from "../../api/models_school"
 import { EmployeeContext, PositionContext } from "../../context/api/schools"
@@ -45,31 +45,38 @@ export const EmployeePositionFormInputs = (params?: EPFIParams) => {
   }
 
   return <>
-    <Box
-      sx={{
-        '& > :not(style)': { m: 1 },
-      }}
-    >
-      <TextField value={obj?.employee?.firstName} name="first_name" label="Nombre(s)" variant="outlined" required/>
-      <TextField value={obj?.employee?.lastName} name="last_name" label="Apellido(s)" variant="outlined" required/>
-      <TextField value={obj?.employee?.contact} name="contact" label="Contacto" variant="outlined" required/>
-      <TextField value={obj?.employee?.profesion} name="profesion" label="Profesión" variant="outlined" required/>
-      <FormControl>
-        <InputLabel id="demo-simple-select-label">Cargo</InputLabel>
-        <Select
-          labelId="demo-simple-select-label"
-          id="demo-simple-select"
-          value={positionId ?? 'null'}
-          label="Cargo"
-          onChange={handleChange}
-        >
-          <MenuItem value={'null'} key={`menu-item-position-null`}>No seleccionado</MenuItem>
-          {positions?.map(
-            (position, index) => <MenuItem value={position.id} key={`menu-item-position-${index}`}> {position.name} </MenuItem>
-          )}
-          <MenuItem value='new' key={`menu-item-position-new`}>Nuevo</MenuItem>
-        </Select>
-      </FormControl>
-    </Box>
+    <Grid container spacing={2}>
+      <Grid item xs={12} sm={6}>
+        <TextField fullWidth value={obj?.employee?.firstName} name="first_name" label="Nombre(s)" variant="outlined" required/>
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <TextField fullWidth value={obj?.employee?.lastName} name="last_name" label="Apellido(s)" variant="outlined" required/>
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <TextField fullWidth value={obj?.employee?.contact} name="contact" label="Contacto" variant="outlined" required/>
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <TextField fullWidth value={obj?.employee?.profesion} name="profesion" label="Profesión" variant="outlined" required/>
+      </Grid>
+      <Grid item xs={12} sm={12}>
+        <FormControl fullWidth>
+          <InputLabel id="demo-simple-select-label">Cargo</InputLabel>
+          <Select
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            value={positionId ?? 'null'}
+            fullWidth
+            label="Cargo"
+            onChange={handleChange}
+          >
+            <MenuItem value={'null'} key={`menu-item-position-null`}>No seleccionado</MenuItem>
+            {positions?.map(
+              (position, index) => <MenuItem value={position.id} key={`menu-item-position-${index}`}> {position.name} </MenuItem>
+            )}
+            <MenuItem value='new' key={`menu-item-position-new`}>Nuevo</MenuItem>
+          </Select>
+        </FormControl>
+      </Grid>
+    </Grid>
   </>
 }

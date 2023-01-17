@@ -9,6 +9,7 @@ import { Menu as MenuIcon, SaveAlt as SaveAltIcon } from '@mui/icons-material'
 import { SchoolFormModal } from './forms/SchoolFormModal';
 import { SchoolContext, SchoolPromContext } from '../context/api/schools';
 import { isNumber } from 'class-validator';
+import { YearSelect } from './forms/YearSelect';
 
 export const NavMenu = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -25,35 +26,6 @@ export const NavMenu = () => {
         "location": "aaaaaaaaaaaaaaaaaa"
       }
     })
-  }
-
-  const handleChange = (event: SelectChangeEvent) => {
-    const year = parseInt(String(event?.target?.value))
-    if (isNumber(year)) {
-      useSchoolProm?.setYear(year)
-    }
-  }
-
-  const years = [...new Array(111)].map((_, i) => i + 1990)
-
-  const YearSelect = () => {
-    return (
-      <FormControl fullWidth size='small'>
-        <InputLabel id="year-select-label">&#8288;Año</InputLabel>
-        <Select
-          fullWidth
-          labelId="year-select-label"
-          id="year-select"
-          value={String(useSchoolProm?.year) ?? 'null'}
-          label="&#8288;Año"
-          onChange={handleChange}
-        >
-          {years.map(
-            (year, index) => <MenuItem value={year} key={`menu-item-position-${index}`}> {year} </MenuItem>
-          )}
-        </Select>
-      </FormControl>
-    )
   }
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -87,7 +59,7 @@ export const NavMenu = () => {
         onClose={handleClose}
       >
         <MenuItem disableRipple>
-          <YearSelect/>
+          <YearSelect hook={[useSchoolProm?.year, useSchoolProm?.setYear]} />
         </MenuItem>
         <SchoolFormModal btn={
           <MenuItem>

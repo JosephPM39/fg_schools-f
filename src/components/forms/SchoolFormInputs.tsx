@@ -1,4 +1,4 @@
-import { TextField, Box, IconButton, Typography, CardMedia } from "@mui/material"
+import { TextField, Box, IconButton, Typography, CardMedia, Grid } from "@mui/material"
 import { ChangeEvent, useState } from "react"
 import { ISchool } from "../../api/models_school"
 import DefaultPreview from '../../assets/signature.png'
@@ -21,27 +21,30 @@ export const SchoolFormInputs = (params?: Partial<ISchool>) => {
   }
 
   return <>
-    <Box
-      sx={{
-        '& > :not(style)': { m: 1 },
-      }}
-    >
-      <TextField value={params?.['name']} name="name" label="Nombre" variant="outlined" required/>
-      <TextField value={params?.['location']} name="location" label="Ubicación" variant="outlined" required/>
-      <TextField value={params?.['code']} name="code" label="Código" variant="outlined" required/>
-      <IconButton component="label" >
-        <input hidden accept="image/*" type="file" name="icon" onChange={onSelectIcon}/>
-        <Box display='flex' alignItems='center' >
-          <Typography>Logo:</Typography>
-          <CardMedia
-            component="img"
-            alt={icon?.name}
-            height="40"
-            image={getPreview()}
-          />
-
-        </Box>
-      </IconButton>
-    </Box>
+    <Grid container spacing={2}>
+      <Grid item xs={12} sm={6}>
+        <TextField fullWidth value={params?.['name']} name="name" label="Nombre" variant="outlined" required/>
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <TextField fullWidth value={params?.['location']} name="location" label="Ubicación" variant="outlined" required/>
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <TextField fullWidth value={params?.['code']} name="code" label="Código" variant="outlined" required/>
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <IconButton component="label" >
+          <input hidden accept="image/*" type="file" name="icon" onChange={onSelectIcon}/>
+          <Box display='flex' alignItems='center' >
+            <Typography>Logo:</Typography>
+            <CardMedia
+              component="img"
+              alt={icon?.name}
+              height="40"
+              image={getPreview()}
+            />
+          </Box>
+        </IconButton>
+      </Grid>
+    </Grid>
   </>
 }

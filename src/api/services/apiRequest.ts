@@ -1,3 +1,4 @@
+import { instanceToPlain } from 'class-transformer'
 import { CONFIG } from '../../config'
 import { IBaseModel } from '../models_school/base.model'
 import { QueryUsed } from '../types'
@@ -17,9 +18,12 @@ export const post = async <Model extends IBaseModel>(params: PostParams<Model>) 
 }
 
 export const get = async <Model extends IBaseModel>(params: GetParams) => {
+  const query = instanceToPlain(params.query, {
+    exposeUnsetFields: false
+  })
   const { id } = searchByHandler(params.searchBy)
-  const searchParams = new URLSearchParams(params.query)
-  const path = `${CONFIG.schoolsApiUrl}${params.path}/${id}${searchParams}`
+  const searchParams = new URLSearchParams(query)
+  const path = `${CONFIG.schoolsApiUrl}${params.path}/${id}?${searchParams}`
 
   const res = await fetchOnce(path)
   if (!res) return
@@ -32,9 +36,12 @@ export const get = async <Model extends IBaseModel>(params: GetParams) => {
 }
 
 export const getFiltered = async <Model extends IBaseModel>(params: GetParams) => {
+  const query = instanceToPlain(params.query, {
+    exposeUnsetFields: false
+  })
   const { body } = searchByHandler(params.searchBy)
-  const searchParams = new URLSearchParams(params.query)
-  const path = `${CONFIG.schoolsApiUrl}${params.path}/get-filtered${searchParams}`
+  const searchParams = new URLSearchParams(query)
+  const path = `${CONFIG.schoolsApiUrl}${params.path}/get-filtered?${searchParams}`
 
   const res = await fetchOnce(path, {
     method: 'POST',

@@ -1,15 +1,24 @@
 import { Modal, Btn, BtnProps } from '../../containers/Modal'
 import { SchoolFormInputs } from './SchoolFormInputs';
-import { ChangeEvent, FormEvent, useRef, useState } from 'react';
+import { ChangeEvent, FormEvent, ReactNode, useEffect, useRef, useState } from 'react';
 import { EmployeePositionFormInputs } from './EmployeePositionFormInputs';
 import { PositionType } from '../../api/models_school/schools/position.model';
-import { Box, FormControlLabel, FormLabel, Radio, RadioGroup } from '@mui/material';
+import { Box, Button, Divider, FormControlLabel, FormLabel, Radio, RadioGroup } from '@mui/material';
+import { IEmployeePosition, ISchoolProm } from '../../api/models_school';
+import { SelectSchool } from './SelectSchool';
+import { SelectEmployeePosition } from './SelectEmployeePosition';
 
-export const SchoolFormModal = ({btn}:{btn?: React.ReactNode}) => {
+const Form = () => {
 
   const form = useRef<HTMLFormElement | null>(null)
   const [schoolOrigin, setSchoolOrigin] = useState<string>('new')
   const [principalOrigin, setPrincipalOrigin] = useState<string>('new')
+  const [schoolSelected, setSchoolSelected] = useState<ISchoolProm>()
+  const employeePositionSelectHook = useState<Partial<IEmployeePosition>>()
+
+  const [schoolInput, setSchoolInput] = useState<ReactNode>(<>Loading</>)
+  const [principalInput, setPrincipalInput] = useState<ReactNode>(<>Loading</>)
+
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -32,46 +41,60 @@ export const SchoolFormModal = ({btn}:{btn?: React.ReactNode}) => {
     setPrincipalOrigin(e.target.value)
   }
 
-  const SchoolData = () => {
-    if (schoolOrigin === 'new') {
-      return <SchoolFormInputs/>
-    }
-    return <>Seleccion una vieja xd</>
-  }
-
-  const PrincipalData = () => {
+  useEffect(() => {
+    let inputs = <></>
     if (principalOrigin === 'new') {
-      return <EmployeePositionFormInputs type={PositionType.PRINCIPAL} />
+      inputs = <EmployeePositionFormInputs type={PositionType.PRINCIPAL} />
     }
     if (principalOrigin === 'previous') {
-      return <>Seleccione al viejo xd</>
+      inputs = <SelectEmployeePosition schoolProm={schoolSelected} hook={employeePositionSelectHook} type={PositionType.PRINCIPAL} />
     }
-    return <>Seleccione a otor viejo xd</>
-  }
+    if (principalOrigin === 'all') {
+      inputs = <SelectEmployeePosition hook={employeePositionSelectHook} type={PositionType.PRINCIPAL} />
+    }
+    setPrincipalInput(inputs)
+  }, [principalOrigin, schoolSelected])
 
-  const Form = () => {
-    return <>
-      <form ref={form} onSubmit={onSubmit}>
-        <FormLabel>Escuela</FormLabel>
-        <RadioGroup row onChange={onChangeSchoolOrigin} defaultValue={schoolOrigin}>
-          <FormControlLabel value='new' control={<Radio/>} label='Nueva' />
-          <FormControlLabel value='previous' control={<Radio/>} label='Habilitar' />
-        </RadioGroup>
-        <SchoolData/>
-        <FormLabel>Director</FormLabel>
-        <RadioGroup row onChange={onChangePrincipalOrigin} defaultValue={principalOrigin}>
-          <FormControlLabel value='new' control={<Radio/>} label='Nuevo' />
-          {
-            schoolOrigin === 'previous' &&
-            <FormControlLabel value='previous' control={<Radio/>} label='Años anteriores' />
-          }
-          <FormControlLabel value='all' control={<Radio/>} label='De otras instituciones' />
-        </RadioGroup>
-        <PrincipalData/>
-        <input type='submit'/>
-      </form>
-    </>
-  }
+  useEffect(() => {
+    let inputs = <></>
+    if (schoolOrigin === 'new') {
+      inputs = <SchoolFormInputs/>
+    }
+    if (schoolOrigin === 'previous') {
+      inputs = <SelectSchool hook={[schoolSelected, setSchoolSelected]}/>
+    }
+    setSchoolInput(inputs)
+  }, [schoolOrigin, schoolSelected])
+
+
+  return <>
+    <form ref={form} onSubmit={onSubmit}>
+      <FormLabel>Escuela: </FormLabel>
+      <RadioGroup row onChange={onChangeSchoolOrigin} value={schoolOrigin}>
+        <FormControlLabel value='new' control={<Radio/>} label='Nueva' />
+        <FormControlLabel value='previous' control={<Radio/>} label='Habilitar' />
+      </RadioGroup>
+      {schoolInput}
+      <br/>
+      <Divider/>
+      <br/>
+      <FormLabel>Director: </FormLabel>
+      <RadioGroup row onChange={onChangePrincipalOrigin} value={principalOrigin}>
+        <FormControlLabel value='new' control={<Radio/>} label='Nuevo' />
+        {
+          schoolOrigin === 'previous' &&
+            <FormControlLabel value='previous' control={<Radio/>} label='Escuela seleccionada' />
+        }
+        <FormControlLabel value='all' control={<Radio/>} label='De otras escuelas' />
+      </RadioGroup>
+      {principalInput}
+      <br/>
+      <Button type='submit' variant='contained'>Guardar</Button>
+    </form>
+  </>
+}
+
+export const SchoolFormModal = ({btn}:{btn?: React.ReactNode}) => {
 
   const mBtn = (): Btn | BtnProps => {
     if(btn) {

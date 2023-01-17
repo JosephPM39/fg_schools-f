@@ -92,7 +92,7 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
     setMetadata(res?.queryUsed)
     setNeedFetching(false)
 
-    return !!res
+    return res
   }, [params, offline, data])
 
   useEffect(() => {

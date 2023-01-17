@@ -65,7 +65,7 @@ export const searchByHandler = (sby?: string | object) => {
 }
 
 export const queryFilter = <Model extends IBaseModel>(json: Model[], query: IQuery | undefined) => {
-  if (query) {
+  if (query && query.limit !== 'NONE') {
     const { offset, limit } = query
     if (offset && limit) {
       return json.slice(parseInt(offset), (parseInt(limit) + parseInt(offset)))
