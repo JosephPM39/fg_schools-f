@@ -4,20 +4,23 @@ import { validate, ValidationError } from 'class-validator'
 import { IQuery, Query } from './query'
 
 export const validateIdBy = async <Model extends {}>(params: ValidateIdOptions<Model>) => {
-  const { idBy, version, model } = params
-  const dto = typeof idBy === 'object' ? idBy : { id: idBy }
+  const { searchBy, version, model } = params
+  if (!searchBy) return undefined
   const valid = await validateDto<Model>({
-    dto,
+    dto: searchBy,
     model,
     version,
     validatorOptions: {
       skipMissingProperties: true,
-      skipUndefinedProperties: true
+      skipUndefinedProperties: true,
+    },
+    transformOptions: {
+      exposeUnsetFields: false,
     }
   })
 
   const propertiesAllowed = Object.keys(valid)
-  const dtoProperties = Object.keys(dto)
+  const dtoProperties = Object.keys(searchBy)
   const rejectedProperties = dtoProperties.filter((p) => !propertiesAllowed.includes(p))
 
   if (rejectedProperties.length > 0) {

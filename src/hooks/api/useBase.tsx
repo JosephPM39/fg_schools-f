@@ -1,8 +1,10 @@
-import { useCallback, useEffect, useState } from 'react'
-import { create as apiCreate, read, CreateParams, ReadParams } from '../../api/services'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { StorageRequest, CreateParams, ReadParams } from '../../api/services'
 import { IBaseModel } from '../../api/models_school/base.model'
 import { ModelClassType, QueryUsed } from '../../api/types'
 import { filterBy } from '../../api/services/utils'
+import { useNetStatus } from '../useNetStatus'
+import { useDebounce } from '../useDebouce'
 
 export interface BaseParams<Model extends IBaseModel> {
   path: string
@@ -14,7 +16,9 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
   const [data, setData] = useState<Model[] | undefined>([])
   const [metadata, setMetadata] = useState<QueryUsed | undefined>(undefined)
   const [needFetching, setNeedFetching] = useState(false)
-  const offline = false
+  const { offlineMode: offline, netOnline } = useNetStatus()
+
+  const storage = useMemo(() => new StorageRequest<Model>(), [])
 
   const findOneLocal = ({id}: {id?: Model['id']}) => {
     const local = data?.find((e) => e.id === id) ?? undefined
@@ -26,8 +30,8 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
     const local = findOneLocal({id})
     if (local) return local
 
-    const remote = await (read<Model>({
-      searchBy: id,
+    const remote = await (storage.read({
+      searchBy: { id },
       ...params,
       offline
     }))
@@ -47,7 +51,7 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
     const local = filterBy<Model>(data ?? [], searchBy)
     if (local.length > 0) return local
 
-    const remote = await (read<Model>({
+    const remote = await (storage.read({
       searchBy,
       ...params,
       offline
@@ -59,12 +63,15 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
   }
 
   const create = async ({data: dto }: Pick<CreateParams<Model>, 'data'>) => {
-    const res = await apiCreate<Model>({
+    const res = await storage.create({
       data: dto,
       ...params,
       offline
     })
-    if (res) {
+    if (res && Array.isArray(res)) {
+      data?.push(...res)
+    }
+    if (res && !Array.isArray(res)) {
       data?.push(res)
     }
     return !!res
@@ -74,9 +81,9 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
     query,
     searchBy,
     mode = 'clean'
-  }: Pick<ReadParams<Model>, 'query' | 'searchBy'> & {mode?: 'clean' | 'merge'
+  }: Partial<Pick<ReadParams<Model>, 'query' | 'searchBy'>> & {mode?: 'clean' | 'merge'
     }) => {
-    const res = await (read<Model>({
+    const res = await (storage.read({
       query,
       searchBy,
       ...params,
@@ -93,18 +100,32 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
     setNeedFetching(false)
 
     return res
-  }, [params, offline, data])
+  }, [params, storage, offline, data])
 
   useEffect(() => {
     if (data && data.length < 1 && params.autoFetch !== false) {
       setNeedFetching(true)
     }
-  }, [data, params.autoFetch])
+  }, [data, params.autoFetch, offline])
 
   useEffect(() => {
     if (!needFetching) return
     fetch({})
   }, [needFetching, fetch])
+
+  const {debounce} = useDebounce()
+
+  useEffect(() => {
+    if (offline && netOnline) {
+      debounce(() => storage.goOffline({
+        path: params.path,
+        limit: 'NONE'
+      }))
+    }
+    if (!offline) {
+      storage.goOnline()
+    }
+  }, [offline, storage, params.path])
 
   return {
     data,

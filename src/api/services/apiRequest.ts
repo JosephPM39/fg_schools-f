@@ -2,7 +2,7 @@ import { instanceToPlain } from 'class-transformer'
 import { CONFIG } from '../../config'
 import { IBaseModel } from '../models_school/base.model'
 import { QueryUsed } from '../types'
-import { PostParams, GetParams, PatchParams, DeleteParams } from './types'
+import { PostParams, GetParams, PatchParams, DeleteParams, GetFilteredParams } from './types'
 import { removeOfflineFlag, addOfflineFlag, searchByHandler } from './utils'
 import { fetchOnce } from './utils'
 
@@ -36,20 +36,19 @@ export class ApiRequest<Model extends IBaseModel> {
     }
   }
 
-  getFiltered = async (params: GetParams<Model>) => {
+  getFiltered = async (params: GetFilteredParams<Model>) => {
     const query = instanceToPlain(params.query, {
       exposeUnsetFields: false
     })
-    const body = {
+    const body = JSON.stringify(removeOfflineFlag({
       ...params.searchBy
-    }
-    delete body.id
+    }))
     const searchParams = new URLSearchParams(query)
     const path = `${CONFIG.schoolsApiUrl}${params.path}/get-filtered?${searchParams}`
 
     const res = await fetchOnce(path, {
       method: 'POST',
-      body: JSON.stringify(body)
+      body
     })
     if (!res) return
     const json = await res.json()

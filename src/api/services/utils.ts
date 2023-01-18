@@ -1,7 +1,6 @@
 import { IBaseModel } from '../models_school/base.model'
 import { QueryUsed } from '../types'
 import { ByOperator, IQuery, Order } from '../validations/query'
-import { Data } from './types'
 
 const requests: Array<string> = []
 
@@ -19,7 +18,7 @@ export const fetchOnce = async (input: RequestInfo, init?: RequestInit) => {
   return response
 }
 
-export const removeOfflineFlag = <Model extends IBaseModel>(data: Data<Model>): Model[] | Model => {
+export const removeOfflineFlag = <Model extends IBaseModel>(data: Model | Model[]): Model[] | Model => {
   if (!Array.isArray(data)) {
     delete data.offline
     return data
@@ -31,7 +30,7 @@ export const removeOfflineFlag = <Model extends IBaseModel>(data: Data<Model>): 
   })
 }
 
-export const addOfflineFlag = <Model extends IBaseModel>(data: Data<Model>, offlineFlagValue: boolean = false): Model[] | undefined => {
+export const addOfflineFlag = <Model extends IBaseModel>(data: Model | Model[], offlineFlagValue: boolean = false): Model[] | undefined => {
   if (!data) return undefined
   if (!Array.isArray(data)) {
     if (Object.values(data).length < 1) return []

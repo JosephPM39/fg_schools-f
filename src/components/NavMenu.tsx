@@ -10,12 +10,14 @@ import { SchoolFormModal } from './forms/SchoolFormModal';
 import { SchoolContext, SchoolPromContext } from '../context/api/schools';
 import { isNumber } from 'class-validator';
 import { YearSelect } from './forms/YearSelect';
+import { useNetStatus } from '../hooks/useNetStatus';
 
 export const NavMenu = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const useSchool = useContext(SchoolContext)
   const useSchoolProm = useContext(SchoolPromContext)
+  const { offlineMode, toggleOfflineMode } = useNetStatus()
 
   const postSchool = () => {
     useSchool?.create({
@@ -76,8 +78,8 @@ export const NavMenu = () => {
           &#8288;Ajustes
         </MenuItem>
         <Divider sx={{ my: 0.5 }} />
-        <MenuItem disableRipple disableTouchRipple>
-          <FormControlLabel control={<Switch defaultChecked />} label="&#8288;Modo offline" />
+        <MenuItem onClick={toggleOfflineMode} disableRipple disableTouchRipple>
+          <FormControlLabel control={<Switch defaultChecked={offlineMode}/>} label="&#8288;Modo offline" />
         </MenuItem>
         <Divider sx={{ my: 0.5 }} />
         <MenuItem onClick={handleClose} disableRipple>

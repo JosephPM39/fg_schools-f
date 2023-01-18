@@ -9,7 +9,7 @@ export class LocalRequest<Model extends IBaseModel> {
     if (!searchBy) {
       return queryFilter(existent, query)
     }
-    const filteredBy = filterBy(existent, searchBy as Partial<Model>)
+    const filteredBy = filterBy<Model>(existent, searchBy as Partial<Model>)
     return queryFilter(filteredBy, query)
   }
 
@@ -27,7 +27,8 @@ export class LocalRequest<Model extends IBaseModel> {
       if (duplicates.length > 0) {
         throw new Error('Duplicate data not allowed')
       }
-      return this.set(path, [...existent, ...data])
+      const d = [...existent, ...data]
+      return this.set(path, d) ? data : undefined
     }
 
     if (existent && !Array.isArray(data)) {
@@ -35,14 +36,15 @@ export class LocalRequest<Model extends IBaseModel> {
       if (duplicates.length > 0) {
         throw new Error('Duplicate data not allowed')
       }
-      return this.set(path, [...existent, data])
+      const d = [...existent, data]
+      return this.set(path, d) ? [data] : undefined
     }
 
     if (Array.isArray(data)) {
-      return this.set(path, data)
+      return this.set(path, data) ? data : undefined
     }
 
-    return this.set(path, [data])
+    return this.set(path, [data]) ? [data] : undefined
   }
 
   patch = ({ path, data, id }: PatchParams<Model>) => {

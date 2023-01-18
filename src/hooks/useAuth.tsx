@@ -7,6 +7,8 @@ export const useAuth = () => {
   useEffect(() => {
     const { fetch: originalFetch } = window
 
+    console.log('Seupt ')
+
     window.fetch = async (...args) => {
       let [resource, config] = args
       config = {

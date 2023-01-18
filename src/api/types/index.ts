@@ -51,8 +51,8 @@ export interface ValidateDtoOptions<Model> {
   transformOptions?: ClassTransformOptions
 }
 
-export interface ValidateIdOptions<Model> {
-  idBy: IdBy
+export interface ValidateIdOptions<Model extends IBaseModel> {
+  searchBy?: ReadParams<Model>['searchBy']
   model: ModelClassType<Model>
   version: EXPOSE_VERSIONS
 }

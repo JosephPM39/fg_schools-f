@@ -27,3 +27,10 @@ export interface PatchParams<Model extends IBaseModel> extends BaseApiParams {
 export interface DeleteParams<Model extends IBaseModel> extends BaseApiParams {
   id: Model['id']
 }
+
+type SearchById<Model extends IBaseModel> = Pick<Partial<Model>, 'id'>
+type SearchBy<Model extends IBaseModel> = Omit<Partial<Model>, 'id'>
+
+export const isSearchById = <Model extends IBaseModel>(search: SearchById<Model> | SearchBy<Model>): search is SearchById<Model> => {
+  return (search as SearchById<Model>).id !== undefined
+}
