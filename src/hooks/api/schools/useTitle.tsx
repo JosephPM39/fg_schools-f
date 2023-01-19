@@ -1,12 +1,10 @@
 import { ITitle, Title } from '../../../api/models_school'
 import { useBase } from '../useBase'
-import { BaseParams } from './types'
 
-export const useTitle = ({ netStatus }: BaseParams) => {
+export const useTitle = () => {
   const hook = useBase<ITitle>({
     path: 'schools/title',
-    model: Title,
-    netStatus
+    model: Title
   })
 
   return hook

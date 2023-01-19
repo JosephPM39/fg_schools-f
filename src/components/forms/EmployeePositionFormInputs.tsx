@@ -1,7 +1,7 @@
 import { TextField, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Grid } from "@mui/material"
 import { useContext, useEffect, useState } from "react"
 import { IEmployeePosition, IPosition } from "../../api/models_school"
-import { ApiContext } from "../../context/ApiContext"
+import { EmployeeContext, PositionContext } from "../../context/api/schools"
 
 interface EPFIParams {
   type?: IPosition['type']
@@ -10,8 +10,8 @@ interface EPFIParams {
 
 export const EmployeePositionFormInputs = (params?: EPFIParams) => {
   const [obj, setObj] = useState<Partial<IEmployeePosition>>()
-  const usePosition = useContext(ApiContext)?.usePosition
-  const useEmployee = useContext(ApiContext)?.useEmployee
+  const usePosition = useContext(PositionContext)
+  const useEmployee = useContext(EmployeeContext)
   const [positionId, setPositionId] = useState<IPosition['id'] | undefined>()
   const [positions, setPositions] = useState<Array<IPosition> | undefined>([])
 

@@ -1,12 +1,10 @@
 import { IEmployee, Employee } from '../../../api/models_school'
-import { BaseParams } from './types'
 import { useBase } from '../useBase'
 
-export const useEmployee = ({ netStatus }: BaseParams) => {
+export const useEmployee = () => {
   const hook = useBase<IEmployee>({
     path: 'schools/employee',
-    model: Employee,
-    netStatus
+    model: Employee
   })
 
   return hook

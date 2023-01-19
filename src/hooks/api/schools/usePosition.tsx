@@ -1,12 +1,10 @@
 import { IPosition, Position } from '../../../api/models_school'
 import { useBase } from '../useBase'
-import { BaseParams } from './types'
 
-export const usePosition = ({ netStatus }: BaseParams) => {
+export const usePosition = () => {
   const hook = useBase<IPosition>({
     path: 'schools/position',
-    model: Position,
-    netStatus
+    model: Position
   })
 
   return hook

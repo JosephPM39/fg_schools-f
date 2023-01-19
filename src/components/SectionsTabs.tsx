@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { ITitle, IGroup, ISectionProm } from '../api/models_school';
 import { Tabs } from '../containers/Tabs';
-import { ApiContext } from '../context/ApiContext';
+import { GroupContext, TitleContext } from '../context/api/schools';
 
 interface Params {
   sectionProms: ISectionProm[]
@@ -16,8 +16,8 @@ interface Section {
 export const SectionsTabs = (params: Params) => {
   const [sections, setSections] = React.useState<Array<Section>>([])
   const [list, setList] = React.useState<Array<{label: string, content: JSX.Element}>>([])
-  const useTitle = React.useContext(ApiContext)?.useTitle
-  const useGroup = React.useContext(ApiContext)?.useGroup
+  const useTitle = React.useContext(TitleContext)
+  const useGroup = React.useContext(GroupContext)
 
   React.useEffect(() => {
     const getData = async () => {
