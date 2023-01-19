@@ -64,7 +64,7 @@ export class StorageRequest<Model extends IBaseModel> {
 
   // To go online, this method will make a post with localStorage data with offline: true flag
   goOnline = async () => {
-
+    this.local.destroy()
   }
 
   read = async (params: ReadParams<Model>) => {

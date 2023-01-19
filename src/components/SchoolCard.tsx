@@ -1,4 +1,5 @@
-import { Card, CardActions, CardContent,CardMedia,Button, Typography} from '@mui/material'
+import { Article, Delete, Edit, KeyboardArrowDown } from '@mui/icons-material';
+import { Card, CardActions, CardContent,CardMedia,Button, Typography, MenuItem, Menu} from '@mui/material'
 import { useContext, useEffect, useState } from 'react';
 import { ISchoolProm } from '../api/models_school';
 import { EmployeeContext, EmployeePositionContext, PositionContext, SchoolContext } from '../context/api/schools';
@@ -15,6 +16,15 @@ export const SchoolCard = (params: Params) => {
   const useSchool = useContext(SchoolContext)
   const useEmployee = useContext(EmployeeContext)
   const usePosition = useContext(PositionContext)
+
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget)
+  }
+  const handleClose = () => {
+    setAnchorEl(null)
+  }
 
   useEffect(() => {
     const getData = async () => {
@@ -76,9 +86,36 @@ export const SchoolCard = (params: Params) => {
         </Typography>
       </CardContent>
       <CardActions>
-        <SectionsModal initOpen={false} schoolProm={params.schoolProm} cardData={obj} />
-        <Button size="small">Share</Button>
-        <Button size="small">Learn More</Button>
+        <SectionsModal
+          btnProps={{
+            children: 'Abrir',
+            startIcon: <Article/>,
+            variant: 'contained',
+            color: 'info',
+            size: 'small'
+          }}
+          initOpen={false}
+          schoolProm={params.schoolProm}
+          cardData={obj}/>
+        <Button
+          id="school-menu-button"
+          aria-controls={open ? 'basic-menu' : undefined}
+          aria-haspopup="true"
+          aria-expanded={open ? 'true' : undefined}
+          onClick={handleClick}
+          variant='outlined'
+          size='small'
+          endIcon={<KeyboardArrowDown/>}
+        > Más opciones </Button>
+        <Menu
+          id="school-menu"
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleClose}
+        >
+          <MenuItem sx={{color: 'darkblue'}} ><Edit/>&#8288; Editar</MenuItem>
+          <MenuItem onClick={handleClose} sx={{color: 'red'}}><Delete/>&#8288; Eliminar</MenuItem>
+        </Menu>
       </CardActions>
     </Card>
   );

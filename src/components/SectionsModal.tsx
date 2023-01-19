@@ -1,7 +1,7 @@
 import { ISchoolProm, ISectionProm } from '../api/models_school';
 import { SchoolsCardData } from './types';
 import { SectionsTabs } from './SectionsTabs';
-import { Modal } from '../containers/Modal'
+import { BtnProps, Modal } from '../containers/Modal'
 import { useContext, useEffect, useState } from 'react';
 import { SectionPromContext } from '../context/api/schools';
 
@@ -9,6 +9,7 @@ interface Params {
   initOpen: boolean,
   schoolProm: ISchoolProm,
   cardData?: SchoolsCardData
+  btnProps: BtnProps['btnProps']
 }
 
 export const SectionsModal = (params: Params) => {
@@ -28,7 +29,7 @@ export const SectionsModal = (params: Params) => {
   if (proms.length < 1) return <>Without data</>
 
   return (
-    <Modal fullScreen btnProps={{ children: 'Listados' }} title={`Escuela: ${params.cardData?.school?.name}`}>
+    <Modal fullScreen btnProps={params.btnProps} title={`Escuela: ${params.cardData?.school?.name}`}>
       <SectionsTabs sectionProms={proms} />
     </Modal>
   );

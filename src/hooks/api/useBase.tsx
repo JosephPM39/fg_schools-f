@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { StorageRequest, CreateParams, ReadParams } from '../../api/services'
+import { StorageRequest, ReadParams } from '../../api/services'
 import { IBaseModel } from '../../api/models_school/base.model'
 import { ModelClassType, QueryUsed } from '../../api/types'
 import { filterBy } from '../../api/services/utils'
 import { useDebounce } from '../useDebouce'
-import { useNetStatus } from '../useNetStatus'
+import { useNetStatus, AppNetStatus } from '../useNetStatus'
 
 export interface BaseParams<Model extends IBaseModel> {
   path: string
@@ -12,40 +12,55 @@ export interface BaseParams<Model extends IBaseModel> {
   autoFetch?: boolean
 }
 
+type FetchParams<Model extends IBaseModel> = Partial<Pick<ReadParams<Model>, 'query' | 'searchBy'>> & {
+  mode?: 'clean' | 'merge'
+}
+
 export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => {
-  const [data, setData] = useState<Model[] | undefined>([])
+  // ========== DATA HOOKS ==========
   const [metadata, setMetadata] = useState<QueryUsed | undefined>(undefined)
+  const [data, setData] = useState<Model[] | undefined>([])
   const [needFetching, setNeedFetching] = useState(false)
-  const { offlineMode: offline, netOnline } = useNetStatus()
 
+  // ========== HELPER HOOKS ==========
+  const { appNetStatus, setAppNetStatus, isAppOffline } = useNetStatus()
   const storage = useMemo(() => new StorageRequest<Model>(), [])
+  const { debounce } = useDebounce()
+  const offline = isAppOffline()
 
-  const findOneLocal = ({id}: {id?: Model['id']}) => {
-    const local = data?.find((e) => e.id === id) ?? undefined
-    if (local) return local
+  // ========== CONFIG ==========
+  const requestConfig = useMemo(() => ({
+    ...params,
+    offline
+  }), [params, offline])
+
+  // ==========================================
+  // ============= READ FUNCTIONS =============
+  // ==========================================
+
+  const findOneLocal = (id?: Model['id']) => {
+    return data?.find((e) => e.id === id)
   }
 
-  const findOne = async ({id}:{id?: Model['id']}): Promise<Model | undefined> => {
+  const findOne = async ({id}: {id?: Model['id']}) => {
     if (!id || !data || data.length < 1) return undefined
-    const local = findOneLocal({id})
+
+    const local = findOneLocal(id)
     if (local) return local
 
-    const remote = await (storage.read({
+    const remote = await storage.read({
       searchBy: { id },
-      ...params,
-      offline
-    }))
-
+      ...requestConfig
+    })
     if (!remote?.data || remote?.data?.length < 1) return undefined
 
-    if (!findOneLocal({id})){
+    if (!findOneLocal(id)){
       data.push(...remote.data)
     }
-
     return remote.data[0]
   }
 
-  const findBy = async (searchBy: Partial<Model> | undefined): Promise<Model[] | undefined> => {
+  const findBy = async (searchBy?: Partial<Model>) => {
     if (!searchBy || !data || data.length < 1) return undefined
 
     const local = filterBy<Model>(data ?? [], searchBy)
@@ -53,20 +68,74 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
 
     const remote = await (storage.read({
       searchBy,
-      ...params,
-      offline
+      ...requestConfig
     }))
     if (!remote?.data) return undefined
+
     data.push(...remote.data)
     setMetadata(remote.queryUsed)
     return remote.data
   }
 
-  const create = async ({data: dto }: Pick<CreateParams<Model>, 'data'>) => {
+  const fetchF = async ({ query, searchBy, mode = 'clean' }: FetchParams<Model>) => {
+    const res = await (storage.read({
+      query,
+      searchBy,
+      ...requestConfig
+    }))
+    if (mode === 'merge') {
+      setData([...data ?? [], ...res?.data ?? []])
+    }
+    if (mode === 'clean') {
+      setData(res?.data)
+    }
+    setMetadata(res?.queryUsed)
+    setNeedFetching(false)
+    return res
+  }
+
+  const fetch = useCallback(fetchF, [storage, requestConfig, data])
+
+  // ========================================
+  // ============= UPDATE HOOKS =============
+  // ========================================
+
+  const configFetching = () => {
+    if (!(data && data.length < 1 && params.autoFetch !== false)) return
+    setNeedFetching(true)
+  }
+
+  const configAutoFetch = () => {
+    if (!needFetching) return
+    fetch({})
+  }
+
+  const configAppMode = () => {
+    if (appNetStatus === AppNetStatus.mountOffline) {
+      debounce(() => storage.goOffline({
+        path: requestConfig.path,
+        limit: 'NONE'
+      }))
+      setAppNetStatus(AppNetStatus.offline)
+    }
+    if (appNetStatus === AppNetStatus.unmountOffline) {
+      storage.goOnline()
+      setAppNetStatus(AppNetStatus.online)
+    }
+  }
+
+  useEffect(configFetching, [data, params.autoFetch, offline])
+  useEffect(configAutoFetch, [needFetching, fetch])
+  useEffect(configAppMode, [offline, appNetStatus, requestConfig.path])
+
+  // ============================================
+  // ============= CREATE FUNCTIONS =============
+  // ============================================
+
+  const create = async (dto: Model | Model[]) => {
     const res = await storage.create({
       data: dto,
-      ...params,
-      offline
+      ...requestConfig
     })
     if (res && Array.isArray(res)) {
       data?.push(...res)
@@ -76,57 +145,6 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
     }
     return !!res
   }
-
-  const fetch = useCallback(async ({
-    query,
-    searchBy,
-    mode = 'clean'
-  }: Partial<Pick<ReadParams<Model>, 'query' | 'searchBy'>> & {mode?: 'clean' | 'merge'
-    }) => {
-    const res = await (storage.read({
-      query,
-      searchBy,
-      ...params,
-      offline
-    }))
-
-    if (mode === 'merge') {
-      setData([...data ?? [], ...res?.data ?? []])
-    }
-    if (mode === 'clean') {
-      setData(res?.data)
-    }
-    setMetadata(res?.queryUsed)
-    setNeedFetching(false)
-
-    return res
-  }, [params, storage, offline, data])
-
-  useEffect(() => {
-    if (data && data.length < 1 && params.autoFetch !== false) {
-      setNeedFetching(true)
-    }
-  }, [data, params.autoFetch, offline])
-
-  useEffect(() => {
-    if (!needFetching) return
-    fetch({})
-  }, [needFetching, fetch])
-
-  const {debounce} = useDebounce()
-
-  useEffect(() => {
-    if (offline && netOnline) {
-      debounce(() => storage.goOffline({
-        path: params.path,
-        limit: 'NONE'
-      }))
-    }
-    if (!offline) {
-      storage.goOnline()
-    }
-    console.log('Render offline')
-  }, [offline, netOnline, storage, params.path])
 
   return {
     data,

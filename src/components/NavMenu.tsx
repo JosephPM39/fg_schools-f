@@ -17,16 +17,14 @@ export const NavMenu = () => {
   const open = Boolean(anchorEl);
   const useSchool = useContext(SchoolContext)
   const useSchoolProm = useContext(SchoolPromContext)
-  const { offlineMode, toggleOfflineMode } = useNetStatus()
+  const { isAppOffline, toggleOfflineMode } = useNetStatus()
 
   const postSchool = () => {
     useSchool?.create({
-      data: {
-        "name": "aasdf",
-        "code": "75289-5897",
-        "icon": "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/540.jpg",
-        "location": "aaaaaaaaaaaaaaaaaa"
-      }
+      "name": "aasdf",
+      "code": "75289-5897",
+      "icon": "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/540.jpg",
+      "location": "aaaaaaaaaaaaaaaaaa"
     })
   }
 
@@ -79,7 +77,7 @@ export const NavMenu = () => {
         </MenuItem>
         <Divider sx={{ my: 0.5 }} />
         <MenuItem onClick={toggleOfflineMode} disableRipple disableTouchRipple>
-          <FormControlLabel control={<Switch checked={offlineMode}/>} label="&#8288;Modo offline" />
+          <FormControlLabel control={<Switch checked={isAppOffline()}/>} label="&#8288;Modo offline" />
         </MenuItem>
         <Divider sx={{ my: 0.5 }} />
         <MenuItem onClick={handleClose} disableRipple>
