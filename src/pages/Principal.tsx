@@ -3,10 +3,10 @@ import { NavBar } from '../containers/NavBar'
 import { SearchField } from '../components/SearchField'
 import { SchoolCard } from '../components/SchoolCard'
 import { useContext } from 'react'
-import { SchoolPromContext } from '../context/api/schools/'
+import { ApiContext } from '../context/ApiContext'
 
 export const Principal = () => {
-  const schoolProms = useContext(SchoolPromContext)
+  const schoolProms = useContext(ApiContext)?.useSchoolProm
 
   const Cards = () => {
     return schoolProms?.data?.map((prom, index)=> (

@@ -3,7 +3,7 @@ import { SchoolsCardData } from './types';
 import { SectionsTabs } from './SectionsTabs';
 import { Modal } from '../containers/Modal'
 import { useContext, useEffect, useState } from 'react';
-import { SectionPromContext } from '../context/api/schools';
+import { ApiContext } from '../context/ApiContext';
 
 interface Params {
   initOpen: boolean,
@@ -13,7 +13,7 @@ interface Params {
 
 export const SectionsModal = (params: Params) => {
   const [proms, setProms] = useState<Array<ISectionProm>>([])
-  const useSectionProm = useContext(SectionPromContext)
+  const useSectionProm = useContext(ApiContext)?.useSectionProm
 
   useEffect(() => {
     const getData = async () => {

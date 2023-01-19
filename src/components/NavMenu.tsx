@@ -11,12 +11,13 @@ import { SchoolContext, SchoolPromContext } from '../context/api/schools';
 import { isNumber } from 'class-validator';
 import { YearSelect } from './forms/YearSelect';
 import { useNetStatus } from '../hooks/useNetStatus';
+import { ApiContext } from '../context/ApiContext';
 
 export const NavMenu = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const useSchool = useContext(SchoolContext)
-  const useSchoolProm = useContext(SchoolPromContext)
+  const useSchool = useContext(ApiContext)?.useSchool
+  const useSchoolProm = useContext(ApiContext)?.useSchoolProm
   const { offlineMode, toggleOfflineMode } = useNetStatus()
 
   const postSchool = () => {

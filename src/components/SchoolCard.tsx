@@ -1,7 +1,7 @@
 import { Card, CardActions, CardContent,CardMedia,Button, Typography} from '@mui/material'
 import { useContext, useEffect, useState } from 'react';
 import { ISchoolProm } from '../api/models_school';
-import { EmployeeContext, EmployeePositionContext, PositionContext, SchoolContext } from '../context/api/schools';
+import { ApiContext } from '../context/ApiContext';
 import { SectionsModal } from './SectionsModal';
 import { SchoolsCardData } from './types';
 
@@ -11,10 +11,10 @@ interface Params {
 
 export const SchoolCard = (params: Params) => {
   const [obj, setObj] = useState<SchoolsCardData | undefined>(undefined)
-  const useEmployeePosition = useContext(EmployeePositionContext)
-  const useSchool = useContext(SchoolContext)
-  const useEmployee = useContext(EmployeeContext)
-  const usePosition = useContext(PositionContext)
+  const useEmployeePosition = useContext(ApiContext)?.useEmployeePosition
+  const useSchool = useContext(ApiContext)?.useSchool
+  const useEmployee = useContext(ApiContext)?.useEmployee
+  const usePosition = useContext(ApiContext)?.usePosition
 
   useEffect(() => {
     const getData = async () => {

@@ -3,20 +3,23 @@ import { StorageRequest, CreateParams, ReadParams } from '../../api/services'
 import { IBaseModel } from '../../api/models_school/base.model'
 import { ModelClassType, QueryUsed } from '../../api/types'
 import { filterBy } from '../../api/services/utils'
-import { useNetStatus } from '../useNetStatus'
 import { useDebounce } from '../useDebouce'
 
 export interface BaseParams<Model extends IBaseModel> {
   path: string
   model: ModelClassType<Model>
   autoFetch?: boolean
+  netStatus: {
+    offlineMode: boolean
+    netOnline: boolean
+  }
 }
 
 export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => {
   const [data, setData] = useState<Model[] | undefined>([])
   const [metadata, setMetadata] = useState<QueryUsed | undefined>(undefined)
   const [needFetching, setNeedFetching] = useState(false)
-  const { offlineMode: offline, netOnline } = useNetStatus()
+  const { offlineMode: offline, netOnline } = params.netStatus
 
   const storage = useMemo(() => new StorageRequest<Model>(), [])
 
@@ -125,7 +128,7 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
     if (!offline) {
       storage.goOnline()
     }
-  }, [offline, storage, params.path])
+  }, [offline, storage, params.path, netOnline])
 
   return {
     data,

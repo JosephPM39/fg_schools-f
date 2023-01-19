@@ -1,11 +1,9 @@
 import {Principal} from './pages/Principal'
 import {ReactNode, useContext} from 'react'
 
-import {
-  SchoolComponentProviders,
-} from './context/api/schools/'
 import { SessionContext, SessionProvider } from './context/SessionContext';
 import { Unauthorized } from './pages/Unauthorized';
+import { ApiProvider } from './context/ApiContext';
 
 function App() {
 
@@ -16,9 +14,9 @@ function App() {
       return <Unauthorized/>
     }
 
-    return <SchoolComponentProviders>
+    return <ApiProvider>
       {children}
-    </SchoolComponentProviders>
+    </ApiProvider>
   }
 
   return <SessionProvider>

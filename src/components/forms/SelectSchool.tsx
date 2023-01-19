@@ -3,6 +3,7 @@ import { Dispatch, SetStateAction, useContext, useEffect, useState } from "react
 import { ISchool, ISchoolProm } from "../../api/models_school"
 import { QueryUsed } from "../../api/types"
 import { SchoolPromContext, SchoolContext } from "../../context/api/schools"
+import { ApiContext } from "../../context/ApiContext"
 import { useSchoolProm } from "../../hooks/api/schools/useSchoolProm"
 import { YearSelect } from "./YearSelect"
 
@@ -15,8 +16,8 @@ export const SelectSchool = ({hook}: params) => {
     data: Array<ISchoolProm> | undefined
     queryUsed: QueryUsed | undefined
   }>()
-  const useSchoolPromsContext = useContext(SchoolPromContext)
-  const useSchool = useContext(SchoolContext)
+  const useSchoolPromsContext = useContext(ApiContext)?.useSchoolProm
+  const useSchool = useContext(ApiContext)?.useSchool
   const [year, setYear] = useState<number>((useSchoolPromsContext?.year ?? new Date().getFullYear()) - 1)
   const useSchoolProms = useSchoolProm({autoFetch: false})
   const [schoolPromSelected, setSchoolPromSelected] = hook
