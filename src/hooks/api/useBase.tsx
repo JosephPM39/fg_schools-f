@@ -128,7 +128,12 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
     if (!offline) {
       storage.goOnline()
     }
+<<<<<<< HEAD
   }, [offline, storage, params.path, netOnline])
+=======
+    console.log('Render offline')
+  }, [offline, netOnline, storage, params.path])
+>>>>>>> offline_re-rendering
 
   return {
     data,

@@ -5,7 +5,6 @@ const toBool = (value?: string | null) => value?.toLowerCase() === 'true'
 export const useNetStatus = () => {
   const [offlineMode, setOfflineMode] = useState(toBool(localStorage.getItem('offline')))
   const [netOnline, setNetOnline] = useState(navigator.onLine)
-  const [initOffline, setInitOffline] = useState(toBool(localStorage.getItem('offline-init')))
 
   useEffect(() => {
     const offlineHandler = () => {
@@ -29,21 +28,24 @@ export const useNetStatus = () => {
   useEffect(() => {
     const storageHandler = () => {
       const offline = window.localStorage.getItem('offline')
-      const offlineInit = window.localStorage.getItem('offline-init')
+      console.log('offlimeno handler')
       if (offline && toBool(offline) !== offlineMode) {
+        console.log('seupt offlineMode')
         setOfflineMode(toBool(offline))
       }
-      if (offlineInit && toBool(offlineInit) !== initOffline) {
-        setInitOffline(toBool(offlineInit))
-      }
     }
+    window.onstorage = () => {
+    // When local storage changes, dump the list to
+    // the console.
+      console.log(window.localStorage.getItem('offline'), 'seeing');
+    };
 
     window.addEventListener('storage', storageHandler)
 
     return () => {
       window.removeEventListener('storage', storageHandler)
     }
-  }, [offlineMode, initOffline])
+  }, [offlineMode])
 
   const toggleOfflineMode = () => {
     if (offlineMode) {
@@ -54,10 +56,12 @@ export const useNetStatus = () => {
 
   const goOffline = () => {
     localStorage.setItem('offline', String(true))
+    window.dispatchEvent(new Event('storage'))
   }
 
   const goOnline = () => {
     localStorage.setItem('offline', String(false))
+    window.dispatchEvent(new Event('storage'))
   }
 
   return {

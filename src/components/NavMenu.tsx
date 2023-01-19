@@ -80,7 +80,7 @@ export const NavMenu = () => {
         </MenuItem>
         <Divider sx={{ my: 0.5 }} />
         <MenuItem onClick={toggleOfflineMode} disableRipple disableTouchRipple>
-          <FormControlLabel control={<Switch defaultChecked={offlineMode}/>} label="&#8288;Modo offline" />
+          <FormControlLabel control={<Switch checked={offlineMode}/>} label="&#8288;Modo offline" />
         </MenuItem>
         <Divider sx={{ my: 0.5 }} />
         <MenuItem onClick={handleClose} disableRipple>
