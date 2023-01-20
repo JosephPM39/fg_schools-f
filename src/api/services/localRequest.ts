@@ -1,10 +1,15 @@
 import { IBaseModel } from '../models_school/base.model'
-import { GetFilteredParams, GetParams, PostParams, DeleteParams, PatchParams } from './types'
+import { PostParams, DeleteParams, PatchParams, ReadParams } from './types'
 import { filterBy, queryFilter } from './utils'
 
 export class LocalRequest<Model extends IBaseModel> {
-  read = ({ path, searchBy, query }: GetParams<Model> | GetFilteredParams<Model>) => {
-    const existent = this.get(path)
+
+  constructor(
+    private path: string
+  ) {}
+
+  read = ({ searchBy, query }: ReadParams<Model>) => {
+    const existent = this.get(this.path)
     if (!existent) return undefined
     if (!searchBy) {
       return queryFilter(existent, query)
@@ -13,8 +18,8 @@ export class LocalRequest<Model extends IBaseModel> {
     return queryFilter(filteredBy, query)
   }
 
-  create = ({path, data}: PostParams<Model>) => {
-    const existent = this.get(path)
+  create = ({ data }: PostParams<Model>) => {
+    const existent = this.get(this.path)
 
     if (existent && Array.isArray(data)) {
 
@@ -28,7 +33,7 @@ export class LocalRequest<Model extends IBaseModel> {
         throw new Error('Duplicate data not allowed')
       }
       const d = [...existent, ...data]
-      return this.set(path, d) ? data : undefined
+      return this.set(this.path, d) ? data : undefined
     }
 
     if (existent && !Array.isArray(data)) {
@@ -37,18 +42,18 @@ export class LocalRequest<Model extends IBaseModel> {
         throw new Error('Duplicate data not allowed')
       }
       const d = [...existent, data]
-      return this.set(path, d) ? [data] : undefined
+      return this.set(this.path, d) ? [data] : undefined
     }
 
     if (Array.isArray(data)) {
-      return this.set(path, data) ? data : undefined
+      return this.set(this.path, data) ? data : undefined
     }
 
-    return this.set(path, [data]) ? [data] : undefined
+    return this.set(this.path, [data]) ? [data] : undefined
   }
 
-  patch = ({ path, data, id }: PatchParams<Model>) => {
-    const existent = this.get(path)
+  patch = ({ data, id }: PatchParams<Model>) => {
+    const existent = this.get(this.path)
     if (!existent) return false
 
     const index = existent.findIndex((e) => e.id === id)
@@ -59,11 +64,11 @@ export class LocalRequest<Model extends IBaseModel> {
       ...data
     }
 
-    return this.set(path, existent)
+    return this.set(this.path, existent)
   }
 
-  delete = ({ path, id }: DeleteParams<Model>) => {
-    const existent = this.get(path)
+  delete = ({ id }: DeleteParams<Model>) => {
+    const existent = this.get(this.path)
     if (!existent) return false
 
     const index = existent.findIndex((e) => e.id === id)
@@ -72,7 +77,7 @@ export class LocalRequest<Model extends IBaseModel> {
     const res = delete existent[index]
     if (!res) return false
 
-    return this.set(path, existent)
+    return this.set(this.path, existent)
   }
 
   get = (k: string) => {

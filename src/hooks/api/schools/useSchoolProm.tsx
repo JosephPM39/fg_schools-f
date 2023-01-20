@@ -2,8 +2,28 @@ import { useEffect, useState } from 'react'
 import { ISchoolProm, SchoolProm } from '../../../api/models_school'
 import { useBase } from '../useBase'
 
-export const useSchoolProm = (params?: {autoFetch?: boolean, year?: number}) => {
-  const [year, setYear] = useState<number>(params?.year ?? new Date().getFullYear())
+interface Params {
+  autoFetch?: boolean,
+  year?: number
+}
+
+const defaultParams = {
+  autoFetch: true,
+  year: new Date().getFullYear()
+}
+
+const getParams = (params?: Params): Required<Params> => {
+  if (!params) return defaultParams
+  const {year, autoFetch} = params
+  return {
+    year: year ?? defaultParams.year,
+    autoFetch: autoFetch ?? defaultParams.autoFetch
+  }
+}
+
+export const useSchoolProm = (params?: Params) => {
+  const {year: yearParam, autoFetch} = getParams(params)
+  const [year, setYear] = useState<number>(yearParam)
 
   const hook = useBase<ISchoolProm>({
     path: 'schools/school-prom',
@@ -12,16 +32,16 @@ export const useSchoolProm = (params?: {autoFetch?: boolean, year?: number}) => 
   })
 
   useEffect(() => {
-    if (params?.autoFetch ?? true) {
+    if (autoFetch) {
       hook.fetch({searchBy: { year }})
     }
-  }, [year, params?.autoFetch])
+  }, [year, autoFetch])
 
   useEffect(() => {
-    if (params?.year) {
-      setYear(params?.year)
+    if (yearParam) {
+      setYear(yearParam)
     }
-  }, [params?.year])
+  }, [yearParam])
 
   return {
     ...hook,

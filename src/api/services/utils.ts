@@ -101,4 +101,3 @@ export const filterBy = <Model extends IBaseModel>(json: Model[], searchBy: Part
     return res.length === keys.length
   })
 }
-

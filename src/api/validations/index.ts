@@ -1,5 +1,5 @@
 import { ValidateIdOptions, ValidateDtoOptions } from '../types'
-import { ClassConstructor, plainToInstance } from 'class-transformer'
+import { ClassConstructor, instanceToPlain, plainToInstance } from 'class-transformer'
 import { validate, ValidationError } from 'class-validator'
 import { IQuery, Query } from './query'
 
@@ -52,7 +52,11 @@ export const validateDto = async <Model extends {}>(params: ValidateDtoOptions<M
     delete boomError.stack
     throw boomError
   }
-  return instance
+  const plain = instanceToPlain(instance, {
+    exposeUnsetFields: false,
+    ...transformOptions
+  })
+  return plain as Model
 }
 
 export const validateQuery = async (query?: object | IQuery): Promise<Partial<Query> | undefined> => {

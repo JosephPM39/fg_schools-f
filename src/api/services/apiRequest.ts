@@ -2,14 +2,19 @@ import { instanceToPlain } from 'class-transformer'
 import { CONFIG } from '../../config'
 import { IBaseModel } from '../models_school/base.model'
 import { QueryUsed } from '../types'
-import { PostParams, GetParams, PatchParams, DeleteParams, GetFilteredParams } from './types'
-import { removeOfflineFlag, addOfflineFlag, searchByHandler } from './utils'
+import { PostParams, GetNormalParams, PatchParams, DeleteParams, GetFilteredParams } from './types'
+import { removeOfflineFlag, addOfflineFlag } from './utils'
 import { fetchOnce } from './utils'
 
 export class ApiRequest<Model extends IBaseModel> {
+
+  constructor(
+    private path: string
+  ) {}
+
   post = async (params: PostParams<Model>) => {
     const data = removeOfflineFlag<Model>(params.data)
-    const path = `${CONFIG.schoolsApiUrl}${params.path}`
+    const path = `${CONFIG.schoolsApiUrl}${this.path}`
     const res = await fetch(path, {
       method: 'POST',
       body: JSON.stringify(data)
@@ -18,13 +23,13 @@ export class ApiRequest<Model extends IBaseModel> {
     return addOfflineFlag<Model>(await res.json())
   }
 
-  get = async (params: GetParams<Model>) => {
+  get = async (params: GetNormalParams<Model>) => {
     const query = instanceToPlain(params.query, {
       exposeUnsetFields: false
     })
     const { id } = params.searchBy ?? { id: '' }
     const searchParams = new URLSearchParams(query)
-    const path = `${CONFIG.schoolsApiUrl}${params.path}/${id}?${searchParams}`
+    const path = `${CONFIG.schoolsApiUrl}${this.path}/${id}?${searchParams}`
 
     const res = await fetchOnce(path)
     if (!res) return
@@ -44,7 +49,7 @@ export class ApiRequest<Model extends IBaseModel> {
       ...params.searchBy
     }))
     const searchParams = new URLSearchParams(query)
-    const path = `${CONFIG.schoolsApiUrl}${params.path}/get-filtered?${searchParams}`
+    const path = `${CONFIG.schoolsApiUrl}${this.path}/get-filtered?${searchParams}`
 
     const res = await fetchOnce(path, {
       method: 'POST',
@@ -60,7 +65,7 @@ export class ApiRequest<Model extends IBaseModel> {
   }
 
   patch = async (params: PatchParams<Model>) => {
-    const path = `${CONFIG.schoolsApiUrl}${params.path}${params.id}`
+    const path = `${CONFIG.schoolsApiUrl}${this.path}${params.id}`
     const res = await fetch(path, {
       method: 'PATCH',
       body: JSON.stringify(params.data)
@@ -69,8 +74,8 @@ export class ApiRequest<Model extends IBaseModel> {
     return res.body
   }
 
-  deleteF = async (params: DeleteParams<Model>) => {
-    const path = `${CONFIG.schoolsApiUrl}${params.path}${params.id}`
+  delete = async (params: DeleteParams<Model>) => {
+    const path = `${CONFIG.schoolsApiUrl}${this.path}${params.id}`
     const res = await fetch(path, {
       method: 'PATCH',
     })

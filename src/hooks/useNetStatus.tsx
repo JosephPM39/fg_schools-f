@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react"
 
-// export type Status = 'mount-offline' | 'online' | 'unmount-offline' | 'offline' | 'mount-error' | 'unmount-error'
 export enum AppNetStatus {
   mountOffline = 'mount-offline',
   mountError = 'mount-error',
@@ -102,6 +101,10 @@ export const useNetStatus = () => {
     return appNetStatus === AppNetStatus.offline
   }
 
+  const isAppNetStatus = (st: AppNetStatus) => {
+    return appNetStatus === st
+  }
+
   const toggleOfflineMode = () => {
     if (!isBrowserOnline) {
       console.log('Denied')
@@ -128,6 +131,7 @@ export const useNetStatus = () => {
     appNetErrors,
     appNetStatus,
     isAppOffline,
+    isAppNetStatus,
     isBrowserOnline,
     setAppNetStatus: changeAppNetStatus,
     toggleOfflineMode,

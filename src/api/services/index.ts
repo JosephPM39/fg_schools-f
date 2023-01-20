@@ -1,58 +1,59 @@
 import { IBaseModel } from "../models_school/base.model";
 import {validateDto, validateIdBy, validateQuery} from '../validations'
-import { EXPOSE_VERSIONS as EV, ModelClassType, QueryUsed } from '../types'
+import { EXPOSE_VERSIONS as EV, ModelClassType } from '../types'
 import { ApiRequest } from "./apiRequest";
-import { IQuery } from "../validations/query"
 import { LocalRequest } from "./localRequest";
-import { isSearchById } from "./types";
+import { isSearchById, SearchBy, SearchById } from "./types";
 import { instanceToPlain } from "class-transformer";
+import {
+  ReadParams,
+  PostParams as CreateParams,
+  PatchParams as UpdateParams,
+  DeleteParams
+} from './types'
+export type { ReadParams, CreateParams, UpdateParams, DeleteParams }
 
-interface BaseParams {
+
+interface GoOfflineParams {
+  limit: number | 'NONE'
+}
+
+interface StorageRequestConfig<Model extends IBaseModel> {
+  model: ModelClassType<Model>
   path: string
   offline: boolean
 }
 
-export interface CreateParams<Model> extends BaseParams {
-  data: Model[] | Model
-  model: ModelClassType<Model>
-}
-
-export interface ReadParams<Model extends IBaseModel> extends BaseParams {
-  model: ModelClassType<Model>
-  query?: IQuery
-  searchBy?: Omit<Partial<Model>, 'id'> | Pick<Model, 'id'>
-}
-
-interface GoOfflineParams<Model extends IBaseModel> {
-  limit: number | 'NONE'
-  path: string
-}
-
 export class StorageRequest<Model extends IBaseModel> {
 
-  private local = new LocalRequest<Model>()
-  private api = new ApiRequest<Model>()
+  private local = new LocalRequest<Model>(this.config.path)
+  private api = new ApiRequest<Model>(this.config.path)
+
+  constructor(
+    private config: StorageRequestConfig<Model>
+  ) {}
 
   create = async (params: CreateParams<Model>) => {
-    const { data: dto, model, path } = params
+    const { data: dto } = params
+    const {model, offline } = this.config
     const data = await validateDto<Model>({
       dto: dto,
-      model: model,
+      model,
       version: EV.CREATE
     })
 
-    if (!params.offline) {
-      const res = await this.api.post({ path, data })
+    if (offline) {
+      const res = await this.api.post({ data })
       if (!res) throw new Error('Falló la operación')
       return res[0]
     }
-    return this.local.create({path, data})
+    return this.local.create({ data })
   }
 
   // To go offline, fetch entity, the lenght of fetch will be pass as parameter (limit)
-  goOffline = async ({path, limit}: GoOfflineParams<Model>) => {
+  goOffline = async ({limit}: GoOfflineParams) => {
+    const {path} = this.config
     const res = await this.api.get({
-      path,
       query: {
         limit: String(limit)
       }
@@ -68,24 +69,49 @@ export class StorageRequest<Model extends IBaseModel> {
   }
 
   read = async (params: ReadParams<Model>) => {
-    const { query: dto, searchBy: sb, model, path } = params
+    const { query: dto, searchBy: sb} = params
+    const {model, offline } = this.config
     const query = dto ? await validateQuery(dto) : undefined
     const searchBy = instanceToPlain(
       await validateIdBy({searchBy: sb, model, version: EV.GET }),
       {
         exposeUnsetFields: false
       }
-    ) as Partial<Model>
+    ) as SearchById<Model> | SearchBy<Model>
 
-    if (!params.offline) {
-      if (!searchBy || isSearchById(searchBy)) {
-        return await this.api.get({ query, searchBy, path })
-      }
-      return await this.api.getFiltered({ query, searchBy, path })
+    if (offline) return this.local.read({searchBy,query})
+
+    if (!searchBy || isSearchById(searchBy)) {
+      return await this.api.get({ searchBy, query })
     }
+    return await this.api.getFiltered({searchBy, query})
+  }
 
-    console.log(searchBy,'searchBy')
-    return this.local.read({ path, searchBy, query })
+  update = async (params: UpdateParams<Model>) => {
+    const {data: dto, id } = params
+    const {model, offline } = this.config
+    const data = await validateDto<Model>({
+      dto,
+      model,
+      version: EV.UPDATE
+    })
+
+    const config = { id, data }
+
+    if (offline) return this.local.patch(config)
+
+    const res = await this.api.patch(config)
+    return !!res
+  }
+
+  delete = async (params: DeleteParams<Model>) => {
+    const { id } = params
+    const { offline } = this.config
+
+    if (offline) return this.local.delete({id})
+
+    const res = await this.api.delete({id})
+    return !!res
   }
 }
 
