@@ -4,29 +4,18 @@ import { Settings as SettingsIcon, Edit as EditIcon, Logout as LogoutIcon } from
 import MenuItem from '@mui/material/MenuItem';
 import Divider from '@mui/material/Divider';
 import { MenuStyled } from '../styles/MenuStyled'
-import { FormControl, FormControlLabel, InputLabel, Select, SelectChangeEvent, Switch } from '@mui/material';
+import { FormControlLabel, Switch } from '@mui/material';
 import { Menu as MenuIcon, SaveAlt as SaveAltIcon } from '@mui/icons-material'
 import { AddSchoolPromFormModal } from './forms/AddSchoolPromFormModal';
-import { SchoolContext, SchoolPromContext } from '../context/api/schools';
-import { isNumber } from 'class-validator';
+import { SchoolPromContext } from '../context/api/schools';
 import { YearSelect } from './forms/YearSelect';
 import { useNetStatus } from '../hooks/useNetStatus';
 
 export const NavMenu = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const useSchool = useContext(SchoolContext)
   const useSchoolProm = useContext(SchoolPromContext)
   const { isAppOffline, toggleOfflineMode } = useNetStatus()
-
-  const postSchool = () => {
-    useSchool?.create({
-      "name": "aasdf",
-      "code": "75289-5897",
-      "icon": "https://cloudflare-ipfs.com/ipfs/Qmd3W5DuhgHirLHGVixi6V76LhCkZUz6pnFt5AJBiyvHye/avatar/540.jpg",
-      "location": "aaaaaaaaaaaaaaaaaa"
-    })
-  }
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -70,10 +59,12 @@ export const NavMenu = () => {
           </MenuItem>
         }
         />
-        <MenuItem onClick={handleClose}>
+
+        {isAppOffline() && <MenuItem onClick={handleClose}>
           <SaveAltIcon/>
-           &#8288;Respaldar todo
-        </MenuItem>
+          &#8288;Respaldar todo
+        </MenuItem>}
+
         <MenuItem onClick={handleClose} disableRipple>
           <SettingsIcon/>
           &#8288;Ajustes
@@ -82,12 +73,12 @@ export const NavMenu = () => {
         <MenuItem onClick={toggleOfflineMode} disableRipple disableTouchRipple>
           <FormControlLabel control={<Switch checked={isAppOffline()}/>} label="&#8288;Modo offline" />
         </MenuItem>
-        <Divider sx={{ my: 0.5 }} />
-        <MenuItem onClick={handleClose} disableRipple>
+        {!isAppOffline() && <Divider sx={{ my: 0.5 }} /> }
+        {!isAppOffline() && <MenuItem onClick={handleClose} disableRipple>
           <LogoutIcon/>
           &#8288;Cerrar sesión
         </MenuItem>
-
+        }
 
       </MenuStyled>
     </div>

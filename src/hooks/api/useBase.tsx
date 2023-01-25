@@ -133,10 +133,10 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
       data: dto,
     })
     if (res && Array.isArray(res)) {
-      data?.push(...res)
+      setData([...data, ...res])
     }
     if (res && !Array.isArray(res)) {
-      data?.push(res)
+      setData([...data, res])
     }
     return !!res
   }
