@@ -1,90 +1,49 @@
 import { SchoolFormInputs } from '../SchoolFormInputs';
-import { ChangeEvent, FormEvent, ReactNode, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, FormEvent, ReactNode, useContext, useEffect, useRef, useState } from 'react';
 import { EmployeePositionFormInputs } from '../EmployeePositionFormInputs';
 import { PositionType } from '../../../api/models_school/schools/position.model';
 import { Button, Divider, FormControlLabel, FormLabel, Radio, RadioGroup } from '@mui/material';
-import { IEmployeePosition, ISchool, ISchoolProm } from '../../../api/models_school';
+import { IEmployeePosition, ISchoolProm } from '../../../api/models_school';
 import { SelectSchoolPromYear } from '../SelectSchoolProm-Year';
 import { SelectEmployeePositionPromYear } from '../SelectEmployeePosition-PromYear';
+import { useEmployee } from '../../../hooks/api/schools/useEmployee';
+import { useEmployeePosition } from '../../../hooks/api/schools/useEmployeePosition';
+import { SchoolPromContext } from '../../../context/api/schools';
+import { useSchool } from '../../../hooks/api/schools/useSchool';
+import { getSubmitData } from './getData'
 
 type SchoolOrigin = 'new' | 'previous'
 type PrincipalOrigin = 'new' | 'previous' | 'all'
 
 export const Form = () => {
-
   const form = useRef<HTMLFormElement | null>(null)
+
   const [schoolOrigin, setSchoolOrigin] = useState<SchoolOrigin>('new')
   const [principalOrigin, setPrincipalOrigin] = useState<PrincipalOrigin>('new')
   const [schoolSelected, setSchoolSelected] = useState<ISchoolProm>()
-  const [epSelected, setEPSelected] = useState<Partial<IEmployeePosition>>()
+  const [principalSelected, setPrincipalSelected] = useState<IEmployeePosition>()
 
   const [schoolInput, setSchoolInput] = useState<ReactNode>(<>Loading</>)
   const [principalInput, setPrincipalInput] = useState<ReactNode>(<>Loading</>)
 
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    let schoolData: Partial<ISchool> | undefined
-    let principal: Partial<IEmployeePosition> | undefined
-    if (!form.current) return
-    const formData = new FormData(form.current)
+  const [isSending, setSending] = useState(false)
 
-    const icon = formData.get('icon') as File | null
-    const name = formData.get('name') as string ?? undefined
-    const location = formData.get('location') as string ?? undefined
-    const code = formData.get('code') as string ?? undefined
-
-    schoolData = {
-      icon: icon?.name || 'default',
-      name,
-      location,
-      code
-    }
-
-    const firstName = formData.get('first_name') as string
-    const lastName = formData.get('last_name') as string
-    const contact = formData.get('contact') as string
-    const profesion = formData.get('profesion') as string
-    const positionId = formData.get('position_id') as string
-
-    principal = {
-      employee: {
-        firstName,
-        lastName,
-        contact,
-        profesion
-      },
-      positionId
-    }
-
-    console.log(form, 'form')
-
-    if (schoolOrigin === 'new') {
-      console.log(schoolData, 'data')
-    }
-
-    console.log(principal,'data')
-
-    if (schoolOrigin === 'previous') {
-      console.log(schoolSelected, 'previous school')
-    }
-  }
-
-  const onChangeSchoolOrigin = (e: ChangeEvent<HTMLInputElement>) => {
-    setSchoolOrigin(e.target.value as SchoolOrigin)
-    if (e.target.value === 'new' && principalOrigin === 'previous') {
-      setPrincipalOrigin('new')
-    }
-  }
+  const useEmployees = useEmployee()
+  const useEmployeePositions = useEmployeePosition()
+  const useSchools = useSchool()
+  const useSchoolProms = useContext(SchoolPromContext)
 
   useEffect(() => {
     if (!schoolSelected && principalOrigin === 'previous') {
       setPrincipalOrigin('new')
     }
-  }, [schoolSelected, principalOrigin])
-
-  const onChangePrincipalOrigin = (e: ChangeEvent<HTMLInputElement>) => {
-    setPrincipalOrigin(e.target.value as PrincipalOrigin)
-  }
+    if (schoolOrigin === 'new' && schoolSelected) {
+      setSchoolSelected(undefined)
+    }
+    if (principalOrigin === 'new' && principalSelected) {
+      setPrincipalSelected(undefined)
+    }
+  }, [schoolSelected, principalOrigin, schoolOrigin, principalSelected])
 
   useEffect(() => {
     if (principalOrigin === 'new') {
@@ -109,11 +68,11 @@ export const Form = () => {
       <SelectEmployeePositionPromYear
         proms={getSchoolProm()}
         yearSelect={needYearSelect()}
-        onSelect={(ep) => setEPSelected(ep)}
+        onSelect={(ep) => setPrincipalSelected(ep)}
         type={PositionType.PRINCIPAL}
       />
     )
-  }, [principalOrigin, schoolSelected, epSelected])
+  }, [principalOrigin, schoolSelected, principalSelected])
 
   useEffect(() => {
     if (schoolOrigin === 'new') {
@@ -124,6 +83,53 @@ export const Form = () => {
     }
   }, [schoolOrigin])
 
+  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    submitAction()
+  }
+
+  const submitAction = async () => {
+    setSending(true)
+    const data = getSubmitData({
+      schoolSelected,
+      principalSelected,
+      form: form.current
+    })
+
+    if (!data || !useSchoolProms) return
+
+    if (data.school) {
+      await useSchools.create({
+        ...data.school.data
+      })
+    }
+
+    if (data.principal?.employee) {
+      await useEmployees.create(data.principal.employee)
+    }
+
+    if (data.principal) {
+      const ep = {
+        ...data.principal,
+      }
+      delete ep.employee
+      await useEmployeePositions.create(ep)
+    }
+
+    await useSchoolProms.create(data.schoolProm)
+    setSending(false)
+  }
+
+  const onChangeSchoolOrigin = (e: ChangeEvent<HTMLInputElement>) => {
+    setSchoolOrigin(e.target.value as SchoolOrigin)
+    if (e.target.value === 'new' && principalOrigin === 'previous') {
+      setPrincipalOrigin('new')
+    }
+  }
+
+  const onChangePrincipalOrigin = (e: ChangeEvent<HTMLInputElement>) => {
+    setPrincipalOrigin(e.target.value as PrincipalOrigin)
+  }
 
   return <>
     <form ref={form} onSubmit={onSubmit}>
@@ -147,7 +153,9 @@ export const Form = () => {
       </RadioGroup>
       {principalInput}
       <br/>
-      <Button type='submit' variant='contained'>Guardar</Button>
+      <Button type='submit' variant='contained' disabled={isSending}>
+        {isSending ? 'Guardando...' : 'Guardar'}
+      </Button>
     </form>
   </>
 }

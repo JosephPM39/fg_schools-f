@@ -49,6 +49,10 @@ export const EmployeePositionFormInputs = (params?: EPFIParams) => {
           value={obj?.employee?.firstName}
           name="first_name"
           label="Nombre(s)"
+          type='text'
+          inputProps={{
+            maxLength: 40,
+          }}
           variant="outlined"
           required
         />
@@ -59,6 +63,10 @@ export const EmployeePositionFormInputs = (params?: EPFIParams) => {
           value={obj?.employee?.lastName}
           name="last_name"
           label="Apellido(s)"
+          type='text'
+          inputProps={{
+            maxLength: 40,
+          }}
           variant="outlined"
           required
         />
@@ -69,6 +77,10 @@ export const EmployeePositionFormInputs = (params?: EPFIParams) => {
           value={obj?.employee?.contact}
           name="contact"
           label="Contacto"
+          type='text'
+          inputProps={{
+            maxLength: 55,
+          }}
           variant="outlined"
           required
         />
@@ -79,6 +91,10 @@ export const EmployeePositionFormInputs = (params?: EPFIParams) => {
           value={obj?.employee?.profesion}
           name="profesion"
           label="Profesión"
+          type='text'
+          inputProps={{
+            maxLength: 10,
+          }}
           variant="outlined"
           required
         />

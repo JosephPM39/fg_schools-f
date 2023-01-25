@@ -42,7 +42,7 @@ export class StorageRequest<Model extends IBaseModel> {
       version: EV.CREATE
     })
 
-    if (offline) {
+    if (!offline) {
       const res = await this.api.post({ data })
       if (!res) throw new Error('Falló la operación')
       return res[0]

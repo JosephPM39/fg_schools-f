@@ -42,7 +42,7 @@ export const SelectSchoolPromYear = ({onSelect}: params) => {
         <SelectSchoolProm list={list} onSelect={onSelect}/>
       </Grid>
       <Grid item xs={12} sm={6}>
-        <YearSelect onSelect={(y) => setYear(y)}/>
+        <YearSelect onSelect={(y) => setYear(y)} defaultValue={year}/>
       </Grid>
     </Grid>
   </>

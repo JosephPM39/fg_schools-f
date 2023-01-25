@@ -20,12 +20,12 @@ export class EmployeePosition extends BaseModel {
   @Expose({ since: EV.CREATE_NESTED, until: EV.DELETE })
   @IsOptional()
   @ValidateNested()
-    employee: Employee | undefined
+    employee?: Employee | undefined
 
   @Expose({ since: EV.CREATE_NESTED, until: EV.DELETE })
   @IsOptional()
   @ValidateNested()
-    position: Position | undefined
+    position?: Position | undefined
 }
 
 export interface IEmployeePosition extends EmployeePosition {}

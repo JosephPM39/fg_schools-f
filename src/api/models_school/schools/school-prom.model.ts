@@ -26,12 +26,12 @@ export class SchoolProm extends BaseModel {
   @Expose({ since: EV.CREATE_NESTED, until: EV.DELETE })
   @ValidateIf(o => !o.principalId)
   @ValidateNested()
-    principal: EmployeePosition
+    principal?: EmployeePosition
 
   @Expose({ since: EV.CREATE_NESTED, until: EV.DELETE })
   @ValidateIf(o => !o.schoolId)
   @ValidateNested()
-    school: School | undefined
+    school?: School
 
 }
 
