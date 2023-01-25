@@ -6,7 +6,7 @@ import Divider from '@mui/material/Divider';
 import { MenuStyled } from '../styles/MenuStyled'
 import { FormControl, FormControlLabel, InputLabel, Select, SelectChangeEvent, Switch } from '@mui/material';
 import { Menu as MenuIcon, SaveAlt as SaveAltIcon } from '@mui/icons-material'
-import { SchoolFormModal } from './forms/SchoolFormModal';
+import { AddSchoolPromFormModal } from './forms/AddSchoolPromFormModal';
 import { SchoolContext, SchoolPromContext } from '../context/api/schools';
 import { isNumber } from 'class-validator';
 import { YearSelect } from './forms/YearSelect';
@@ -59,9 +59,12 @@ export const NavMenu = () => {
         onClose={handleClose}
       >
         <MenuItem disableRipple>
-          <YearSelect hook={[useSchoolProm?.year, useSchoolProm?.setYear]} />
+          <YearSelect
+            onSelect={(y) => useSchoolProm?.setYear(y)}
+            defaultValue={useSchoolProm?.year}
+          />
         </MenuItem>
-        <SchoolFormModal btn={
+        <AddSchoolPromFormModal btn={
           <MenuItem>
             <EditIcon/>&#8288;Agregar escuela
           </MenuItem>

@@ -23,7 +23,13 @@ export const Tabs = (props: TabsProps) => {
 
   const TabsPanels = () => {
     return <> { data.map(
-      (dto, i) => <TabPanel orientation={orientation} index={i} idPrefix={idPrefix} value={value} key={`${idPrefix}-${i}`}>
+      (dto, i) => <TabPanel
+        orientation={orientation}
+        index={i}
+        idPrefix={idPrefix}
+        value={value}
+        key={`${idPrefix}-${i}`}
+      >
         {dto.content}
       </TabPanel>
     ) }
@@ -33,7 +39,7 @@ export const Tabs = (props: TabsProps) => {
   const boxH = orientation === 'vertical' ? 224 : undefined
 
   return (
-    <>
+    <Box sx={{ width: '100%' }}>
       <Box
         sx={{ flexGrow: 1, bgcolor: 'background.paper', display: 'flex', height: boxH }}
       >
@@ -46,13 +52,19 @@ export const Tabs = (props: TabsProps) => {
           sx={{ borderRight: 1, borderColor: 'divider' }}
         > {
             data.map(
-              (dto, i) => <Tab orientation={orientation} label={dto.label} index={i} idPrefix={idPrefix} key={`${idPrefix}-${i}`} />
+              (dto, i) => <Tab
+                orientation={orientation}
+                label={dto.label}
+                index={i}
+                idPrefix={idPrefix}
+                key={`${idPrefix}-${i}`}
+              />
             )
           }
         </TabsM>
         {orientation==='vertical' && <TabsPanels/>}
       </Box>
       {orientation==='horizontal' && <TabsPanels/>}
-    </>
+    </Box>
   );
 }

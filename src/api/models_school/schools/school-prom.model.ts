@@ -3,9 +3,7 @@ import { BaseModel } from '../base.model'
 import { IsInt, IsUUID, Max, Min, ValidateIf, ValidateNested } from 'class-validator'
 import { EXPOSE_VERSIONS as EV } from '../../types'
 import { ISchool, School } from './school.model'
-import { Group, IGroup } from './group.model'
 import { EmployeePosition, IEmployeePosition } from './employee-position.model'
-import { ITitle, Title } from './title.model'
 
 @Exclude()
 export class SchoolProm extends BaseModel {
@@ -33,7 +31,7 @@ export class SchoolProm extends BaseModel {
   @Expose({ since: EV.CREATE_NESTED, until: EV.DELETE })
   @ValidateIf(o => !o.schoolId)
   @ValidateNested()
-    school: School
+    school: School | undefined
 
 }
 

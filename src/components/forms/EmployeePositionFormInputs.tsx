@@ -1,7 +1,8 @@
 import { TextField, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Grid } from "@mui/material"
-import { useContext, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { IEmployeePosition, IPosition } from "../../api/models_school"
-import { EmployeeContext, PositionContext } from "../../context/api/schools"
+import { useEmployee } from "../../hooks/api/schools/useEmployee"
+import { usePosition } from "../../hooks/api/schools/usePosition"
 
 interface EPFIParams {
   type?: IPosition['type']
@@ -10,10 +11,9 @@ interface EPFIParams {
 
 export const EmployeePositionFormInputs = (params?: EPFIParams) => {
   const [obj, setObj] = useState<Partial<IEmployeePosition>>()
-  const usePosition = useContext(PositionContext)
-  const useEmployee = useContext(EmployeeContext)
+  const usePositions = usePosition()
+  const useEmployees = useEmployee()
   const [positionId, setPositionId] = useState<IPosition['id'] | undefined>()
-  const [positions, setPositions] = useState<Array<IPosition> | undefined>([])
 
   useEffect(() => {
     if (params?.initData?.employee && params?.initData?.position && !obj) {
@@ -21,13 +21,10 @@ export const EmployeePositionFormInputs = (params?: EPFIParams) => {
       setPositionId(params.initData.position.id)
     }
     const getData = async () => {
-      const employee = await useEmployee?.findOne({ id: params?.initData?.employeeId })
-      const position = await usePosition?.findOne({ id: params?.initData?.positionId })
+      const employee = await useEmployees.findOne({ id: params?.initData?.employeeId })
+      const position = await usePositions.findOne({ id: params?.initData?.positionId })
       if (params?.type) {
-        setPositions(await usePosition?.findBy({type: params.type}))
-      }
-      if (!params?.type) {
-        setPositions(usePosition?.data)
+        await usePositions.findBy({type: params.type})
       }
       setObj({
         employee,
@@ -38,7 +35,7 @@ export const EmployeePositionFormInputs = (params?: EPFIParams) => {
     if (params && !obj) {
       getData()
     }
-  }, [params, useEmployee, usePosition, obj])
+  }, [params, useEmployees, usePositions, obj])
 
   const handleChange = (event: SelectChangeEvent) => {
     setPositionId(event?.target?.value as IPosition['id'])
@@ -47,33 +44,71 @@ export const EmployeePositionFormInputs = (params?: EPFIParams) => {
   return <>
     <Grid container spacing={2}>
       <Grid item xs={12} sm={6}>
-        <TextField fullWidth value={obj?.employee?.firstName} name="first_name" label="Nombre(s)" variant="outlined" required/>
+        <TextField
+          fullWidth
+          value={obj?.employee?.firstName}
+          name="first_name"
+          label="Nombre(s)"
+          variant="outlined"
+          required
+        />
       </Grid>
       <Grid item xs={12} sm={6}>
-        <TextField fullWidth value={obj?.employee?.lastName} name="last_name" label="Apellido(s)" variant="outlined" required/>
+        <TextField
+          fullWidth
+          value={obj?.employee?.lastName}
+          name="last_name"
+          label="Apellido(s)"
+          variant="outlined"
+          required
+        />
       </Grid>
       <Grid item xs={12} sm={6}>
-        <TextField fullWidth value={obj?.employee?.contact} name="contact" label="Contacto" variant="outlined" required/>
+        <TextField
+          fullWidth
+          value={obj?.employee?.contact}
+          name="contact"
+          label="Contacto"
+          variant="outlined"
+          required
+        />
       </Grid>
       <Grid item xs={12} sm={6}>
-        <TextField fullWidth value={obj?.employee?.profesion} name="profesion" label="Profesión" variant="outlined" required/>
+        <TextField
+          fullWidth
+          value={obj?.employee?.profesion}
+          name="profesion"
+          label="Profesión"
+          variant="outlined"
+          required
+        />
       </Grid>
       <Grid item xs={12} sm={12}>
-        <FormControl fullWidth>
-          <InputLabel id="demo-simple-select-label">Cargo</InputLabel>
+        <FormControl required fullWidth>
+          <InputLabel id="select-position-label">Cargo</InputLabel>
           <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={positionId ?? 'null'}
+            labelId="select-position-label"
+            id="select-position"
+            value={positionId ?? ''}
             fullWidth
             label="Cargo"
+            name="position_id"
             onChange={handleChange}
+            required
           >
-            <MenuItem value={'null'} key={`menu-item-position-null`}>No seleccionado</MenuItem>
-            {positions?.map(
-              (position, index) => <MenuItem value={position.id} key={`menu-item-position-${index}`}> {position.name} </MenuItem>
-            )}
-            <MenuItem value='new' key={`menu-item-position-new`}>Nuevo</MenuItem>
+            <MenuItem value={''} key={`menu-item-position-null`}>
+              --- Selecione el cargo ---
+            </MenuItem>
+
+            {usePositions.data.map((position, index) => (
+              <MenuItem value={position.id} key={`menu-item-position-${index}`}>
+                {position.name}
+              </MenuItem>
+            ))}
+
+            <MenuItem value='' key={`menu-item-position-new`}>
+              Nuevo
+            </MenuItem>
           </Select>
         </FormControl>
       </Grid>

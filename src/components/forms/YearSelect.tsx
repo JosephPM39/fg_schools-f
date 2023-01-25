@@ -1,17 +1,22 @@
 import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from "@mui/material"
 import { isNumber } from "class-validator"
-import { Dispatch, SetStateAction } from "react"
+import { Dispatch, SetStateAction, useEffect, useState } from "react"
 
 interface params {
-  hook: [number | undefined, Dispatch<SetStateAction<number>> | undefined]
+  onSelect: (select: number) => void
+  defaultValue?: number
 }
 
-export const YearSelect = ({hook}: params) => {
-  const [year, setYear] = hook
+export const YearSelect = ({onSelect, defaultValue}: params) => {
+  const [year, setYear] = useState<number>(defaultValue ?? new Date().getFullYear())
+
+  useEffect(() => {
+    onSelect(year)
+  }, [year])
 
   const handleChange = (event: SelectChangeEvent) => {
     const yearSelected = parseInt(String(event?.target?.value))
-    if (isNumber(yearSelected) && setYear) {
+    if (isNumber(yearSelected)) {
       setYear(yearSelected)
     }
   }

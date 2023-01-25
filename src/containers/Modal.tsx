@@ -9,7 +9,6 @@ import CloseIcon from '@mui/icons-material/Close';
 import Slide from '@mui/material/Slide';
 import { TransitionProps } from '@mui/material/transitions';
 import { useShow } from '../hooks/useShow';
-import { MenuItem } from '@mui/material';
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -49,7 +48,7 @@ export const Modal = (params: Params) => {
 
   return (
     <>
-      {Btn()}
+      <Btn/>
       <Dialog
         fullScreen={params.fullScreen}
         open={show}

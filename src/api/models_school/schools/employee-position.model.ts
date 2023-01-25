@@ -2,7 +2,7 @@ import { Exclude, Expose } from 'class-transformer'
 import { BaseModel } from '../base.model'
 import { Employee, IEmployee } from './employee.model'
 import { IPosition, Position } from './position.model'
-import { IsUUID, ValidateNested } from 'class-validator'
+import { IsOptional, IsUUID, ValidateNested } from 'class-validator'
 import { EXPOSE_VERSIONS as EV } from '../../types'
 
 @Exclude()
@@ -18,12 +18,14 @@ export class EmployeePosition extends BaseModel {
   // RELATIONS
 
   @Expose({ since: EV.CREATE_NESTED, until: EV.DELETE })
+  @IsOptional()
   @ValidateNested()
-    employee: Employee
+    employee: Employee | undefined
 
   @Expose({ since: EV.CREATE_NESTED, until: EV.DELETE })
+  @IsOptional()
   @ValidateNested()
-    position: Position
+    position: Position | undefined
 }
 
 export interface IEmployeePosition extends EmployeePosition {}

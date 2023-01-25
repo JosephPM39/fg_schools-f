@@ -19,5 +19,9 @@ export const Tab = (props: TabProps) => {
 
   const {idPrefix, index: i, orientation, ...other} = props
 
-  return <TabM {...a11yProps({idPrefix,index: i, orientation})} {...other} />
+  return <TabM
+    {...a11yProps({idPrefix,index: i, orientation})}
+    {...other}
+    wrapped
+  />
 }

@@ -174,6 +174,7 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
 
   return {
     data,
+    setData,
     metadata,
     findOne,
     findBy,

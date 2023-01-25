@@ -4,7 +4,7 @@ import { SearchField } from '../components/SearchField'
 import { SchoolCard } from '../components/SchoolCard'
 import { useContext } from 'react'
 import { SchoolPromContext } from '../context/api/schools'
-import { Box, Container } from '@mui/system'
+import { Container } from '@mui/system'
 
 export const Principal = () => {
   const schoolProms = useContext(SchoolPromContext)

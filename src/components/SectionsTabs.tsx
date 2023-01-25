@@ -56,6 +56,6 @@ export const SectionsTabs = (params: Params) => {
     setList(res)
   }, [sections, params.sectionProms])
 
-  return <Tabs data={list} orientation='vertical' idPrefix='sections' />
+  return <Tabs data={list} orientation='horizontal' idPrefix='sections' />
 }
 

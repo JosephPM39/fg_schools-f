@@ -22,17 +22,44 @@ export const SchoolFormInputs = (params?: Partial<ISchool>) => {
   return <>
     <Grid container spacing={2}>
       <Grid item xs={12} sm={6}>
-        <TextField fullWidth value={params?.['name']} name="name" label="Nombre" variant="outlined" required/>
+        <TextField
+          fullWidth
+          value={params?.['name']}
+          name="name"
+          label="Nombre"
+          variant="outlined"
+          required
+        />
       </Grid>
       <Grid item xs={12} sm={6}>
-        <TextField fullWidth value={params?.['location']} name="location" label="Ubicación" variant="outlined" required/>
+        <TextField
+          fullWidth
+          value={params?.['location']}
+          name="location"
+          label="Ubicación"
+          variant="outlined"
+          required
+        />
       </Grid>
       <Grid item xs={12} sm={6}>
-        <TextField fullWidth value={params?.['code']} name="code" label="Código" variant="outlined" required/>
+        <TextField
+          fullWidth
+          value={params?.['code']}
+          name="code"
+          label="Código"
+          variant="outlined"
+          required
+        />
       </Grid>
       <Grid item xs={12} sm={6}>
         <IconButton component="label" >
-          <input hidden accept="image/*" type="file" name="icon" onChange={onSelectIcon}/>
+          <input
+            hidden
+            accept="image/*"
+            type="file"
+            name="icon"
+            onChange={onSelectIcon}
+          />
           <Box display='flex' alignItems='center' >
             <Typography>Logo:</Typography>
             <CardMedia
