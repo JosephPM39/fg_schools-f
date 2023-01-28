@@ -33,7 +33,9 @@ export const useSchoolProm = (params?: Params) => {
 
   useEffect(() => {
     if (autoFetch) {
-      hook.fetch({searchBy: { year }})
+      hook.fetch({searchBy: { year }, query: {
+        limit: '100'
+      }})
     }
   }, [year, autoFetch])
 

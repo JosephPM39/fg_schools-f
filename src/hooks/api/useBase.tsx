@@ -73,8 +73,9 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
       searchBy,
     }))
     if (!remote?.data) return undefined
-
-    data.push(...remote.data)
+    if(filterBy<Model>(data ?? [], searchBy as Partial<Model>).length < 1) {
+      data.push(...remote.data)
+    }
     setMetadata(remote.queryUsed)
     return remote.data
   }
