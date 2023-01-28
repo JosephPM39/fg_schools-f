@@ -1,20 +1,46 @@
+import { ResponseError, Responses } from '../handlers/errors'
 import { IBaseModel } from '../models_school/base.model'
 import { QueryUsed } from '../types'
 import { ByOperator, IQuery, Order } from '../validations/query'
 
 const requests: Array<string> = []
+const promisess: Array<{
+  promise: Promise<Response>
+  request: string
+}> = []
+
+
+let promises: {
+  [key: string]: Promise<Response>
+} = {}
+
+
+const findPromise = (request: string) => {
+  const index = promisess.findIndex((promise) => promise.request === request)
+  return {
+    promise: promisess[index],
+    index
+  }
+}
 
 export const fetchOnce = async (input: RequestInfo, init?: RequestInit) => {
-  const request = `${input.toString()}${init?.toString()}`
+  const request = `${input.toString()}${JSON.stringify(init ?? '')}`
   if (requests.includes(request)) {
-    return undefined
+    const res = await promises[request]
+    return res.clone()
+    // throw new ResponseError(Responses[102])
   }
   requests.push(request)
+  promises = {
+    ...promises,
+    [request]: fetch(input, init)
+  }
 
-  const response = await fetch(input, init)
+  const response = await promises[request]
 
   const index = requests.findIndex((e) => e === request)
   delete requests[index]
+  delete promises[request]
   return response
 }
 
@@ -65,7 +91,7 @@ export const searchByHandler = (sby?: string | object) => {
 }
 
 export const queryFilter = <Model extends IBaseModel>(json: Model[], query?: IQuery): {
-  data: Model[] | undefined,
+  data: Model[] | null,
   queryUsed: QueryUsed
 } => {
   const filt: Required<IQuery> = {
