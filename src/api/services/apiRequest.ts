@@ -6,7 +6,21 @@ import { PostParams, GetNormalParams, PatchParams, DeleteParams, GetFilteredPara
 import { removeOfflineFlag, addOfflineFlag } from './utils'
 import { fetchOnce } from './utils'
 
-export class ApiRequest<Model extends IBaseModel> {
+interface Crud<Model extends IBaseModel> {
+  get: (p: GetNormalParams<Model>) => Promise<{
+    data: Model[] | null,
+    queryUsed: QueryUsed
+  }>
+  getFiltered: (p: GetFilteredParams<Model>) => Promise<{
+    data: Model[] | null,
+    queryUsed: QueryUsed
+  }>
+  post: (p: PostParams<Model>) => Promise<Model[] | false>
+  patch: (p: PatchParams<Model>) => Promise<boolean>
+  delete: (p: DeleteParams<Model>) => Promise<boolean>
+}
+
+export class ApiRequest<Model extends IBaseModel> implements Crud<Model> {
 
   constructor(
     private path: string
@@ -20,7 +34,7 @@ export class ApiRequest<Model extends IBaseModel> {
       body: JSON.stringify(data)
     })
 
-    return addOfflineFlag<Model>(await res.json())
+    return addOfflineFlag<Model>(await res.json()) ?? false
   }
 
   get = async (params: GetNormalParams<Model>) => {
@@ -32,11 +46,10 @@ export class ApiRequest<Model extends IBaseModel> {
     const path = `${CONFIG.schoolsApiUrl}${this.path}/${id}?${searchParams}`
 
     const res = await fetchOnce(path)
-    if (!res) return
     const json = await res.json()
 
     return {
-      data: addOfflineFlag<Model>(json.data),
+      data: addOfflineFlag<Model>(json.data) ?? null,
       queryUsed: json.queryUsed as QueryUsed
     }
   }
@@ -55,11 +68,10 @@ export class ApiRequest<Model extends IBaseModel> {
       method: 'POST',
       body
     })
-    if (!res) return
     const json = await res.json()
 
     return {
-      data: addOfflineFlag<Model>(json.data),
+      data: addOfflineFlag<Model>(json.data) ?? null,
       queryUsed: json.queryUsed as QueryUsed
     }
   }
@@ -71,7 +83,7 @@ export class ApiRequest<Model extends IBaseModel> {
       body: JSON.stringify(params.data)
     })
 
-    return res.body
+    return !!res.body
   }
 
   delete = async (params: DeleteParams<Model>) => {
@@ -80,6 +92,6 @@ export class ApiRequest<Model extends IBaseModel> {
       method: 'PATCH',
     })
 
-    return res.body
+    return !!res.body
   }
 }

@@ -1,8 +1,19 @@
 import { IBaseModel } from '../models_school/base.model'
+import { QueryUsed } from '../types'
 import { PostParams, DeleteParams, PatchParams, ReadParams } from './types'
 import { filterBy, queryFilter } from './utils'
 
-export class LocalRequest<Model extends IBaseModel> {
+interface Crud<Model extends IBaseModel> {
+  read: (p: ReadParams<Model>) => {
+    data: Model[] | null,
+    queryUsed: QueryUsed
+  }
+  create: (p: PostParams<Model>) => Model[] | false
+  patch: (p: PatchParams<Model>) => boolean
+  delete: (p: DeleteParams<Model>) => boolean
+}
+
+export class LocalRequest<Model extends IBaseModel> implements Crud<Model> {
 
   constructor(
     private path: string
@@ -10,11 +21,10 @@ export class LocalRequest<Model extends IBaseModel> {
 
   read = ({ searchBy, query }: ReadParams<Model>) => {
     const existent = this.get(this.path)
-    if (!existent) return undefined
     if (!searchBy) {
-      return queryFilter(existent, query)
+      return queryFilter(existent ?? [], query)
     }
-    const filteredBy = filterBy<Model>(existent, searchBy as Partial<Model>)
+    const filteredBy = filterBy<Model>(existent ?? [], searchBy as Partial<Model>)
     return queryFilter(filteredBy, query)
   }
 
@@ -33,7 +43,7 @@ export class LocalRequest<Model extends IBaseModel> {
         throw new Error('Duplicate data not allowed')
       }
       const d = [...existent, ...data]
-      return this.set(this.path, d) ? data : undefined
+      return this.set(this.path, d) ? data : false
     }
 
     if (existent && !Array.isArray(data)) {
@@ -42,14 +52,14 @@ export class LocalRequest<Model extends IBaseModel> {
         throw new Error('Duplicate data not allowed')
       }
       const d = [...existent, data]
-      return this.set(this.path, d) ? [data] : undefined
+      return this.set(this.path, d) ? [data] : false
     }
 
     if (Array.isArray(data)) {
-      return this.set(this.path, data) ? data : undefined
+      return this.set(this.path, data) ? data : false
     }
 
-    return this.set(this.path, [data]) ? [data] : undefined
+    return this.set(this.path, [data]) ? [data] : false
   }
 
   patch = ({ data, id }: PatchParams<Model>) => {

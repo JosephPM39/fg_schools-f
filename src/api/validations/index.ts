@@ -71,7 +71,7 @@ export const validateQuery = async (query?: object | IQuery): Promise<Partial<Qu
   })
 }
 
-const formatValidationError = (error: ValidationError[] | ValidationError) => {
+export const formatValidationError = (error: ValidationError[] | ValidationError) => {
   const format = (error: ValidationError) => {
     const constraints = JSON.stringify(error.constraints ?? '')
 
