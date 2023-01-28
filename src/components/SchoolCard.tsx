@@ -1,21 +1,29 @@
 import { Article, Delete, Edit, KeyboardArrowDown } from '@mui/icons-material';
-import { Card, CardActions, CardContent,CardMedia,Button, Typography, MenuItem, Menu} from '@mui/material'
+import { Card, CardActions, CardContent,CardMedia,Button, Typography, MenuItem, Menu, CircularProgress} from '@mui/material'
+import { Box } from '@mui/system';
 import { useContext, useEffect, useState } from 'react';
-import { ISchoolProm } from '../api/models_school';
+import { IEmployee, IEmployeePosition, IPosition, ISchool, ISchoolProm } from '../api/models_school';
 import { EmployeeContext, EmployeePositionContext, PositionContext, SchoolContext } from '../context/api/schools';
+import { useDebounce } from '../hooks/useDebouce';
+import { useNearScreen } from '../hooks/useNearScreen';
 import { SectionsModal } from './SectionsModal';
-import { SchoolsCardData } from './types';
 
 interface Params {
   schoolProm: ISchoolProm
 }
 
 export const SchoolCard = (params: Params) => {
-  const [obj, setObj] = useState<SchoolsCardData | undefined>(undefined)
+  const [school, setSchool] = useState<ISchool | undefined>(undefined)
+  const [principal, setPrincipal] = useState<IEmployeePosition | undefined>(undefined)
+  const [employee, setEmployee] = useState<IEmployee | undefined>(undefined)
+  const [position, setPosition] = useState<IPosition | undefined>(undefined)
+
   const useEmployeePosition = useContext(EmployeePositionContext)
   const useSchool = useContext(SchoolContext)
   const useEmployee = useContext(EmployeeContext)
   const usePosition = useContext(PositionContext)
+  const { element, show } = useNearScreen()
+  const {promiseHelper} = useDebounce()
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -27,76 +35,100 @@ export const SchoolCard = (params: Params) => {
   }
 
   useEffect(() => {
-    const getData = async () => {
-      const principal = await useEmployeePosition?.findOne({ id: params.schoolProm.principalId })
+    if (!show) return
+    const get = async () => {
       const school = await useSchool?.findOne({ id: params.schoolProm.schoolId })
-      const employee = await useEmployee?.findOne({ id: principal?.employeeId })
-      const position = await usePosition?.findOne({ id: principal?.positionId })
-      if (school) {
-        setObj({
-          school: {...school},
-          principal: {
-            relation: principal,
-            position,
-            employee
-          }
-        })
+      if (!school) {
+        const school = await promiseHelper(useSchool?.findOne({ id: params.schoolProm.schoolId }), 5000)
+        return setSchool(school)
       }
+      setSchool(school)
     }
-    getData()
-  }, [
-    useSchool,
-    useEmployee,
-    usePosition,
-    useEmployeePosition,
-    useSchool?.data?.length,
-    useEmployee?.data?.length,
-    usePosition?.data?.length,
-    useEmployeePosition?.data?.length,
-    params.schoolProm,
-  ])
+    get()
+  }, [show, params, useSchool?.data])
 
-  if (!obj) return <>Without Data</>
+  useEffect(() => {
+    if (!show) return
+    const get = async () => {
+      const principal = await useEmployeePosition?.findOne({ id: params.schoolProm.principalId })
+      setPrincipal(principal)
+    }
+    get()
+  }, [show, params, useEmployeePosition?.data])
+
+  useEffect(() => {
+    if (!show) return
+    const get = async () => {
+      const employee = await useEmployee?.findOne({ id: principal?.employeeId })
+      setEmployee(employee)
+    }
+    get()
+  }, [show, params, useEmployee?.data, principal])
+
+  useEffect(() => {
+    if (!show) return
+    const get = async () => {
+      const position = await usePosition?.findOne({ id: principal?.positionId })
+      setPosition(position)
+    }
+    get()
+  }, [show, params, usePosition?.data, principal])
 
   return (
-    <Card sx={{ maxWidth: 345 }}>
-      <CardMedia
+    <Card ref={element} sx={{ maxWidth: 345 }}>
+      { school ? <CardMedia
         component="img"
-        alt={obj?.school?.name}
+        alt={school?.name}
         height="140"
-        image={obj?.school?.icon}
-      />
+        image={school?.icon}
+      /> : <Box height='140px' width='345px' display='flex' alignItems='center' justifyContent='center'>
+        <CircularProgress/>
+      </Box>
+      }
       <CardContent>
         <Typography gutterBottom variant="h5" component="div">
-          {obj?.school?.name ?? 'Lizard d'}
+          {school?.name ?? 'Loading...'}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          <>
-
-            {/* console.error('Render card', obj.school?.name)*/ }
-            Dirección: {obj?.school?.location}
+          { school && position && employee ? <>
+            Dirección: {school?.location}
             <br/>
-            Código: {obj?.school?.code}
+            Código: {school?.code}
             <br/>
-            {`${obj?.principal?.position?.name}: `}
-            {`${obj?.principal?.employee?.profesion} `}
-            {`${obj?.principal?.employee?.firstName} `}
-            {`${obj?.principal?.employee?.lastName} `}
-          </>
+            {`${position?.name}: `}
+            {`${employee?.profesion} `}
+            {`${employee?.firstName} `}
+            {`${employee?.lastName} `}
+          </> : <>
+              Loading...
+            <br/>
+            <br/>
+            <br/>
+            <br/>
+          </> }
         </Typography>
       </CardContent>
       <CardActions>
-        <SectionsModal
+        {show && <SectionsModal
           btnProps={{
             children: 'Abrir',
             startIcon: <Article/>,
             variant: 'contained',
             color: 'info',
-            size: 'small'
+            size: 'small',
+            disabled: !params.schoolProm
           }}
           initOpen={false}
           schoolProm={params.schoolProm}
-          cardData={obj}/>
+          cardData={{
+            principal: {
+              ...principal,
+              employee,
+              position
+            },
+            school
+          }}/>
+        }
         <Button
           id="school-menu-button"
           aria-controls={open ? 'basic-menu' : undefined}
@@ -105,6 +137,7 @@ export const SchoolCard = (params: Params) => {
           onClick={handleClick}
           variant='outlined'
           size='small'
+          disabled={!params.schoolProm}
           endIcon={<KeyboardArrowDown/>}
         > Más opciones </Button>
         <Menu
