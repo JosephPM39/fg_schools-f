@@ -63,11 +63,11 @@ export class StorageRequest<Model extends IBaseModel> implements Crud<Model> {
 
     if (!offline) {
       const res = await this.api.post({ data })
-      if (!res) throw new Error('Falló la operación')
+      if (!res) throw new Error('No se pudo crear')
       return res
     }
     const res = this.local.create({ data })
-    if (!res) throw new Error('Falló la operación')
+    if (!res) throw new Error('No se pudo crear')
     return res
   }
 
@@ -121,12 +121,12 @@ export class StorageRequest<Model extends IBaseModel> implements Crud<Model> {
 
     if (offline) {
       const res = this.local.patch(config)
-      if (!res) { throw new Error('Falló la operación') }
+      if (!res) { throw new Error('No se pudo actualizar') }
       return res
     }
 
     const res = await this.api.patch(config)
-    if (!res) { throw new Error('Falló la operación') }
+    if (!res) { throw new Error('No se pudo actualizar') }
     return res
   }
 
@@ -136,12 +136,12 @@ export class StorageRequest<Model extends IBaseModel> implements Crud<Model> {
 
     if (offline) {
       const res = this.local.delete({id})
-      if (!res) { throw new Error('Falló la operación') }
+      if (!res) { throw new Error('No se pudo eliminar') }
       return res
     }
 
     const res = await this.api.delete({id})
-    if (!res) { throw new Error('Falló la operación') }
+    if (!res) { throw new Error('No se pudo eliminar') }
     return res
   }
 

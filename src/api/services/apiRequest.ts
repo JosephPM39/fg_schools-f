@@ -1,5 +1,6 @@
 import { instanceToPlain } from 'class-transformer'
 import { CONFIG } from '../../config'
+import { ResponseError, Responses, Status } from '../handlers/errors'
 import { IBaseModel } from '../models_school/base.model'
 import { QueryUsed } from '../types'
 import { PostParams, GetNormalParams, PatchParams, DeleteParams, GetFilteredParams } from './types'
@@ -20,6 +21,12 @@ interface Crud<Model extends IBaseModel> {
   delete: (p: DeleteParams<Model>) => Promise<boolean>
 }
 
+const throwError = (status: number) => {
+  const st: Status = Object
+    .keys(Responses).includes(String(status)) ? status as Status : 999
+  throw new ResponseError(Responses[st])
+}
+
 export class ApiRequest<Model extends IBaseModel> implements Crud<Model> {
 
   constructor(
@@ -34,6 +41,8 @@ export class ApiRequest<Model extends IBaseModel> implements Crud<Model> {
       body: JSON.stringify(data)
     })
 
+    if (res.status !== 201) throwError(res.status)
+
     return addOfflineFlag<Model>(await res.json()) ?? false
   }
 
@@ -46,6 +55,9 @@ export class ApiRequest<Model extends IBaseModel> implements Crud<Model> {
     const path = `${CONFIG.schoolsApiUrl}${this.path}/${id}?${searchParams}`
 
     const res = await fetchOnce(path)
+
+    if (res.status !== 200) throwError(res.status)
+
     const json = await res.json()
 
     return {
@@ -68,6 +80,9 @@ export class ApiRequest<Model extends IBaseModel> implements Crud<Model> {
       method: 'POST',
       body
     })
+
+    if (res.status !== 200) throwError(res.status)
+
     const json = await res.json()
 
     return {
@@ -83,6 +98,8 @@ export class ApiRequest<Model extends IBaseModel> implements Crud<Model> {
       body: JSON.stringify(params.data)
     })
 
+    if (res.status !== 200) throwError(res.status)
+
     return !!res.body
   }
 
@@ -91,6 +108,8 @@ export class ApiRequest<Model extends IBaseModel> implements Crud<Model> {
     const res = await fetch(path, {
       method: 'PATCH',
     })
+
+    if (res.status !== 200) throwError(res.status)
 
     return !!res.body
   }

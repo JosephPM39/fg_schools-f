@@ -1,3 +1,4 @@
+import { ResponseError, Responses } from '../handlers/errors'
 import { IBaseModel } from '../models_school/base.model'
 import { QueryUsed } from '../types'
 import { PostParams, DeleteParams, PatchParams, ReadParams } from './types'
@@ -40,7 +41,7 @@ export class LocalRequest<Model extends IBaseModel> implements Crud<Model> {
       )
 
       if (duplicates.length > 0) {
-        throw new Error('Duplicate data not allowed')
+        throw new ResponseError(Responses[400], 'El dato ya existe')
       }
       const d = [...existent, ...data]
       return this.set(this.path, d) ? data : false
@@ -49,7 +50,7 @@ export class LocalRequest<Model extends IBaseModel> implements Crud<Model> {
     if (existent && !Array.isArray(data)) {
       const duplicates = filterBy(existent, {id: data.id} as Partial<Model>)
       if (duplicates.length > 0) {
-        throw new Error('Duplicate data not allowed')
+        throw new ResponseError(Responses[400], 'El dato ya existe')
       }
       const d = [...existent, data]
       return this.set(this.path, d) ? [data] : false
@@ -64,10 +65,10 @@ export class LocalRequest<Model extends IBaseModel> implements Crud<Model> {
 
   patch = ({ data, id }: PatchParams<Model>) => {
     const existent = this.get(this.path)
-    if (!existent) return false
+    if (!existent) throw new ResponseError(Responses[404], 'No existe la colección')
 
     const index = existent.findIndex((e) => e.id === id)
-    if (index === -1) return false
+    if (index === -1) throw new ResponseError(Responses[404])
 
     existent[index] = {
       ...existent[index],
@@ -79,10 +80,10 @@ export class LocalRequest<Model extends IBaseModel> implements Crud<Model> {
 
   delete = ({ id }: DeleteParams<Model>) => {
     const existent = this.get(this.path)
-    if (!existent) return false
+    if (!existent) throw new ResponseError(Responses[404], 'No existe la colección')
 
     const index = existent.findIndex((e) => e.id === id)
-    if (index === -1) return false
+    if (index === -1) throw new ResponseError(Responses[404])
 
     const res = delete existent[index]
     if (!res) return false

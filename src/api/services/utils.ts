@@ -1,27 +1,13 @@
-import { ResponseError, Responses } from '../handlers/errors'
 import { IBaseModel } from '../models_school/base.model'
 import { QueryUsed } from '../types'
 import { ByOperator, IQuery, Order } from '../validations/query'
 
 const requests: Array<string> = []
-const promisess: Array<{
-  promise: Promise<Response>
-  request: string
-}> = []
-
-
 let promises: {
   [key: string]: Promise<Response>
 } = {}
 
 
-const findPromise = (request: string) => {
-  const index = promisess.findIndex((promise) => promise.request === request)
-  return {
-    promise: promisess[index],
-    index
-  }
-}
 
 export const fetchOnce = async (input: RequestInfo, init?: RequestInit) => {
   const request = `${input.toString()}${JSON.stringify(init ?? '')}`

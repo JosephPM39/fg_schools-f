@@ -9,7 +9,7 @@ interface CustomResponse {
   body?: object
 }
 
-type Status = 102 | 201 | 200 | 401 | 404 | 400 | 500 | 999
+export type Status = 102 | 201 | 200 | 401 | 404 | 400 | 500 | 999
 
 export enum States {
   processing = 'PROCESSING',
