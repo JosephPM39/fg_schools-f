@@ -24,7 +24,7 @@ export const SectionsModal = (params: Params) => {
       if (res && res?.length > 0) setProms(res)
     }
     if (proms.length < 1) getData()
-  }, [params.schoolProm.id, proms.length, useSectionProm])
+  }, [params.schoolProm.id, proms.length, useSectionProm?.data])
 
   return (
     <Modal fullScreen btnProps={params.btnProps} title={`Escuela: ${params.cardData?.school?.name}`}>

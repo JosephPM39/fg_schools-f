@@ -108,8 +108,8 @@ export const SchoolCard = (params: Params) => {
           </> }
         </Typography>
       </CardContent>
-      <CardActions>
-        {show && <SectionsModal
+      {show ? <CardActions>
+        <SectionsModal
           btnProps={{
             children: 'Abrir',
             startIcon: <Article/>,
@@ -128,9 +128,8 @@ export const SchoolCard = (params: Params) => {
             },
             school
           }}/>
-        }
         <Button
-          id="school-menu-button"
+          id={`school-menu-button-${params.schoolProm.id}`}
           aria-controls={open ? 'basic-menu' : undefined}
           aria-haspopup="true"
           aria-expanded={open ? 'true' : undefined}
@@ -141,7 +140,7 @@ export const SchoolCard = (params: Params) => {
           endIcon={<KeyboardArrowDown/>}
         > Más opciones </Button>
         <Menu
-          id="school-menu"
+          id={`school-menu-${params.schoolProm.id}`}
           anchorEl={anchorEl}
           open={open}
           onClose={handleClose}
@@ -149,7 +148,13 @@ export const SchoolCard = (params: Params) => {
           <MenuItem sx={{color: 'darkblue'}} ><Edit/>&#8288; Editar</MenuItem>
           <MenuItem onClick={handleClose} sx={{color: 'red'}}><Delete/>&#8288; Eliminar</MenuItem>
         </Menu>
+
+      </CardActions> : <CardActions>
+        <br/>
+          ...loading
+        <br/>
       </CardActions>
+      }
     </Card>
   );
 }
