@@ -80,7 +80,7 @@ export class StorageRequest<Model extends IBaseModel> implements Crud<Model> {
       if (!res) throw new Error('No se pudo crear')
       return res
     }
-    const res = this.local.create({ data })
+    const res = await this.local.create({ data })
     if (!res) throw new Error('No se pudo crear')
     return res
   }
@@ -134,7 +134,7 @@ export class StorageRequest<Model extends IBaseModel> implements Crud<Model> {
     const config = { id, data }
 
     if (offline) {
-      const res = this.local.patch(config)
+      const res = await this.local.patch(config)
       if (!res) { throw new Error('No se pudo actualizar') }
       return res
     }
@@ -149,7 +149,7 @@ export class StorageRequest<Model extends IBaseModel> implements Crud<Model> {
     const { offline } = this.config
 
     if (offline) {
-      const res = this.local.delete({id})
+      const res = await this.local.delete({id})
       if (!res) { throw new Error('No se pudo eliminar') }
       return res
     }

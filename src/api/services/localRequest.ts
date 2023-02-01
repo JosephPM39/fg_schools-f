@@ -2,16 +2,16 @@ import { ResponseError, Responses } from '../handlers/errors'
 import { IBaseModel } from '../models_school/base.model'
 import { QueryUsed } from '../types'
 import { PostParams, DeleteParams, PatchParams, ReadParams } from './types'
-import { filterBy, queryFilter } from './utils'
+import { debounce, filterBy, queryFilter } from './utils'
 
 interface Crud<Model extends IBaseModel> {
-  read: (p: ReadParams<Model>) => {
+  read: (p: ReadParams<Model>) => Promise<{
     data: Model[] | null,
     queryUsed: QueryUsed
-  }
-  create: (p: PostParams<Model>) => Model[] | false
-  patch: (p: PatchParams<Model>) => boolean
-  delete: (p: DeleteParams<Model>) => boolean
+  }>
+  create: (p: PostParams<Model>) => Promise<Model[] | false>
+  patch: (p: PatchParams<Model>) => Promise<boolean>
+  delete: (p: DeleteParams<Model>) => Promise<boolean>
 }
 
 export class LocalRequest<Model extends IBaseModel> implements Crud<Model> {
@@ -20,16 +20,16 @@ export class LocalRequest<Model extends IBaseModel> implements Crud<Model> {
     private path: string
   ) {}
 
-  read = ({ searchBy, query }: ReadParams<Model>) => {
+  read = ({searchBy,query}: ReadParams<Model>) => debounce(() => {
     const existent = this.get(this.path)
     if (!searchBy) {
       return queryFilter(existent ?? [], query)
     }
     const filteredBy = filterBy<Model>(existent ?? [], searchBy as Partial<Model>)
     return queryFilter(filteredBy, query)
-  }
+  }, [])
 
-  create = ({ data }: PostParams<Model>) => {
+  create = ({ data }: PostParams<Model>) => debounce(() => {
     const existent = this.get(this.path)
 
     if (existent && Array.isArray(data)) {
@@ -61,9 +61,9 @@ export class LocalRequest<Model extends IBaseModel> implements Crud<Model> {
     }
 
     return this.set(this.path, [data]) ? [data] : false
-  }
+  }, [])
 
-  patch = ({ data, id }: PatchParams<Model>) => {
+  patch = ({ data, id }: PatchParams<Model>) => debounce(() => {
     const existent = this.get(this.path)
     if (!existent) throw new ResponseError(Responses[404], 'No existe la colección')
 
@@ -76,9 +76,9 @@ export class LocalRequest<Model extends IBaseModel> implements Crud<Model> {
     }
 
     return this.set(this.path, existent)
-  }
+  }, [])
 
-  delete = ({ id }: DeleteParams<Model>) => {
+  delete = ({ id }: DeleteParams<Model>) => debounce(() => {
     const existent = this.get(this.path)
     if (!existent) throw new ResponseError(Responses[404], 'No existe la colección')
 
@@ -89,7 +89,7 @@ export class LocalRequest<Model extends IBaseModel> implements Crud<Model> {
     if (!res) return false
 
     return this.set(this.path, existent)
-  }
+  }, [])
 
   get = (k: string) => {
     try {

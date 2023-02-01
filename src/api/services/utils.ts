@@ -7,8 +7,6 @@ let promises: {
   [key: string]: Promise<Response>
 } = {}
 
-
-
 export const fetchOnce = async (input: RequestInfo, init?: RequestInit) => {
   const request = `${input.toString()}${JSON.stringify(init ?? '')}`
   if (requests.includes(request)) {
@@ -30,6 +28,23 @@ export const fetchOnce = async (input: RequestInfo, init?: RequestInit) => {
   return response
 }
 
+export const debounce = <T extends (...any: any) => any>(
+  cb: T,
+  p: Parameters<T>,
+  time: number = 50
+) => {
+  return new Promise<ReturnType<T>>((res, rej) => {
+    setTimeout(() => {
+      try {
+        res(cb(p))
+      }
+      catch (e) {
+        rej(e)
+      }
+    }, time)
+  })
+}
+
 export const removeOfflineFlag = <Model extends IBaseModel>(data: Model | Model[]): Model[] | Model => {
   if (!Array.isArray(data)) {
     delete data.offline
@@ -42,7 +57,10 @@ export const removeOfflineFlag = <Model extends IBaseModel>(data: Model | Model[
   })
 }
 
-export const addOfflineFlag = <Model extends IBaseModel>(data: Model | Model[], offlineFlagValue: boolean = false): Model[] | undefined => {
+export const addOfflineFlag = <Model extends IBaseModel>(
+  data: Model | Model[],
+  offlineFlagValue: boolean = false
+): Model[] | undefined => {
   if (!data) return undefined
   if (!Array.isArray(data)) {
     if (Object.values(data).length < 1) return []
