@@ -84,15 +84,15 @@ export enum ErrorType {
 
 
 export function isCustomError(e: unknown): e is CustomError {
-  return !!(e as CustomError).type
+  return (e as CustomError).type !== undefined
 }
 
 export function isResponseError(e: unknown): e is ResponseError {
-  return !!(e as ResponseError).type && (e as ResponseError).type === ErrorType.apiResponse
+  return (e as ResponseError).type === ErrorType.apiResponse
 }
 
 export function isInvalidDataError(e: unknown): e is InvalidDataError {
-  return !!(e as InvalidDataError).type && (e as InvalidDataError).type === ErrorType.validation
+  return (e as InvalidDataError).type === ErrorType.validation
 }
 
 function isError(e: unknown): e is Error {
@@ -113,21 +113,19 @@ export class ResponseError extends CustomError {
     public response: CustomResponse,
     ...args: ConstructorParameters<typeof Error>
   ) {
-    delete args[0]
     super(ErrorType.apiResponse, ...args)
   }
 }
 
 export class InvalidDataError extends CustomError {
   constructor (
-    public validationError: ValidationError,
+    public validationError: ValidationError | ValidationError[],
     ...args: ConstructorParameters<typeof Error>
   ) {
-    delete args[0]
     super(ErrorType.validation, ...args)
   }
 
-  getFormat = formatValidationError(this.validationError)
+  getErrors = () => formatValidationError(this.validationError)
 }
 
 export type ErrorCatched = ResponseError | InvalidDataError | CustomError

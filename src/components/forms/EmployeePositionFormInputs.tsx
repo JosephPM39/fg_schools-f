@@ -51,6 +51,7 @@ export const EmployeePositionFormInputs = (params?: EPFIParams) => {
           label="Nombre(s)"
           type='text'
           inputProps={{
+            minLength: 1,
             maxLength: 40,
           }}
           variant="outlined"
@@ -65,6 +66,7 @@ export const EmployeePositionFormInputs = (params?: EPFIParams) => {
           label="Apellido(s)"
           type='text'
           inputProps={{
+            minLength: 1,
             maxLength: 40,
           }}
           variant="outlined"
@@ -79,6 +81,7 @@ export const EmployeePositionFormInputs = (params?: EPFIParams) => {
           label="Contacto"
           type='text'
           inputProps={{
+            minLength: 1,
             maxLength: 55,
           }}
           variant="outlined"
@@ -93,6 +96,7 @@ export const EmployeePositionFormInputs = (params?: EPFIParams) => {
           label="Profesión"
           type='text'
           inputProps={{
+            minLength: 1,
             maxLength: 10,
           }}
           variant="outlined"

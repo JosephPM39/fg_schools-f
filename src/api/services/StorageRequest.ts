@@ -43,6 +43,11 @@ interface Crud<Model extends IBaseModel> {
 
 }
 
+interface ValidateParams<Model extends IBaseModel> {
+  data: CreateParams<Model>['data']
+  version?: EV
+}
+
 export class StorageRequest<Model extends IBaseModel> implements Crud<Model> {
 
   private local = new LocalRequest<Model>(this.config.path)
@@ -51,6 +56,15 @@ export class StorageRequest<Model extends IBaseModel> implements Crud<Model> {
   constructor(
     private config: StorageRequestConfig<Model>
   ) {}
+
+  validate = async ({data: dto, version = EV.CREATE}: ValidateParams<Model>) => {
+    const data = await validateDto<Model>({
+      model: this.config.model,
+      dto,
+      version
+    })
+    return data
+  }
 
   create = async (params: CreateParams<Model>) => {
     const { data: dto } = params

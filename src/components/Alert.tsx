@@ -1,13 +1,13 @@
 import { AlertTitle, Alert as AlertMUI, Snackbar, Slide } from "@mui/material"
-import { CustomError, isResponseError, isInvalidDataError, isCustomError, ErrorType, InvalidDataError, ResponseError } from "../api/handlers/errors"
+import { CustomError, isResponseError, isInvalidDataError, InvalidDataError, ResponseError } from "../api/handlers/errors"
 
-interface Custom {
+export interface AlertProps {
   title?: string
-  type: 'info' | 'warning' | 'error' | 'success'
-  details: string
+  type?: 'info' | 'warning' | 'error' | 'success'
+  details?: string
 }
 
-interface WithError {
+export interface AlertWithError {
   error: CustomError
 }
 
@@ -16,24 +16,28 @@ interface BaseParams {
   onClose: () => void
 }
 
-type AlertParams = BaseParams & (Custom | WithError)
+type AlertParams = BaseParams & (AlertProps | AlertWithError)
 
-function isWithError(params: AlertParams): params is (BaseParams & WithError) {
-  return !!(params as (BaseParams & WithError)).error
+export function isAlertWithError(p: AlertProps | AlertWithError): p is AlertWithError {
+  return (p as AlertWithError).error !== undefined
 }
 
-function getNotifyMsg(e: CustomError | ResponseError | InvalidDataError): Custom {
+function isWithError(params: AlertParams): params is (BaseParams & AlertWithError) {
+  return (params as (BaseParams & AlertWithError)).error !== undefined
+}
+
+function getNotifyMsg(e: CustomError | ResponseError | InvalidDataError): AlertProps {
   if (isResponseError(e)) {
     return {
-      title: e.name,
+      title: e.message,
       details: e.response.msg,
       type: e.response.type
     }
   }
   if (isInvalidDataError(e)) {
     return {
-      title: e.name,
-      details: e.getFormat(),
+      title: e.type,
+      details: 'Revisa bien los datos que has ingresado',
       type: 'warning'
     }
   }
@@ -58,9 +62,9 @@ export const Alert = (params: AlertParams) => {
 
   return <>
     <Snackbar open={show} TransitionComponent={Slide}>
-      <AlertMUI onClose={onClose} severity={type}>
+      <AlertMUI onClose={onClose} severity={type ?? 'info'}>
         <AlertTitle>{title ?? 'Ha ocurrido algo'}</AlertTitle>
-        {details}
+        {details ?? ''}
       </AlertMUI>
     </Snackbar>
   </>

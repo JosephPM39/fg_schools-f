@@ -7,6 +7,7 @@ import { EmployeeContext, EmployeePositionContext, PositionContext, SchoolContex
 import { useDebounce } from '../hooks/useDebouce';
 import { useNearScreen } from '../hooks/useNearScreen';
 import { SectionsModal } from './SectionsModal';
+import DefaultIcon from '../assets/signature.png'
 
 interface Params {
   schoolProm: ISchoolProm
@@ -80,7 +81,7 @@ export const SchoolCard = (params: Params) => {
         component="img"
         alt={school?.name}
         height="140"
-        image={school?.icon}
+        image={school?.icon === 'default' ? DefaultIcon : school.icon}
       /> : <Box height='140px' width='345px' display='flex' alignItems='center' justifyContent='center'>
         <CircularProgress/>
       </Box>

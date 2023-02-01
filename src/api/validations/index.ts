@@ -2,6 +2,7 @@ import { ValidateIdOptions, ValidateDtoOptions } from '../types'
 import { ClassConstructor, instanceToPlain, plainToInstance } from 'class-transformer'
 import { validate, ValidationError } from 'class-validator'
 import { IQuery, Query } from './query'
+import { InvalidDataError } from '../handlers/errors'
 
 export const validateIdBy = async <Model extends {}>(params: ValidateIdOptions<Model>) => {
   const { searchBy, version, model } = params
@@ -45,12 +46,7 @@ export const validateDto = async <Model extends {}>(params: ValidateDtoOptions<M
   )
   const errors = await validate(instance, params.validatorOptions)
   if (errors.length > 0) {
-    const boomError = new Error('Invalid data')
-    boomError.cause = {
-      details: formatValidationError(errors)
-    }
-    delete boomError.stack
-    throw boomError
+    throw new InvalidDataError(errors, 'Datos no válidos')
   }
   const plain = instanceToPlain(instance, {
     exposeUnsetFields: false,

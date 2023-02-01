@@ -42,6 +42,8 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
   // ============= READ FUNCTIONS =============
   // ==========================================
 
+  const validate = storage.validate
+
   const findOneLocal = (id?: Model['id']) => {
     return data?.find((e) => e.id === id)
   }
@@ -177,6 +179,7 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
     data,
     setData,
     metadata,
+    validate,
     findOne,
     findBy,
     fetch,

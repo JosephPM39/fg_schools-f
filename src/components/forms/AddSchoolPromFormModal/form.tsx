@@ -1,5 +1,5 @@
 import { SchoolFormInputs } from '../SchoolFormInputs';
-import { ChangeEvent, FormEvent, ReactNode, useContext, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, FormEvent, FormEventHandler, ReactNode, useContext, useEffect, useRef, useState } from 'react';
 import { EmployeePositionFormInputs } from '../EmployeePositionFormInputs';
 import { PositionType } from '../../../api/models_school/schools/position.model';
 import { Button, Divider, FormControlLabel, FormLabel, Radio, RadioGroup } from '@mui/material';
@@ -10,7 +10,9 @@ import { useEmployee } from '../../../hooks/api/schools/useEmployee';
 import { useEmployeePosition } from '../../../hooks/api/schools/useEmployeePosition';
 import { SchoolPromContext } from '../../../context/api/schools';
 import { useSchool } from '../../../hooks/api/schools/useSchool';
-import { getSubmitData } from './getData'
+import { getSubmitData, SubmitData } from './getData'
+import { Alert, AlertProps, AlertWithError } from '../../Alert';
+import { isInvalidDataError, promiseHandleError, ResponseError } from '../../../api/handlers/errors';
 
 type SchoolOrigin = 'new' | 'previous'
 type PrincipalOrigin = 'new' | 'previous' | 'all'
@@ -32,6 +34,13 @@ export const Form = () => {
   const useEmployeePositions = useEmployeePosition()
   const useSchools = useSchool()
   const useSchoolProms = useContext(SchoolPromContext)
+
+  const [notify, setNotify] = useState<AlertProps | AlertWithError>()
+  const [showNotify, setShowNofity] = useState(false)
+
+  useEffect(() => {
+    if (notify) setShowNofity(true)
+  }, [notify])
 
   useEffect(() => {
     if (!schoolSelected && principalOrigin === 'previous') {
@@ -83,12 +92,16 @@ export const Form = () => {
     }
   }, [schoolOrigin])
 
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    submitAction()
+  const clearForm = (e: FormEvent<HTMLFormElement>) => {
+    setPrincipalOrigin('new')
+    setSchoolOrigin('new')
+    setPrincipalSelected(undefined)
+    setSchoolSelected(undefined)
+    void (e.target as HTMLFormElement).reset()
   }
 
-  const submitAction = async () => {
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
     setSending(true)
     const data = getSubmitData({
       schoolSelected,
@@ -98,16 +111,53 @@ export const Form = () => {
 
     if (!data || !useSchoolProms) return
 
+    await promiseHandleError((error) => {
+      console.log('Errors', error.message, error.name, error.type,error)
+      console.log(isInvalidDataError(error), 'invalid data')
+      setNotify({error})
+      setSending(false)
+    }, async () => {
+      await validateForm(data)
+      await submitForm(data)
+      setNotify({
+        title: 'Éxito',
+        details: 'Escuela creada',
+        type: 'success'
+      })
+      clearForm(e)
+      setSending(false)
+    })
+  }
+
+  const validateForm = async (data: SubmitData) => {
     if (data.school) {
-      await useSchools.create({
-        ...data.school.data
+      await useSchools.validate({
+        data: data.school.data
       })
     }
+    if (data.principal?.employee) {
+      await useEmployees.validate({
+        data: data.principal.employee
+      })
+    }
+    if (data.principal) {
+      const ep = {
+        ...data.principal,
+      }
+      delete ep.employee
+      await useEmployeePositions.validate({
+        data: ep
+      })
+    }
+  }
 
+  const submitForm = async (data: SubmitData) => {
+    if (data.school) {
+      await useSchools.create(data.school.data)
+    }
     if (data.principal?.employee) {
       await useEmployees.create(data.principal.employee)
     }
-
     if (data.principal) {
       const ep = {
         ...data.principal,
@@ -116,8 +166,7 @@ export const Form = () => {
       await useEmployeePositions.create(ep)
     }
 
-    await useSchoolProms.create(data.schoolProm)
-    setSending(false)
+    await useSchoolProms?.create(data.schoolProm)
   }
 
   const onChangeSchoolOrigin = (e: ChangeEvent<HTMLInputElement>) => {
@@ -153,9 +202,17 @@ export const Form = () => {
       </RadioGroup>
       {principalInput}
       <br/>
-      <Button type='submit' variant='contained' disabled={isSending}>
+      <Button type='submit' variant='contained' disabled={isSending || showNotify}>
         {isSending ? 'Guardando...' : 'Guardar'}
       </Button>
     </form>
+    <Alert
+      show={showNotify}
+      onClose={() => {
+        setShowNofity(false)
+        setNotify(undefined)
+      }}
+      {...notify}
+    />
   </>
 }

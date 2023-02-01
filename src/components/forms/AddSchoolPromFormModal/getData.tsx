@@ -12,7 +12,7 @@ const getSchoolFormData = (form: FormData): {
   const icon = getFormValue<File | null>(form, 'icon')
   const data: ISchool = {
     id: uuidV4(),
-    icon: icon?.name || 'defualt',
+    icon: icon?.name || 'default',
     name: getFormValue<string>(form, 'name'),
     location: getFormValue<string>(form, 'location'),
     code: getFormValue<string>(form, 'code')
@@ -56,14 +56,16 @@ interface SubmitParams {
   schoolSelected?: ISchoolProm
 }
 
-export const getSubmitData = (params: SubmitParams): {
+export interface SubmitData {
   schoolProm: ISchoolProm,
   principal?: IEmployeePosition,
   school?: {
     data: ISchool
     file: File | null
   }
-} | undefined => {
+}
+
+export const getSubmitData = (params: SubmitParams): SubmitData | undefined => {
   const {
     form,
     schoolSelected,

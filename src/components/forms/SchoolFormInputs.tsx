@@ -28,6 +28,10 @@ export const SchoolFormInputs = (params?: Partial<ISchool>) => {
           name="name"
           label="Nombre"
           variant="outlined"
+          inputProps={{
+            minLength: 1,
+            maxLength: 100,
+          }}
           required
         />
       </Grid>
@@ -38,6 +42,10 @@ export const SchoolFormInputs = (params?: Partial<ISchool>) => {
           name="location"
           label="Ubicación"
           variant="outlined"
+          inputProps={{
+            minLength: 1,
+            maxLength: 254,
+          }}
           required
         />
       </Grid>
@@ -47,6 +55,10 @@ export const SchoolFormInputs = (params?: Partial<ISchool>) => {
           value={params?.['code']}
           name="code"
           label="Código"
+          inputProps={{
+            minLength: 1,
+            maxLength: 30,
+          }}
           variant="outlined"
           required
         />
