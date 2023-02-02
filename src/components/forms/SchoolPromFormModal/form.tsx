@@ -1,9 +1,9 @@
 import { SchoolFormInputs } from '../SchoolFormInputs';
-import { ChangeEvent, FormEvent, FormEventHandler, ReactNode, useContext, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, FormEvent, ReactNode, useContext, useEffect, useRef, useState } from 'react';
 import { EmployeePositionFormInputs } from '../EmployeePositionFormInputs';
 import { PositionType } from '../../../api/models_school/schools/position.model';
 import { Button, Divider, FormControlLabel, FormLabel, Radio, RadioGroup } from '@mui/material';
-import { IEmployeePosition, ISchoolProm } from '../../../api/models_school';
+import { ISchoolProm } from '../../../api/models_school';
 import { SelectSchoolPromYear } from '../SelectSchoolProm-Year';
 import { SelectEmployeePositionPromYear } from '../SelectEmployeePosition-PromYear';
 import { useEmployee } from '../../../hooks/api/schools/useEmployee';
@@ -12,18 +12,19 @@ import { SchoolPromContext } from '../../../context/api/schools';
 import { useSchool } from '../../../hooks/api/schools/useSchool';
 import { getSubmitData, SubmitData } from './getData'
 import { Alert, AlertProps, AlertWithError } from '../../Alert';
-import { isInvalidDataError, promiseHandleError, ResponseError } from '../../../api/handlers/errors';
+import { InvalidDataError, isInvalidDataError, promiseHandleError } from '../../../api/handlers/errors';
 
 type SchoolOrigin = 'new' | 'previous'
 type PrincipalOrigin = 'new' | 'previous' | 'all'
 
-export const Form = () => {
+export const Form = (params?: { idForUpdate?: ISchoolProm['id'] }) => {
   const form = useRef<HTMLFormElement | null>(null)
+
+  const [schoolPromForUpdate, setSchoolPromForUpdate] = useState<ISchoolProm>()
 
   const [schoolOrigin, setSchoolOrigin] = useState<SchoolOrigin>('new')
   const [principalOrigin, setPrincipalOrigin] = useState<PrincipalOrigin>('new')
   const [schoolSelected, setSchoolSelected] = useState<ISchoolProm>()
-  const [principalSelected, setPrincipalSelected] = useState<IEmployeePosition>()
 
   const [schoolInput, setSchoolInput] = useState<ReactNode>(<>Loading</>)
   const [principalInput, setPrincipalInput] = useState<ReactNode>(<>Loading</>)
@@ -43,20 +44,28 @@ export const Form = () => {
   }, [notify])
 
   useEffect(() => {
+    const getData = async () => {
+      if (!params?.idForUpdate || !!schoolPromForUpdate) return
+      const res = await useSchoolProms?.findOne({id: params.idForUpdate})
+      if (!res) return
+      return setSchoolPromForUpdate(res)
+    }
+    getData()
+  }, [params, useSchoolProms?.data])
+
+  useEffect(() => {
     if (!schoolSelected && principalOrigin === 'previous') {
       setPrincipalOrigin('new')
     }
     if (schoolOrigin === 'new' && schoolSelected) {
       setSchoolSelected(undefined)
     }
-    if (principalOrigin === 'new' && principalSelected) {
-      setPrincipalSelected(undefined)
-    }
-  }, [schoolSelected, principalOrigin, schoolOrigin, principalSelected])
+  }, [schoolSelected, principalOrigin, schoolOrigin])
 
   useEffect(() => {
     if (principalOrigin === 'new') {
       const input = <EmployeePositionFormInputs
+        idForUpdate={schoolPromForUpdate?.principalId}
         type={PositionType.PRINCIPAL}
       />
       return setPrincipalInput(input)
@@ -77,25 +86,25 @@ export const Form = () => {
       <SelectEmployeePositionPromYear
         proms={getSchoolProm()}
         yearSelect={needYearSelect()}
-        onSelect={(ep) => setPrincipalSelected(ep)}
         type={PositionType.PRINCIPAL}
       />
     )
-  }, [principalOrigin, schoolSelected, principalSelected])
+  }, [principalOrigin, schoolSelected, schoolPromForUpdate])
 
   useEffect(() => {
     if (schoolOrigin === 'new') {
-      return setSchoolInput(<SchoolFormInputs/>)
+      return setSchoolInput(<SchoolFormInputs
+        idForUpdate={schoolPromForUpdate?.schoolId}
+      />)
     }
     if (schoolOrigin === 'previous') {
       return setSchoolInput(<SelectSchoolPromYear onSelect={(p) => setSchoolSelected(p)}/>)
     }
-  }, [schoolOrigin])
+  }, [schoolOrigin, schoolPromForUpdate])
 
   const clearForm = (e: FormEvent<HTMLFormElement>) => {
     setPrincipalOrigin('new')
     setSchoolOrigin('new')
-    setPrincipalSelected(undefined)
     setSchoolSelected(undefined)
     void (e.target as HTMLFormElement).reset()
   }
@@ -104,15 +113,15 @@ export const Form = () => {
     e.preventDefault()
     setSending(true)
     const data = getSubmitData({
-      schoolSelected,
-      principalSelected,
+      schoolOrigin,
+      principalOrigin,
       form: form.current
     })
 
     if (!data || !useSchoolProms) return
 
     await promiseHandleError((error) => {
-      console.log('Errors', error.message, error.name, error.type,error)
+      console.log('Errors', error.message, (error as InvalidDataError).validationError)
       console.log(isInvalidDataError(error), 'invalid data')
       setNotify({error})
       setSending(false)
@@ -121,7 +130,7 @@ export const Form = () => {
       await submitForm(data)
       setNotify({
         title: 'Éxito',
-        details: 'Escuela creada',
+        details: `Escuela ${params?.idForUpdate ? 'actualizada' : 'creada'}`,
         type: 'success'
       })
       clearForm(e)
@@ -152,13 +161,16 @@ export const Form = () => {
   }
 
   const submitForm = async (data: SubmitData) => {
-    if (data.school) {
+
+    // FOR CREATE MODE
+
+    if (data.school && !params?.idForUpdate) {
       await useSchools.create(data.school.data)
     }
-    if (data.principal?.employee) {
+    if (data.principal?.employee && !params?.idForUpdate) {
       await useEmployees.create(data.principal.employee)
     }
-    if (data.principal) {
+    if (data.principal && !params?.idForUpdate) {
       const ep = {
         ...data.principal,
       }
@@ -166,7 +178,40 @@ export const Form = () => {
       await useEmployeePositions.create(ep)
     }
 
-    await useSchoolProms?.create(data.schoolProm)
+    if (!params?.idForUpdate) {
+      await useSchoolProms?.create(data.schoolProm)
+    }
+
+    // FOR UPDATE MODE
+
+    if (data.school && params?.idForUpdate) {
+      await useSchools.update({
+        data: data.school.data,
+        id: data.school.data.id
+      })
+    }
+    if (data.principal?.employee && params?.idForUpdate) {
+      await useEmployees.update({
+        data: data.principal.employee,
+        id: data.principal.employee.id
+      })
+    }
+    if (data.principal && params?.idForUpdate) {
+      const ep = {
+        ...data.principal,
+      }
+      delete ep.employee
+      await useEmployeePositions.update({
+        data: ep,
+        id: ep.id
+      })
+    }
+    if (params?.idForUpdate) {
+      await useSchoolProms?.update({
+        data: data.schoolProm,
+        id: data.schoolProm.id
+      })
+    }
   }
 
   const onChangeSchoolOrigin = (e: ChangeEvent<HTMLInputElement>) => {
@@ -182,10 +227,32 @@ export const Form = () => {
 
   return <>
     <form ref={form} onSubmit={onSubmit}>
+      <input
+        name="school_prom_id"
+        type='text'
+        value={schoolPromForUpdate?.['id'] || ''}
+        onChange={() => {}}
+        hidden
+      />
+      <input
+        name="year"
+        type='number'
+        onChange={() => {}}
+        value={schoolPromForUpdate?.['year'] || ''}
+        hidden
+      />
       <FormLabel>Escuela: </FormLabel>
       <RadioGroup row onChange={onChangeSchoolOrigin} value={schoolOrigin}>
-        <FormControlLabel value='new' control={<Radio/>} label='Nueva' />
-        <FormControlLabel value='previous' control={<Radio/>} label='Habilitar' />
+        <FormControlLabel
+          value='new'
+          control={<Radio/>}
+          label={params?.idForUpdate ? 'Editar' : 'Nueva'}
+        />
+        <FormControlLabel
+          value='previous'
+          control={<Radio/>}
+          label={params?.idForUpdate ? 'Cambiar por' : 'Habilitar'}
+        />
       </RadioGroup>
       {schoolInput}
       <br/>
@@ -193,12 +260,24 @@ export const Form = () => {
       <br/>
       <FormLabel>Director: </FormLabel>
       <RadioGroup row onChange={onChangePrincipalOrigin} value={principalOrigin}>
-        <FormControlLabel value='new' control={<Radio/>} label='Nuevo' />
+        <FormControlLabel
+          value='new'
+          control={<Radio/>}
+          label={params?.idForUpdate ? 'Editar' : 'Nuevo'}
+        />
         {
           (schoolOrigin === 'previous' && schoolSelected) &&
-            <FormControlLabel value='previous' control={<Radio/>} label='Escuela seleccionada' />
+          <FormControlLabel
+            value='previous'
+            control={<Radio/>}
+            label='Escuela seleccionada'
+          />
         }
-        <FormControlLabel value='all' control={<Radio/>} label='De otras escuelas y años' />
+        <FormControlLabel
+          value='all'
+          control={<Radio/>}
+          label='De otras escuelas y años'
+        />
       </RadioGroup>
       {principalInput}
       <br/>

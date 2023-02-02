@@ -3,34 +3,34 @@ import { useEffect, useState } from "react"
 import { ISchoolProm } from "../../api/models_school"
 
 interface params {
-  onSelect: (selected?: ISchoolProm) => void
+  onSelect?: (selected?: ISchoolProm) => void
   list: ISchoolProm[]
 }
 
 export const SelectSchoolProm = (params: params) => {
-  const { onSelect, list } = params
+  const { onSelect = () => {}, list } = params
   const [selected, setSelected] = useState<ISchoolProm>()
 
   useEffect(() => {
     onSelect(selected)
   }, [selected, onSelect])
 
-  const find = (id: ISchoolProm['id']) => {
-    return list.find((e) => e.id === id)
+  const find = (id: ISchoolProm['schoolId']) => {
+    return list.find((e) => e.schoolId === id)
   }
 
-  const findSPName = (id: ISchoolProm['id']) => {
+  const findSPName = (id: ISchoolProm['schoolId']) => {
     const prom = find(id)
     if (!prom) return 'Desconocido'
     return `${prom.school?.name} (Código: ${prom.school?.code})`
   }
 
   const handleChange = (e: SelectChangeEvent) => {
-    const prom = find(e.target.value as ISchoolProm['id'])
+    const prom = find(e.target.value as ISchoolProm['schoolId'])
     setSelected(prom)
   }
 
-  const defaultId = (id: ISchoolProm['id']) => {
+  const defaultId = (id: ISchoolProm['schoolId']) => {
     const ep = find(id)
     if (ep) return id
     if (selected && !find(selected.id)) setSelected(undefined)
@@ -44,7 +44,8 @@ export const SelectSchoolProm = (params: params) => {
         fullWidth
         labelId="school-prom-select-label"
         id="school-prom-select"
-        value={defaultId(selected?.id)}
+        name="school_id"
+        value={defaultId(selected?.schoolId)}
         label="&#8288;Escuela"
         onChange={handleChange}
         required
@@ -54,10 +55,10 @@ export const SelectSchoolProm = (params: params) => {
         </MenuItem>
         {list.map(
           (sp, index) => <MenuItem
-            value={sp.id}
+            value={sp.schoolId}
             key={`menu-item-school-prom-${index}`}
           >
-            {findSPName(sp.id)}
+            {findSPName(sp.schoolId)}
           </MenuItem>
         )}
       </Select>

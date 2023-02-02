@@ -8,6 +8,7 @@ import { useDebounce } from '../hooks/useDebouce';
 import { useNearScreen } from '../hooks/useNearScreen';
 import { SectionsModal } from './SectionsModal';
 import DefaultIcon from '../assets/signature.png'
+import { SchoolPromFormModal } from './forms/SchoolPromFormModal';
 
 interface Params {
   schoolProm: ISchoolProm
@@ -146,7 +147,12 @@ export const SchoolCard = (params: Params) => {
           open={open}
           onClose={handleClose}
         >
-          <MenuItem sx={{color: 'darkblue'}} ><Edit/>&#8288; Editar</MenuItem>
+          <SchoolPromFormModal
+            idForUpdate={params.schoolProm.id}
+            btn={
+              <MenuItem sx={{color: 'darkblue'}} ><Edit/>&#8288; Editar</MenuItem>
+            }
+          />
           <MenuItem onClick={handleClose} sx={{color: 'red'}}><Delete/>&#8288; Eliminar</MenuItem>
         </Menu>
 

@@ -6,7 +6,7 @@ import Divider from '@mui/material/Divider';
 import { MenuStyled } from '../styles/MenuStyled'
 import { FormControlLabel, Switch } from '@mui/material';
 import { Menu as MenuIcon, SaveAlt as SaveAltIcon } from '@mui/icons-material'
-import { AddSchoolPromFormModal } from './forms/AddSchoolPromFormModal';
+import { SchoolPromFormModal } from './forms/SchoolPromFormModal';
 import { SchoolPromContext } from '../context/api/schools';
 import { YearSelect } from './forms/YearSelect';
 import { useNetStatus } from '../hooks/useNetStatus';
@@ -53,7 +53,7 @@ export const NavMenu = () => {
             defaultValue={useSchoolProm?.year}
           />
         </MenuItem>
-        <AddSchoolPromFormModal btn={
+        <SchoolPromFormModal btn={
           <MenuItem>
             <EditIcon/>&#8288;Agregar escuela
           </MenuItem>

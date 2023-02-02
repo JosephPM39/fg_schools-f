@@ -8,7 +8,7 @@ import { YearSelect } from "./YearSelect"
 import { SelectSchoolProm } from "./SelectSchoolProm"
 
 interface params {
-  onSelect: (selected?: ISchoolProm) => void
+  onSelect?: (selected?: ISchoolProm) => void
 }
 
 export const SelectSchoolPromYear = ({onSelect}: params) => {

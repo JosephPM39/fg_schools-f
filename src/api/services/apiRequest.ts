@@ -92,7 +92,7 @@ export class ApiRequest<Model extends IBaseModel> implements Crud<Model> {
   }
 
   patch = async (params: PatchParams<Model>) => {
-    const path = `${CONFIG.schoolsApiUrl}${this.path}${params.id}`
+    const path = `${CONFIG.schoolsApiUrl}${this.path}/${params.id}`
     const res = await fetch(path, {
       method: 'PATCH',
       body: JSON.stringify(params.data)
@@ -104,7 +104,7 @@ export class ApiRequest<Model extends IBaseModel> implements Crud<Model> {
   }
 
   delete = async (params: DeleteParams<Model>) => {
-    const path = `${CONFIG.schoolsApiUrl}${this.path}${params.id}`
+    const path = `${CONFIG.schoolsApiUrl}${this.path}/${params.id}`
     const res = await fetch(path, {
       method: 'PATCH',
     })

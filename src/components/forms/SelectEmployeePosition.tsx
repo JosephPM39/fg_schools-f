@@ -4,13 +4,13 @@ import { IEmployeePosition } from "../../api/models_school"
 import { PositionType } from "../../api/models_school/schools/position.model"
 
 interface params {
-  onSelect: (selected?: IEmployeePosition) => void
+  onSelect?: (selected?: IEmployeePosition) => void
   list: IEmployeePosition[]
   type: PositionType
 }
 
 export const SelectEmployeePosition = (params: params) => {
-  const { onSelect, list, type } = params
+  const { onSelect = () => {}, list, type } = params
   const [selected, setSelected] = useState<IEmployeePosition>()
 
   useEffect(() => {
@@ -53,6 +53,7 @@ export const SelectEmployeePosition = (params: params) => {
         fullWidth
         labelId="ep-select-label"
         id="ep-select"
+        name="employee_position_id"
         value={defaultId(selected?.id)}
         label={getLabel()}
         onChange={handleChange}

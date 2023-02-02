@@ -49,7 +49,7 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
   }
 
   const findOne = async ({id}: {id?: Model['id']}) => {
-    if (!id || !data || data.length < 1) return undefined
+    if (!id || !data) return undefined
 
     const local = findOneLocal(id)
     if (local) return local

@@ -9,7 +9,7 @@ import { SelectEmployeePosition } from "./SelectEmployeePosition"
 import { YearSelect } from "./YearSelect"
 
 interface params {
-  onSelect: (selected?: IEmployeePosition) => void
+  onSelect?: (selected?: IEmployeePosition) => void
   proms?: ISchoolProm[]
   yearSelect: boolean
   type: IPosition['type']
