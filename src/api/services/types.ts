@@ -35,4 +35,31 @@ export const isSearchById = <Model extends IBaseModel>(search: SearchById<Model>
   return (search as SearchById<Model>).id !== undefined
 }
 
+export interface UploadFileParams {
+  file: File | File[]
+}
 
+export type UploadSingleFileResponse = {
+  message: string,
+  name: {
+    original: string,
+    savedAs: string
+  }
+}
+
+export type UploadManyFileResponse = {
+  message: string,
+  names: Array<{
+    original: string,
+    savedAs: string
+  }>
+}
+
+export interface DownloadFileParams {
+  name: string
+  preview?: boolean
+}
+
+export interface DeleteFileParams {
+  name: string
+}

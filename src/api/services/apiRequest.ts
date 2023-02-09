@@ -1,10 +1,9 @@
 import { instanceToPlain } from 'class-transformer'
 import { CONFIG } from '../../config'
-import { ResponseError, Responses, Status } from '../handlers/errors'
 import { IBaseModel } from '../models_school/base.model'
 import { QueryUsed } from '../types'
 import { PostParams, GetNormalParams, PatchParams, DeleteParams, GetFilteredParams } from './types'
-import { removeOfflineFlag, addOfflineFlag } from './utils'
+import { removeOfflineFlag, addOfflineFlag, throwApiResponseError } from './utils'
 import { fetchOnce } from './utils'
 
 interface Crud<Model extends IBaseModel> {
@@ -21,27 +20,20 @@ interface Crud<Model extends IBaseModel> {
   delete: (p: DeleteParams<Model>) => Promise<boolean>
 }
 
-const throwError = (status: number) => {
-  const st: Status = Object
-    .keys(Responses).includes(String(status)) ? status as Status : 999
-  throw new ResponseError(Responses[st])
-}
-
 export class ApiRequest<Model extends IBaseModel> implements Crud<Model> {
-
   constructor(
     private path: string
   ) {}
 
   post = async (params: PostParams<Model>) => {
     const data = removeOfflineFlag<Model>(params.data)
-    const path = `${CONFIG.schoolsApiUrl}${this.path}`
+    const path = `${CONFIG.schoolsApiUrl}/${this.path}`
     const res = await fetch(path, {
       method: 'POST',
       body: JSON.stringify(data)
     })
 
-    if (res.status !== 201) throwError(res.status)
+    if (res.status !== 201) throwApiResponseError(res.status)
 
     return addOfflineFlag<Model>(await res.json()) ?? false
   }
@@ -52,11 +44,11 @@ export class ApiRequest<Model extends IBaseModel> implements Crud<Model> {
     })
     const { id } = params.searchBy ?? { id: '' }
     const searchParams = new URLSearchParams(query)
-    const path = `${CONFIG.schoolsApiUrl}${this.path}/${id}?${searchParams}`
+    const path = `${CONFIG.schoolsApiUrl}/${this.path}/${id}?${searchParams}`
 
     const res = await fetchOnce(path)
 
-    if (res.status !== 200) throwError(res.status)
+    if (res.status !== 200) throwApiResponseError(res.status)
 
     const json = await res.json()
 
@@ -74,14 +66,14 @@ export class ApiRequest<Model extends IBaseModel> implements Crud<Model> {
       ...params.searchBy
     }))
     const searchParams = new URLSearchParams(query)
-    const path = `${CONFIG.schoolsApiUrl}${this.path}/get-filtered?${searchParams}`
+    const path = `${CONFIG.schoolsApiUrl}/${this.path}/get-filtered?${searchParams}`
 
     const res = await fetchOnce(path, {
       method: 'POST',
       body
     })
 
-    if (res.status !== 200) throwError(res.status)
+    if (res.status !== 200) throwApiResponseError(res.status)
 
     const json = await res.json()
 
@@ -92,24 +84,24 @@ export class ApiRequest<Model extends IBaseModel> implements Crud<Model> {
   }
 
   patch = async (params: PatchParams<Model>) => {
-    const path = `${CONFIG.schoolsApiUrl}${this.path}/${params.id}`
+    const path = `${CONFIG.schoolsApiUrl}/${this.path}/${params.id}`
     const res = await fetch(path, {
       method: 'PATCH',
       body: JSON.stringify(params.data)
     })
 
-    if (res.status !== 200) throwError(res.status)
+    if (res.status !== 200) throwApiResponseError(res.status)
 
     return !!res.body
   }
 
   delete = async (params: DeleteParams<Model>) => {
-    const path = `${CONFIG.schoolsApiUrl}${this.path}/${params.id}`
+    const path = `${CONFIG.schoolsApiUrl}/${this.path}/${params.id}`
     const res = await fetch(path, {
       method: 'PATCH',
     })
 
-    if (res.status !== 200) throwError(res.status)
+    if (res.status !== 200) throwApiResponseError(res.status)
 
     return !!res.body
   }

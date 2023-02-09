@@ -7,17 +7,15 @@ export const useAuth = () => {
   useEffect(() => {
     const { fetch: originalFetch } = window
 
-    console.log('Seupt ')
-
     window.fetch = async (...args) => {
       let [resource, config] = args
       config = {
         ...config,
         headers: {
-          ...config?.headers,
           Authorization: `Bearer ${user.token}`,
           'Content-Type': 'application/json',
-          Accept: 'application/json'
+          Accept: 'application/json',
+          ...config?.headers
         }
       }
 

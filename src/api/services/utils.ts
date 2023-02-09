@@ -1,6 +1,7 @@
 import { IBaseModel } from '../models_school/base.model'
 import { QueryUsed } from '../types'
 import { ByOperator, IQuery, Order } from '../validations/query'
+import { ResponseError, Responses, Status } from '../handlers/errors'
 
 const requests: Array<string> = []
 let promises: {
@@ -28,6 +29,11 @@ export const fetchOnce = async (input: RequestInfo, init?: RequestInit) => {
   return response
 }
 
+export const throwApiResponseError = (status: number) => {
+  const st: Status = Object
+    .keys(Responses).includes(String(status)) ? status as Status : 999
+  throw new ResponseError(Responses[st])
+}
 export const debounce = <T extends (...any: any) => any>(
   cb: T,
   p: Parameters<T>,
