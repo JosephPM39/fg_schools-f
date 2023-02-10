@@ -39,6 +39,12 @@ export interface UploadFileParams {
   file: File | File[]
 }
 
+export type FileList = Array<{
+  name: string,
+  urlPreview?: string,
+  url: string
+}>
+
 export type UploadSingleFileResponse = {
   message: string,
   name: {

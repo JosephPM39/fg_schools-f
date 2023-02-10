@@ -1,17 +1,11 @@
 import { CONFIG } from '../../config'
-import { UploadSingleFileResponse, UploadManyFileResponse } from './types'
+import { UploadSingleFileResponse, UploadManyFileResponse, FileList } from './types'
 import { fetchOnce, throwApiResponseError } from './utils'
 
 type UploadReturn<T extends File | Array<File>> = T extends File ?
 UploadSingleFileResponse : UploadManyFileResponse
 
-type List = Array<{
-  name: string,
-  urlPreview?: string,
-  url: string
-}>
-
-export class FileRequest {
+export class ApiFileRequest {
   constructor(
     private path: string
   ){}
@@ -51,7 +45,7 @@ export class FileRequest {
     const path = `${CONFIG.schoolsFilesUrl}/${this.path}`
     const res = await fetchOnce(path)
     if (res.status !== 200) throwApiResponseError(res.status)
-    return await res.json() as List
+    return await res.json() as FileList
   }
 
   getPreviewUrl = (name: string) => `${CONFIG.schoolsFilesUrl}/${this.path}/${name}`
