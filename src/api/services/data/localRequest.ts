@@ -1,8 +1,8 @@
-import { ResponseError, Responses } from '../handlers/errors'
-import { IBaseModel } from '../models_school/base.model'
-import { QueryUsed } from '../types'
-import { PostParams, DeleteParams, PatchParams, ReadParams } from './types'
-import { debounce, filterBy, queryFilter } from './utils'
+import { ResponseError, Responses } from '../../handlers/errors'
+import { IBaseModel } from '../../models_school/base.model'
+import { QueryUsed } from '../../types'
+import { PostParams, DeleteParams, PatchParams, ReadParams } from '../types'
+import { debounce, filterBy, queryFilter } from '../utils'
 
 interface Crud<Model extends IBaseModel> {
   read: (p: ReadParams<Model>) => Promise<{

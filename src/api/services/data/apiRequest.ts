@@ -1,10 +1,9 @@
 import { instanceToPlain } from 'class-transformer'
-import { CONFIG } from '../../config'
-import { IBaseModel } from '../models_school/base.model'
-import { QueryUsed } from '../types'
-import { PostParams, GetNormalParams, PatchParams, DeleteParams, GetFilteredParams } from './types'
-import { removeOfflineFlag, addOfflineFlag, throwApiResponseError } from './utils'
-import { fetchOnce } from './utils'
+import { CONFIG } from '../../../config'
+import { IBaseModel } from '../../models_school/base.model'
+import { QueryUsed } from '../../types'
+import { PostParams, GetNormalParams, PatchParams, DeleteParams, GetFilteredParams } from '../types'
+import { removeOfflineFlag, addOfflineFlag, throwApiResponseError, fetchOnce } from '../utils'
 
 interface Crud<Model extends IBaseModel> {
   get: (p: GetNormalParams<Model>) => Promise<{

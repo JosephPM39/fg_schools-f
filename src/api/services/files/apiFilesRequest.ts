@@ -1,16 +1,13 @@
-import { CONFIG } from '../../config'
-import { UploadSingleFileResponse, UploadManyFileResponse, FileList } from './types'
-import { fetchOnce, throwApiResponseError } from './utils'
+import { CONFIG } from '../../../config'
+import { FileList, UploadFileParams, UploadFileReturn } from '../types'
+import { fetchOnce, throwApiResponseError } from '../utils'
 
-type UploadReturn<T extends File | Array<File>> = T extends File ?
-UploadSingleFileResponse : UploadManyFileResponse
-
-export class ApiFileRequest {
+export class ApiFilesRequest {
   constructor(
     private path: string
   ){}
 
-  upload = async <T extends File | Array<File>>(file: T): Promise<UploadReturn<T>> => {
+  upload = async <T extends UploadFileParams>(file: T): Promise<UploadFileReturn<T>> => {
 
     const path = `${CONFIG.schoolsFilesUrl}/${this.path}`
     const form = new FormData()
@@ -38,7 +35,7 @@ export class ApiFileRequest {
 
     const res = await uploader(form)
     if (res.status !== 201) throwApiResponseError(res.status)
-    return await res.json() as unknown as UploadReturn<T>
+    return await res.json() as unknown as UploadFileReturn<T>
   }
 
   getList = async () => {
@@ -48,7 +45,7 @@ export class ApiFileRequest {
     return await res.json() as FileList
   }
 
-  getPreviewUrl = (name: string) => `${CONFIG.schoolsFilesUrl}/${this.path}/${name}`
+  getPreviewUrl = (name: string) => `${CONFIG.schoolsFilesUrl}/${this.path}/${name}?imgwidth=300`
   getDownloadUrl = (name: string) => `${CONFIG.schoolsFilesUrl}/${this.path}/download/${name}`
 
   delete = async (name: string) => {

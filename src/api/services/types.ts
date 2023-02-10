@@ -35,9 +35,7 @@ export const isSearchById = <Model extends IBaseModel>(search: SearchById<Model>
   return (search as SearchById<Model>).id !== undefined
 }
 
-export interface UploadFileParams {
-  file: File | File[]
-}
+export type UploadFileParams = File | Array<File>
 
 export type FileList = Array<{
   name: string,
@@ -69,3 +67,6 @@ export interface DownloadFileParams {
 export interface DeleteFileParams {
   name: string
 }
+
+export type UploadFileReturn<T extends UploadFileParams> = T extends File ?
+UploadSingleFileResponse : UploadManyFileResponse

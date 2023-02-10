@@ -1,5 +1,5 @@
 import { v4 as uuidV4 } from 'uuid'
-import { UploadSingleFileResponse, UploadManyFileResponse, FileList } from './types'
+import { UploadSingleFileResponse, FileList, UploadFileReturn, UploadFileParams } from '../types'
 
 const getFileExtension = (filename: string) => {
   const split = filename.split('.')
@@ -7,19 +7,14 @@ const getFileExtension = (filename: string) => {
   return split.pop() ?? ''
 }
 
-type UploadReturn<T extends File | Array<File>> = T extends File ?
-UploadSingleFileResponse : UploadManyFileResponse
-
-export class FilesRequest {
+export class LocalFilesRequest {
 
   private dirHandler: FileSystemDirectoryHandle
   private subDirHandler: FileSystemDirectoryHandle
 
   constructor(
     private subDir: string,
-  ) {
-
-  }
+  ) {}
 
   pickDir = async () => {
     this.dirHandler = await window.showDirectoryPicker({
@@ -48,17 +43,17 @@ export class FilesRequest {
     }
   }
 
-  upload = async <T extends File | Array<File>>(file: T): Promise<UploadReturn<T>> => {
+  upload = async <T extends UploadFileParams>(file: T): Promise<UploadFileReturn<T>> => {
     if (!Array.isArray(file)) {
-      return await this.write(file) as unknown as UploadReturn<T>
+      return await this.write(file, false) as unknown as UploadFileReturn<T>
     }
-    const res = await Promise.all(file.map((f) => this.write(f)))
+    const res = await Promise.all(file.map((f) => this.write(f, false)))
     return {
       message: res[0].message,
       names: {
         ...res.map((r) => r.name)
       }
-    } as unknown as UploadReturn<T>
+    } as unknown as UploadFileReturn<T>
   }
 
   getList = async (): Promise<FileList> => {
@@ -89,5 +84,6 @@ export class FilesRequest {
 
   delete = async (name: string) => {
     await this.subDirHandler.removeEntry(name)
+    return true
   }
 }

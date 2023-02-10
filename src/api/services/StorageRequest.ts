@@ -1,8 +1,7 @@
 import { IBaseModel } from "../models_school/base.model";
 import {validateDto, validateIdBy, validateQuery} from '../validations'
 import { EXPOSE_VERSIONS as EV, ModelClassType, QueryUsed } from '../types'
-import { ApiRequest } from "./apiRequest";
-import { LocalRequest } from "./localRequest";
+import { ApiRequest, LocalRequest } from "./data";
 import { isSearchById, SearchBy, SearchById } from "./types";
 import { instanceToPlain } from "class-transformer";
 import {
