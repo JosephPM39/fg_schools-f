@@ -2,12 +2,13 @@ import { ApiFilesRequest, LocalFilesRequest } from "./files"
 import { UploadFileParams, UploadFileReturn } from "./types"
 
 export class StorageFileRequest {
-  local = new LocalFilesRequest(this.subDir)
+  local = new LocalFilesRequest(this.subDir, this.dirHandler)
   api = new ApiFilesRequest(this.subDir)
 
   constructor (
     private subDir: string,
-    private offline: boolean
+    private offline: boolean,
+    private dirHandler?: FileSystemDirectoryHandle
   ) {}
 
   save = <T extends UploadFileParams>(p: T): Promise<UploadFileReturn<T>> => {
@@ -17,18 +18,18 @@ export class StorageFileRequest {
     return this.local.upload(p)
   }
 
-  getUrl = (name: string) => {
+  getUrl = async (name: string) => {
     if (!this.offline) {
       return this.api.getDownloadUrl(name)
     }
-    return this.local.getFileUrl(name)
+    return await this.local.getFileUrl(name)
   }
 
-  getPreviewUrl = (name: string) => {
+  getPreviewUrl = async (name: string) => {
     if (!this.offline) {
       return this.api.getPreviewUrl(name)
     }
-    return this.local.getFileUrl(name)
+    return await this.local.getFileUrl(name)
   }
 
   delete = (name: string): Promise<boolean> => {

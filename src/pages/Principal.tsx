@@ -5,6 +5,7 @@ import { SchoolCard } from '../components/SchoolCard'
 import { useContext } from 'react'
 import { SchoolPromContext } from '../context/api/schools'
 import { Container } from '@mui/system'
+import { PickDirDialog } from '../components/PickDirDialog'
 
 export const Principal = () => {
   const schoolProms = useContext(SchoolPromContext)
@@ -22,6 +23,7 @@ export const Principal = () => {
       <NavBar>
         <SearchField/>
       </NavBar>
+      <PickDirDialog/>
 
       <br/>
       <Container maxWidth='xl'>

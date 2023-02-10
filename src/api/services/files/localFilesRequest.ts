@@ -9,20 +9,29 @@ const getFileExtension = (filename: string) => {
 
 export class LocalFilesRequest {
 
-  private dirHandler: FileSystemDirectoryHandle
   private subDirHandler: FileSystemDirectoryHandle
 
   constructor(
     private subDir: string,
-  ) {}
+    private dirHandler?: FileSystemDirectoryHandle
+  ) {
+    if (this.dirHandler) {
+      this.loadDir(this.dirHandler)
+    }
+  }
+
+  loadDir = async (handler?: FileSystemDirectoryHandle) => {
+    const h = handler ?? await this.pickDir()
+    this.subDirHandler = await h.getDirectoryHandle(this.subDir, {create: true})
+    this.subDirHandler.requestPermission({ mode: 'readwrite' })
+  }
 
   pickDir = async () => {
-    this.dirHandler = await window.showDirectoryPicker({
+    const handler = await window.showDirectoryPicker({
       startIn: 'pictures',
     })
-    this.dirHandler.requestPermission({ mode: 'readwrite' })
-    this.subDirHandler = await this.dirHandler.getDirectoryHandle(this.subDir, {create: true})
-    this.subDirHandler.requestPermission({ mode: 'readwrite' })
+    await handler.requestPermission({ mode: 'readwrite' })
+    return handler
   }
 
   private write = async (file: File, uuidName: boolean = true): Promise<UploadSingleFileResponse> => {

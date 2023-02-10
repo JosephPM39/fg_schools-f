@@ -6,6 +6,7 @@ import {
 } from './context/api/schools/'
 import { SessionContext, SessionProvider } from './context/SessionContext';
 import { Unauthorized } from './pages/Unauthorized';
+import { StorageFileProvider } from './context/files/StorageFilesContext';
 
 function App() {
 
@@ -23,7 +24,9 @@ function App() {
 
   return <SessionProvider>
     <Root>
-      <Principal/>
+      <StorageFileProvider>
+        <Principal/>
+      </StorageFileProvider>
     </Root>
   </SessionProvider>
 }

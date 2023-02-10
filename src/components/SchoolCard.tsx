@@ -1,5 +1,15 @@
 import { Article, Delete, Edit, KeyboardArrowDown } from '@mui/icons-material';
-import { Card, CardActions, CardContent,CardMedia,Button, Typography, MenuItem, Menu, CircularProgress} from '@mui/material'
+import {
+  Card,
+  CardActions,
+  CardContent,
+  CardMedia,
+  Button,
+  Typography,
+  MenuItem,
+  Menu,
+  CircularProgress
+} from '@mui/material'
 import { Box } from '@mui/system';
 import { useContext, useEffect, useState } from 'react';
 import { IEmployee, IEmployeePosition, IPosition, ISchool, ISchoolProm } from '../api/models_school';
@@ -9,6 +19,7 @@ import { useNearScreen } from '../hooks/useNearScreen';
 import { SectionsModal } from './SectionsModal';
 import DefaultIcon from '../assets/signature.png'
 import { SchoolPromFormModal } from './forms/SchoolPromFormModal';
+import { StorageFileContext } from '../context/files/StorageFilesContext';
 
 interface Params {
   schoolProm: ISchoolProm
@@ -20,12 +31,16 @@ export const SchoolCard = (params: Params) => {
   const [employee, setEmployee] = useState<IEmployee | undefined>(undefined)
   const [position, setPosition] = useState<IPosition | undefined>(undefined)
 
+  const [icon, setIcon] = useState<string>()
+
   const useEmployeePosition = useContext(EmployeePositionContext)
   const useSchool = useContext(SchoolContext)
   const useEmployee = useContext(EmployeeContext)
   const usePosition = useContext(PositionContext)
   const { element, show } = useNearScreen()
-  const {promiseHelper} = useDebounce()
+  const { promiseHelper } = useDebounce()
+  const useStorageFile = useContext(StorageFileContext)
+  const useStorage = useStorageFile?.newStorage('school-icon')
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -37,11 +52,21 @@ export const SchoolCard = (params: Params) => {
   }
 
   useEffect(() => {
+    const getData = async () => {
+      if (!school?.icon || school.icon === 'default' || icon) return
+      const iconUrl = await useStorage?.getPreviewUrl(school.icon)
+      setIcon(iconUrl)
+    }
+    getData()
+  }, [school])
+
+  useEffect(() => {
     if (!show) return
     const get = async () => {
       const school = await useSchool?.findOne({ id: params.schoolProm.schoolId })
       if (!school) {
         const school = await promiseHelper(useSchool?.findOne({ id: params.schoolProm.schoolId }), 5000)
+
         return setSchool(school)
       }
       setSchool(school)
@@ -82,7 +107,7 @@ export const SchoolCard = (params: Params) => {
         component="img"
         alt={school?.name}
         height="140"
-        image={school?.icon === 'default' ? DefaultIcon : school.icon}
+        image={icon || DefaultIcon}
       /> : <Box height='140px' width='345px' display='flex' alignItems='center' justifyContent='center'>
         <CircularProgress/>
       </Box>
