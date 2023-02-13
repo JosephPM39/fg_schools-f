@@ -9,6 +9,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import Slide from '@mui/material/Slide';
 import { TransitionProps } from '@mui/material/transitions';
 import { useShow } from '../hooks/useShow';
+import { BtnContainer, BtnPropsContainer, isBtnContainer } from './types';
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -26,20 +27,13 @@ export type ModalParams = {
   fullScreen?: boolean
 }
 
-type Params = ModalParams & (BtnProps | Btn)
-
-export type BtnProps = { btnProps: Omit<Parameters<typeof Button>[0], 'onClick'> }
-export type Btn = { btn: NonNullable<React.ReactNode> }
-
-function isBtnCmp(params: Params): params is ModalParams & Btn {
-  return !!(params as Btn & ModalParams).btn
-}
+type Params = ModalParams & (BtnPropsContainer | BtnContainer)
 
 export const Modal = (params: Params) => {
   const {show, setShow} = useShow(params.initOpen ?? false)
 
   const Btn = () => {
-    if (isBtnCmp(params)) {
+    if (isBtnContainer(params)) {
       const Btn = params.btn
       return <div onClick={() => setShow(true)}> {Btn} </div>
     }

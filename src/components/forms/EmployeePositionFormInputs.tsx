@@ -4,6 +4,7 @@ import { IEmployee, IEmployeePosition, IPosition } from "../../api/models_school
 import { useEmployee } from "../../hooks/api/schools/useEmployee"
 import { useEmployeePosition } from "../../hooks/api/schools/useEmployeePosition"
 import { usePosition } from "../../hooks/api/schools/usePosition"
+import { v4 as uuidV4 } from 'uuid'
 
 interface EPFIParams {
   type?: IPosition['type']
@@ -57,7 +58,7 @@ export const EmployeePositionFormInputs = (params?: EPFIParams) => {
       name="employee_position_id"
       type='text'
       onChange={() => {}}
-      value={obj?.id || ''}
+      value={obj?.id || uuidV4()}
       hidden
     />
     <input

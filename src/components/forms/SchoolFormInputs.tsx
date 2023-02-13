@@ -3,9 +3,9 @@ import { ChangeEvent, useEffect, useState } from "react"
 import { ISchool } from "../../api/models_school"
 import DefaultPreview from '../../assets/signature.png'
 import { useSchool } from "../../hooks/api/schools/useSchool"
+import { v4 as uuidV4 } from 'uuid'
 
 export const SchoolFormInputs = (params?: { idForUpdate?: ISchool['id']}) => {
-  const [icon, setIcon] = useState<File | null>(null)
   const [data, setData] = useState<ISchool>()
   const useSchools = useSchool()
 
@@ -18,29 +18,6 @@ export const SchoolFormInputs = (params?: { idForUpdate?: ISchool['id']}) => {
     }
     getData()
   }, [useSchools.data, params])
-  /*
-  useEffect(() => {
-    const getData = async () => {
-      if (!data?.icon || !data) return
-      const i = await fetch(data.icon)
-      const res = await i.blob()
-
-      setIcon(new File([res], 'icon'))
-    }
-  }, [data])
-*/
-  const onSelectIcon = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.[0]) {
-      return setIcon(e.target.files[0])
-    }
-  }
-
-  const getPreview = () => {
-    if (!!icon) {
-      return URL.createObjectURL(icon)
-    }
-    return DefaultPreview
-  }
 
   const onChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, nam: keyof ISchool) => {
     const d = {
@@ -55,7 +32,7 @@ export const SchoolFormInputs = (params?: { idForUpdate?: ISchool['id']}) => {
       name="school_id"
       type='text'
       onChange={() => {}}
-      value={data?.['id'] || ''}
+      value={data?.['id'] || uuidV4()}
       hidden
     />
     <Grid container spacing={2}>
@@ -112,26 +89,6 @@ export const SchoolFormInputs = (params?: { idForUpdate?: ISchool['id']}) => {
           variant="outlined"
           required
         />
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <IconButton component="label" >
-          <input
-            hidden
-            accept="image/*"
-            type="file"
-            name="school_icon"
-            onChange={onSelectIcon}
-          />
-          <Box display='flex' alignItems='center' >
-            <Typography>Logo:</Typography>
-            <CardMedia
-              component="img"
-              alt={icon?.name}
-              height="40"
-              image={getPreview()}
-            />
-          </Box>
-        </IconButton>
       </Grid>
     </Grid>
   </>

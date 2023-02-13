@@ -1,10 +1,11 @@
-import { Modal, Btn, BtnProps } from '../../../containers/Modal'
+import { Modal } from '../../../containers/Modal'
 import { Box } from '@mui/material';
 import { Form } from './form'
 import { ISchoolProm } from '../../../api/models_school';
+import { BtnContainer, BtnPropsContainer } from '../../../containers/types';
 
 export const SchoolPromFormModal = ({btn, idForUpdate}:{btn?: React.ReactNode, idForUpdate?: ISchoolProm['id']}) => {
-  const mBtn = (): Btn | BtnProps => {
+  const mBtn = (): BtnContainer | BtnPropsContainer => {
     if(btn) {
       return {
         btn

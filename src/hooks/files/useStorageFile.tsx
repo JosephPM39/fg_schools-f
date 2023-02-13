@@ -11,18 +11,17 @@ export const useStorageFile = () => {
 
   useEffect(() => {
     if (dirHandler) return
-    if (needPick) return
+    if (needPick || !isAppOffline()) return
     setNeedPick(true)
     return () => {}
   }, [dirHandler, isAppOffline, needPick])
 
   const pickDir = () => {
-    if (dirHandler) return
+    if (dirHandler || !isAppOffline()) return
     localFR.pickDir().then((h) => setDirHandler(h))
   }
 
-  const newStorage = (subDir: string) => {
-    if (!dirHandler) return
+  const newStorage = (subDir: SubDir) => {
     return new StorageFileRequest(subDir, isAppOffline(), dirHandler)
   }
 
@@ -31,4 +30,9 @@ export const useStorageFile = () => {
     needPick,
     pickDir
   }
+}
+
+export enum SubDir {
+  schoolIcons = 'school-icon',
+  albums = 'albums'
 }

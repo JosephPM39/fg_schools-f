@@ -8,7 +8,8 @@ import {
   Typography,
   MenuItem,
   Menu,
-  CircularProgress
+  CircularProgress,
+  Divider
 } from '@mui/material'
 import { Box } from '@mui/system';
 import { useContext, useEffect, useState } from 'react';
@@ -18,18 +19,21 @@ import { useDebounce } from '../hooks/useDebouce';
 import { useNearScreen } from '../hooks/useNearScreen';
 import { SectionsModal } from './SectionsModal';
 import DefaultIcon from '../assets/signature.png'
+import ImageError from '../assets/image-error.png'
 import { SchoolPromFormModal } from './forms/SchoolPromFormModal';
 import { StorageFileContext } from '../context/files/StorageFilesContext';
+import { SubDir } from '../hooks/files/useStorageFile';
+import { ChangeIconDialog } from './forms/ChangeSchoolIconDialog';
 
 interface Params {
   schoolProm: ISchoolProm
 }
 
 export const SchoolCard = (params: Params) => {
-  const [school, setSchool] = useState<ISchool | undefined>(undefined)
-  const [principal, setPrincipal] = useState<IEmployeePosition | undefined>(undefined)
-  const [employee, setEmployee] = useState<IEmployee | undefined>(undefined)
-  const [position, setPosition] = useState<IPosition | undefined>(undefined)
+  const [school, setSchool] = useState<ISchool>()
+  const [principal, setPrincipal] = useState<IEmployeePosition>()
+  const [employee, setEmployee] = useState<IEmployee>()
+  const [position, setPosition] = useState<IPosition>()
 
   const [icon, setIcon] = useState<string>()
 
@@ -40,7 +44,7 @@ export const SchoolCard = (params: Params) => {
   const { element, show } = useNearScreen()
   const { promiseHelper } = useDebounce()
   const useStorageFile = useContext(StorageFileContext)
-  const useStorage = useStorageFile?.newStorage('school-icon')
+  const useStorage = useStorageFile?.newStorage(SubDir.schoolIcons)
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -72,7 +76,7 @@ export const SchoolCard = (params: Params) => {
       setSchool(school)
     }
     get()
-  }, [show, params, useSchool?.data])
+  }, [show, params, useSchool?.data, useSchool?.data.length])
 
   useEffect(() => {
     if (!show) return
@@ -108,6 +112,10 @@ export const SchoolCard = (params: Params) => {
         alt={school?.name}
         height="140"
         image={icon || DefaultIcon}
+        onError={({currentTarget}) => {
+          currentTarget.onerror = null
+          currentTarget.src = ImageError
+        }}
       /> : <Box height='140px' width='345px' display='flex' alignItems='center' justifyContent='center'>
         <CircularProgress/>
       </Box>
@@ -175,9 +183,13 @@ export const SchoolCard = (params: Params) => {
           <SchoolPromFormModal
             idForUpdate={params.schoolProm.id}
             btn={
-              <MenuItem sx={{color: 'darkblue'}} ><Edit/>&#8288; Editar</MenuItem>
+              <MenuItem sx={{color: 'grey'}} ><Edit/>&#8288; Editar información</MenuItem>
             }
           />
+          <ChangeIconDialog school={school} btn={
+            <MenuItem sx={{color: 'grey'}} ><Edit/>&#8288; Cambiar Logo</MenuItem>
+          } />
+          <Divider/>
           <MenuItem onClick={handleClose} sx={{color: 'red'}}><Delete/>&#8288; Eliminar</MenuItem>
         </Menu>
 

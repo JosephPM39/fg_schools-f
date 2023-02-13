@@ -34,6 +34,13 @@ export const throwApiResponseError = (status: number) => {
     .keys(Responses).includes(String(status)) ? status as Status : 999
   throw new ResponseError(Responses[st])
 }
+
+export const getFileExtension = (filename: string) => {
+  const split = filename.split('.')
+  if (split.length < 2) return ''
+  return split.pop() ?? ''
+}
+
 export const debounce = <T extends (...any: any) => any>(
   cb: T,
   p: Parameters<T>,

@@ -13,7 +13,6 @@ export const useAuth = () => {
         ...config,
         headers: {
           Authorization: `Bearer ${user.token}`,
-          'Content-Type': 'application/json',
           Accept: 'application/json',
           ...config?.headers
         }

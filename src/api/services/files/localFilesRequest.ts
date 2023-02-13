@@ -1,11 +1,6 @@
 import { v4 as uuidV4 } from 'uuid'
 import { UploadSingleFileResponse, FileList, UploadFileReturn, UploadFileParams } from '../types'
-
-const getFileExtension = (filename: string) => {
-  const split = filename.split('.')
-  if (split.length < 2) return ''
-  return split.pop() ?? ''
-}
+import { getFileExtension } from '../utils'
 
 export class LocalFilesRequest {
 
@@ -34,7 +29,7 @@ export class LocalFilesRequest {
     return handler
   }
 
-  private write = async (file: File, uuidName: boolean = true): Promise<UploadSingleFileResponse> => {
+  private write = async (file: File, uuidName: boolean = false): Promise<UploadSingleFileResponse> => {
     let name = uuidName
       ? `${uuidV4()}.${getFileExtension(file.name)}`
       : file.name

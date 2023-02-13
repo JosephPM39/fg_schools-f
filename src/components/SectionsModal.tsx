@@ -1,15 +1,16 @@
 import { ISchoolProm, ISectionProm } from '../api/models_school';
 import { SchoolsCardData } from './types';
 import { SectionsTabs } from './SectionsTabs';
-import { BtnProps, Modal } from '../containers/Modal'
+import { Modal } from '../containers/Modal'
 import { useContext, useEffect, useState } from 'react';
 import { SectionPromContext } from '../context/api/schools';
+import { BtnPropsContainer } from '../containers/types';
 
 interface Params {
   initOpen: boolean,
   schoolProm: ISchoolProm,
   cardData?: SchoolsCardData
-  btnProps: BtnProps['btnProps']
+  btnProps: BtnPropsContainer['btnProps']
 }
 
 export const SectionsModal = (params: Params) => {

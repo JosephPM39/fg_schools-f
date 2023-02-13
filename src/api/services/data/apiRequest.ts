@@ -19,6 +19,12 @@ interface Crud<Model extends IBaseModel> {
   delete: (p: DeleteParams<Model>) => Promise<boolean>
 }
 
+const getHeaders = () => {
+  return {
+    'Content-Type': 'application/json',
+  }
+}
+
 export class ApiRequest<Model extends IBaseModel> implements Crud<Model> {
   constructor(
     private path: string
@@ -29,6 +35,7 @@ export class ApiRequest<Model extends IBaseModel> implements Crud<Model> {
     const path = `${CONFIG.schoolsApiUrl}/${this.path}`
     const res = await fetch(path, {
       method: 'POST',
+      headers: getHeaders(),
       body: JSON.stringify(data)
     })
 
@@ -45,7 +52,9 @@ export class ApiRequest<Model extends IBaseModel> implements Crud<Model> {
     const searchParams = new URLSearchParams(query)
     const path = `${CONFIG.schoolsApiUrl}/${this.path}/${id}?${searchParams}`
 
-    const res = await fetchOnce(path)
+    const res = await fetchOnce(path, {
+      headers: getHeaders(),
+    })
 
     if (res.status !== 200) throwApiResponseError(res.status)
 
@@ -69,6 +78,7 @@ export class ApiRequest<Model extends IBaseModel> implements Crud<Model> {
 
     const res = await fetchOnce(path, {
       method: 'POST',
+      headers: getHeaders(),
       body
     })
 
@@ -86,6 +96,7 @@ export class ApiRequest<Model extends IBaseModel> implements Crud<Model> {
     const path = `${CONFIG.schoolsApiUrl}/${this.path}/${params.id}`
     const res = await fetch(path, {
       method: 'PATCH',
+      headers: getHeaders(),
       body: JSON.stringify(params.data)
     })
 
@@ -98,6 +109,7 @@ export class ApiRequest<Model extends IBaseModel> implements Crud<Model> {
     const path = `${CONFIG.schoolsApiUrl}/${this.path}/${params.id}`
     const res = await fetch(path, {
       method: 'PATCH',
+      headers: getHeaders(),
     })
 
     if (res.status !== 200) throwApiResponseError(res.status)
