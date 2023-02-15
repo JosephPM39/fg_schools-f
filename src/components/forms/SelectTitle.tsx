@@ -1,5 +1,5 @@
 import { ITitle } from "../../api/models_school"
-import { SelectFromList } from "../inputs/Select"
+import { SelectFromList } from "../inputs/SelectFromList"
 
 interface Params {
   onSelect: (select?: ITitle) => void

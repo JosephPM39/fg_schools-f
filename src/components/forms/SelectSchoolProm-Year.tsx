@@ -15,13 +15,10 @@ export const SelectSchoolPromYear = ({onSelect}: params) => {
   const globalYear = useContext(SchoolPromContext)?.year
 
   const [list, setList] = useState<ISchoolProm[]>([])
-  const [year, setYear] = useState<number>((globalYear ?? new Date().getFullYear()) - 1)
+  const initYear = (globalYear ?? new Date().getFullYear()) - 1
+  const [year, setYear] = useState<number>(initYear)
   const proms = useSchoolProm({ year })
   const useSchools = useSchool()
-
-  useEffect(() => {
-    proms.fetch({searchBy: { year }})
-  }, [year])
 
   useEffect(() => {
     const conf = async () => {
@@ -34,7 +31,7 @@ export const SelectSchoolPromYear = ({onSelect}: params) => {
       setList(res)
     }
     conf()
-  }, [proms.data, useSchools])
+  }, [proms.data, useSchools.data])
 
   return <>
     <Grid container spacing={2}>

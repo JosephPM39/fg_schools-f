@@ -17,6 +17,7 @@ interface BaseParams<T extends IBaseModel> {
   onSelect: (select?: T) => void
   list: Array<T>
   defaultValue?: T['id']
+  valueBy?: keyof T
   size?: 'small' | 'medium'
 }
 
@@ -33,10 +34,12 @@ export const SelectFromList = <T extends IBaseModel>(params: Params<T>) => {
     onSelect,
     list,
     defaultValue,
+    valueBy = 'id' as keyof T,
     name,
     size
   } = params
   const [selected, setSelected] = useState<T>()
+  console.log('geting name')
 
   const getItemName = (item: T) => {
     if (isWithProp(params)) {
@@ -49,20 +52,21 @@ export const SelectFromList = <T extends IBaseModel>(params: Params<T>) => {
     onSelect(selected)
   }, [selected])
 
-  const find = (id: T['id']) => {
-    if (!id) return undefined
-    return list.find((e) => e.id === id)
+  const find = <K extends typeof valueBy>(prop: T[K]) => {
+    if (!prop) return undefined
+    return list.find((e) => e[valueBy] === prop)
   }
 
   const handleChange = (e: SelectChangeEvent) => {
-    const item = find(e.target.value as T['id'])
+    const item = find(e.target.value as T[typeof valueBy])
     setSelected(item)
   }
 
-  const defaultId = (id: T['id']) => {
-    const ep = find(id)
-    if (ep?.id) return ep.id
-    if (selected && !find(selected.id)) setSelected(undefined)
+  const defaultId = <K extends typeof valueBy>(prop?: T[K]) => {
+    if (!prop) return
+    const item = find(prop)
+    if (item?.[valueBy]) return String(item[valueBy])
+    if (selected && !find(selected[valueBy as keyof T])) setSelected(undefined)
     return ''
   }
 
@@ -75,7 +79,7 @@ export const SelectFromList = <T extends IBaseModel>(params: Params<T>) => {
         id={`${id}-select`}
         name={name}
         defaultValue={defaultValue}
-        value={defaultId(selected?.id) ?? ''}
+        value={defaultId(selected?.[valueBy]) ?? ''}
         label={`&#8288;${title}`}
         onChange={handleChange}
         required
@@ -85,7 +89,7 @@ export const SelectFromList = <T extends IBaseModel>(params: Params<T>) => {
         </MenuItem>
         {list.map(
           (item, index) => <MenuItem
-            value={item.id}
+            value={String(item[valueBy])}
             key={`menu-item-${id}-${index}`}
           >
             {getItemName(item)}
