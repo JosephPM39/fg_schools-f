@@ -1,10 +1,8 @@
-import { SchoolFormInputs } from '../SchoolFormInputs';
 import { ChangeEvent, FormEvent, ReactNode, useContext, useEffect, useRef, useState } from 'react';
 import { EmployeePositionFormInputs } from '../EmployeePositionFormInputs';
 import { PositionType } from '../../../api/models_school/schools/position.model';
 import { Button, Divider, FormControlLabel, FormLabel, Radio, RadioGroup } from '@mui/material';
-import { ISectionProm } from '../../../api/models_school';
-import { SelectSchoolPromYear } from '../SelectSchoolProm-Year';
+import { ISchoolProm, ISectionProm } from '../../../api/models_school';
 import { SelectEmployeePositionPromYear } from '../SelectEmployeePosition-PromYear';
 import { useEmployee } from '../../../hooks/api/schools/useEmployee';
 import { useEmployeePosition } from '../../../hooks/api/schools/useEmployeePosition';
@@ -15,17 +13,20 @@ import { Alert, AlertProps, AlertWithError } from '../../Alert';
 import { InvalidDataError, isInvalidDataError, promiseHandleError } from '../../../api/handlers/errors';
 import { useTitle } from '../../../hooks/api/schools/useTitle';
 import { useGroup } from '../../../hooks/api/schools/useGroup';
+import { SelectSectionPromYear } from '../SelectSectionPromYear';
+import { SectionInputs } from '../SectionInputs';
 
 type SectionOrigin = 'new' | 'previous'
-type profesorOrigin = 'new' | 'previous' | 'all'
+type ProfesorOrigin = 'new' | 'previous' | 'all'
 
-export const Form = (params?: { idForUpdate?: ISectionProm['id'] }) => {
+export const Form = (params: { idForUpdate?: ISectionProm['id'], schoolPromId: ISchoolProm['id'] }) => {
+  const { idForUpdate, schoolPromId } = params
   const form = useRef<HTMLFormElement | null>(null)
 
   const [sectionPromForUpdate, setSectionPromForUpdate] = useState<ISectionProm>()
 
   const [sectionOrigin, setSectionOrigin] = useState<SectionOrigin>('new')
-  const [profesorOrigin, setProfesorOrigin] = useState<profesorOrigin>('new')
+  const [profesorOrigin, setProfesorOrigin] = useState<ProfesorOrigin>('new')
   const [sectionSelected, setSectionSelected] = useState<ISectionProm>()
 
   const [sectionInput, setSectionInput] = useState<ReactNode>(<>Loading</>)
@@ -49,13 +50,13 @@ export const Form = (params?: { idForUpdate?: ISectionProm['id'] }) => {
 
   useEffect(() => {
     const getData = async () => {
-      if (!params?.idForUpdate || !!sectionPromForUpdate) return
-      const res = await useSectionProms?.findOne({id: params.idForUpdate})
+      if (!idForUpdate || !!sectionPromForUpdate) return
+      const res = await useSectionProms?.findOne({id: idForUpdate})
       if (!res) return
       return setSectionPromForUpdate(res)
     }
     getData()
-  }, [params, useSectionProms?.data])
+  }, [idForUpdate, useSectionProms?.data, sectionPromForUpdate])
 
   useEffect(() => {
     if (!sectionSelected && profesorOrigin === 'previous') {
@@ -87,7 +88,7 @@ export const Form = (params?: { idForUpdate?: ISectionProm['id'] }) => {
 
     return setProfesorInput(
       <SelectEmployeePositionPromYear
-        proms={getSectionProm()}
+        sections={getSectionProm()}
         yearSelect={needYearSelect()}
         type={PositionType.PROFESOR}
       />
@@ -96,44 +97,37 @@ export const Form = (params?: { idForUpdate?: ISectionProm['id'] }) => {
 
   useEffect(() => {
     if (sectionOrigin === 'new') {
-      return setSectionInput(<SchoolFormInputs
-        idForUpdate={sectionPromForUpdate}
+      return setSectionInput(<SectionInputs
+        idForUpdate={sectionPromForUpdate?.id}
       />)
     }
-    if (schoolOrigin === 'previous') {
-      return setSchoolInput(<SelectSchoolPromYear onSelect={(p) => setSchoolSelected(p)}/>)
+    if (sectionOrigin === 'previous') {
+      return setSectionInput(<SelectSectionPromYear onSelect={(p) => setSectionSelected(p)}/>)
     }
-  }, [schoolOrigin, schoolPromForUpdate])
+  }, [sectionOrigin, sectionPromForUpdate, schoolPromId])
 
-  const onChangeSchoolOrigin = (e: ChangeEvent<HTMLInputElement>) => {
-    setSchoolOrigin(e.target.value as SchoolOrigin)
-    if (e.target.value === 'new' && principalOrigin === 'previous') {
-      setPrincipalOrigin('new')
+  const onChangeSectionOrigin = (e: ChangeEvent<HTMLInputElement>) => {
+    setSectionOrigin(e.target.value as SectionOrigin)
+    if (e.target.value === 'new' && profesorOrigin === 'previous') {
+      setProfesorOrigin('new')
     }
   }
 
-  const onChangePrincipalOrigin = (e: ChangeEvent<HTMLInputElement>) => {
-    setPrincipalOrigin(e.target.value as PrincipalOrigin)
+  const onChangeProfesorOrigin = (e: ChangeEvent<HTMLInputElement>) => {
+    setProfesorOrigin(e.target.value as ProfesorOrigin)
   }
 
   return <>
-    <form ref={form} onSubmit={onSubmit}>
+    <form ref={form}>
       <input
-        name="school_prom_id"
+        name="section_prom_id"
         type='text'
-        value={schoolPromForUpdate?.['id'] || ''}
+        value={sectionPromForUpdate?.['id'] || ''}
         onChange={() => {}}
         hidden
       />
-      <input
-        name="year"
-        type='number'
-        onChange={() => {}}
-        value={schoolPromForUpdate?.['year'] || ''}
-        hidden
-      />
-      <FormLabel>Escuela: </FormLabel>
-      <RadioGroup row onChange={onChangeSchoolOrigin} value={schoolOrigin}>
+      <FormLabel>Sección: </FormLabel>
+      <RadioGroup row onChange={onChangeSectionOrigin} value={sectionOrigin}>
         <FormControlLabel
           value='new'
           control={<Radio/>}
@@ -145,19 +139,19 @@ export const Form = (params?: { idForUpdate?: ISectionProm['id'] }) => {
           label={params?.idForUpdate ? 'Cambiar por' : 'Habilitar'}
         />
       </RadioGroup>
-      {schoolInput}
+      {sectionInput}
       <br/>
       <Divider/>
       <br/>
-      <FormLabel>Director: </FormLabel>
-      <RadioGroup row onChange={onChangePrincipalOrigin} value={principalOrigin}>
+      <FormLabel>Docente: </FormLabel>
+      <RadioGroup row onChange={onChangeProfesorOrigin} value={profesorOrigin}>
         <FormControlLabel
           value='new'
           control={<Radio/>}
           label={params?.idForUpdate ? 'Editar' : 'Nuevo'}
         />
         {
-          (schoolOrigin === 'previous' && schoolSelected) &&
+          (sectionOrigin === 'previous' && sectionSelected) &&
           <FormControlLabel
             value='previous'
             control={<Radio/>}
@@ -170,7 +164,7 @@ export const Form = (params?: { idForUpdate?: ISectionProm['id'] }) => {
           label='De otras escuelas y años'
         />
       </RadioGroup>
-      {principalInput}
+      {profesorInput}
       <br/>
       <Button type='submit' variant='contained' disabled={isSending || showNotify}>
         {isSending ? 'Guardando...' : 'Guardar'}

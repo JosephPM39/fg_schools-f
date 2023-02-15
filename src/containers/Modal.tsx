@@ -25,6 +25,7 @@ export type ModalParams = {
   title: string
   children: JSX.Element | JSX.Element[]
   fullScreen?: boolean
+  actionsToolbar?:React. ReactNode
 }
 
 type Params = ModalParams & (BtnPropsContainer | BtnContainer)
@@ -61,6 +62,7 @@ export const Modal = (params: Params) => {
             <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
               {params.title}
             </Typography>
+            {params.actionsToolbar}
           </Toolbar>
         </AppBar>
         {params.children}

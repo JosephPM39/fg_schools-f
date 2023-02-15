@@ -5,6 +5,8 @@ import { Modal } from '../containers/Modal'
 import { useContext, useEffect, useState } from 'react';
 import { SectionPromContext } from '../context/api/schools';
 import { BtnPropsContainer } from '../containers/types';
+import { SectionPromFormModal } from './forms/SectionPromFormModal';
+import { Button } from '@mui/material';
 
 interface Params {
   initOpen: boolean,
@@ -28,7 +30,14 @@ export const SectionsModal = (params: Params) => {
   }, [params.schoolProm.id, proms.length, useSectionProm?.data])
 
   return (
-    <Modal fullScreen btnProps={params.btnProps} title={`Escuela: ${params.cardData?.school?.name}`}>
+    <Modal
+      fullScreen
+      btnProps={params.btnProps}
+      title={`Escuela: ${params.cardData?.school?.name}`}
+      actionsToolbar={<SectionPromFormModal btn={
+        <Button variant='contained' color='info'> Agregar Sección </Button>
+      } schoolPromId={params.schoolProm.id} />}
+    >
       <SectionsTabs sectionProms={proms} />
     </Modal>
   );

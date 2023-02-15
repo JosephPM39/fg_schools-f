@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { ITitle, IGroup, ISectionProm } from '../api/models_school';
 import { Tabs } from '../containers/Tabs';
 import { GroupContext, TitleContext } from '../context/api/schools';
@@ -14,12 +14,12 @@ interface Section {
 }
 
 export const SectionsTabs = (params: Params) => {
-  const [sections, setSections] = React.useState<Array<Section>>([])
-  const [list, setList] = React.useState<Array<{label: string, content: JSX.Element}>>([])
-  const useTitle = React.useContext(TitleContext)
-  const useGroup = React.useContext(GroupContext)
+  const [sections, setSections] = useState<Array<Section>>([])
+  const [list, setList] = useState<Array<{label: string, content: JSX.Element}>>([])
+  const useTitle = useContext(TitleContext)
+  const useGroup = useContext(GroupContext)
 
-  React.useEffect(() => {
+  useEffect(() => {
     const getData = async () => {
       const sectionsBuilt = await Promise.all(
         params.sectionProms.map(
@@ -37,7 +37,7 @@ export const SectionsTabs = (params: Params) => {
     getData()
   }, [useGroup, useTitle, useGroup?.data?.length, useTitle?.data?.length, params.sectionProms])
 
-  React.useEffect(() => {
+  useEffect(() => {
     const getSection = (prom: ISectionProm) => {
       return sections.find((s) => s.sectionPromId === prom.id)
     }
