@@ -18,6 +18,7 @@ export const SelectSchoolProm = (params: params) => {
     name="school_id"
     title="Escuela"
     valueBy="schoolId"
+    omitCreateOption
     itemNameFormat={findSPName}
     list={list}
     onSelect={onSelect}

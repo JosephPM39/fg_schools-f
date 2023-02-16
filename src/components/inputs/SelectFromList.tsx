@@ -14,6 +14,7 @@ interface BaseParams<T extends IBaseModel> {
   id: string
   title: string
   name: string
+  omitCreateOption?: true
   onSelect: (select?: T) => void
   list: Array<T>
   defaultValue?: T['id']
@@ -36,7 +37,8 @@ export const SelectFromList = <T extends IBaseModel>(params: Params<T>) => {
     defaultValue,
     valueBy = 'id' as keyof T,
     name,
-    size
+    size,
+    omitCreateOption
   } = params
   const [selected, setSelected] = useState<T>()
   console.log('geting name')
@@ -80,7 +82,7 @@ export const SelectFromList = <T extends IBaseModel>(params: Params<T>) => {
         name={name}
         defaultValue={defaultValue}
         value={defaultId(selected?.[valueBy]) ?? ''}
-        label={`&#8288;${title}`}
+        label={`${title}`}
         onChange={handleChange}
         required
       >
@@ -95,9 +97,9 @@ export const SelectFromList = <T extends IBaseModel>(params: Params<T>) => {
             {getItemName(item)}
           </MenuItem>
         )}
-        <MenuItem value='new' key={`menu-item-${id}-new`}>
+        {!omitCreateOption && <MenuItem value='new' key={`menu-item-${id}-new`}>
           Nuevo
-        </MenuItem>
+        </MenuItem>}
       </Select>
     </FormControl>
   )

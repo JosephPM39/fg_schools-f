@@ -49,7 +49,7 @@ export const Modal = (params: Params) => {
         open={show}
         TransitionComponent={Transition}
       >
-        <AppBar sx={{ position: 'relative' }}>
+        <AppBar sx={{ position: 'relative', margin: 0 }}>
           <Toolbar>
             <IconButton
               edge="start"

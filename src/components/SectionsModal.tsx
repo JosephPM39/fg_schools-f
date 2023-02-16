@@ -1,4 +1,4 @@
-import { ISchoolProm, ISectionProm } from '../api/models_school';
+import { ISchool, ISchoolProm, ISectionProm } from '../api/models_school';
 import { SchoolsCardData } from './types';
 import { SectionsTabs } from './SectionsTabs';
 import { Modal } from '../containers/Modal'
@@ -10,8 +10,8 @@ import { Button } from '@mui/material';
 
 interface Params {
   initOpen: boolean,
-  schoolProm: ISchoolProm,
-  cardData?: SchoolsCardData
+  schoolPromId: ISchoolProm['id'],
+  school?: ISchool,
   btnProps: BtnPropsContainer['btnProps']
 }
 
@@ -22,21 +22,21 @@ export const SectionsModal = (params: Params) => {
   useEffect(() => {
     const getData = async () => {
       const res = await useSectionProm?.findBy({
-        schoolPromId: params.schoolProm.id
+        schoolPromId: params.schoolPromId
       })
       if (res && res?.length > 0) setProms(res)
     }
     if (proms.length < 1) getData()
-  }, [params.schoolProm.id, proms.length, useSectionProm?.data])
+  }, [params.schoolPromId, proms.length, useSectionProm?.data])
 
   return (
     <Modal
       fullScreen
       btnProps={params.btnProps}
-      title={`Escuela: ${params.cardData?.school?.name}`}
+      title={`Escuela: ${params?.school?.name}`}
       actionsToolbar={<SectionPromFormModal btn={
         <Button variant='contained' color='info'> Agregar Sección </Button>
-      } schoolPromId={params.schoolProm.id} />}
+      } schoolId={params?.school?.id} />}
     >
       <SectionsTabs sectionProms={proms} />
     </Modal>

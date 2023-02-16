@@ -2,7 +2,7 @@ import { ChangeEvent, FormEvent, ReactNode, useContext, useEffect, useRef, useSt
 import { EmployeePositionFormInputs } from '../EmployeePositionFormInputs';
 import { PositionType } from '../../../api/models_school/schools/position.model';
 import { Button, Divider, FormControlLabel, FormLabel, Radio, RadioGroup } from '@mui/material';
-import { ISchoolProm, ISectionProm } from '../../../api/models_school';
+import { ISchool, ISchoolProm, ISectionProm } from '../../../api/models_school';
 import { SelectEmployeePositionPromYear } from '../SelectEmployeePosition-PromYear';
 import { useEmployee } from '../../../hooks/api/schools/useEmployee';
 import { useEmployeePosition } from '../../../hooks/api/schools/useEmployeePosition';
@@ -19,8 +19,13 @@ import { SectionInputs } from '../SectionInputs';
 type SectionOrigin = 'new' | 'previous'
 type ProfesorOrigin = 'new' | 'previous' | 'all'
 
-export const Form = (params: { idForUpdate?: ISectionProm['id'], schoolPromId: ISchoolProm['id'] }) => {
-  const { idForUpdate, schoolPromId } = params
+interface Params {
+  idForUpdate?: ISectionProm['id'],
+  schoolId: ISchool['id']
+}
+
+export const Form = (params: Params) => {
+  const { idForUpdate, schoolId } = params
   const form = useRef<HTMLFormElement | null>(null)
 
   const [sectionPromForUpdate, setSectionPromForUpdate] = useState<ISectionProm>()
@@ -102,9 +107,12 @@ export const Form = (params: { idForUpdate?: ISectionProm['id'], schoolPromId: I
       />)
     }
     if (sectionOrigin === 'previous') {
-      return setSectionInput(<SelectSectionPromYear onSelect={(p) => setSectionSelected(p)}/>)
+      return setSectionInput(<SelectSectionPromYear
+        onSelect={(p) => setSectionSelected(p)}
+        schoolId={schoolId}
+      />)
     }
-  }, [sectionOrigin, sectionPromForUpdate, schoolPromId])
+  }, [sectionOrigin, sectionPromForUpdate, schoolId])
 
   const onChangeSectionOrigin = (e: ChangeEvent<HTMLInputElement>) => {
     setSectionOrigin(e.target.value as SectionOrigin)

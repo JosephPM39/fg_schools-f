@@ -57,7 +57,7 @@ export const SchoolCard = (params: Params) => {
 
   useEffect(() => {
     const getData = async () => {
-      if (!school?.icon || school.icon === 'default' || icon) return
+      if (!school?.icon || school.icon === 'default') return
       const iconUrl = await useStorage?.getPreviewUrl(school.icon)
       setIcon(iconUrl)
     }
@@ -112,9 +112,10 @@ export const SchoolCard = (params: Params) => {
         alt={school?.name}
         height="140"
         image={icon || DefaultIcon}
-        onError={({currentTarget}) => {
-          currentTarget.onerror = null
-          currentTarget.src = ImageError
+        onError={(e) => {
+          e.preventDefault()
+          e.currentTarget.onerror = null
+          e.currentTarget.src = ImageError
         }}
       /> : <Box height='140px' width='345px' display='flex' alignItems='center' justifyContent='center'>
         <CircularProgress/>
@@ -154,15 +155,9 @@ export const SchoolCard = (params: Params) => {
             disabled: !params.schoolProm
           }}
           initOpen={false}
-          schoolProm={params.schoolProm}
-          cardData={{
-            principal: {
-              ...principal,
-              employee,
-              position
-            },
-            school
-          }}/>
+          schoolPromId={params.schoolProm.id}
+          school={school}
+        />
         <Button
           id={`school-menu-button-${params.schoolProm.id}`}
           aria-controls={open ? 'basic-menu' : undefined}

@@ -45,11 +45,11 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
   const validate = storage.validate
 
   const findOneLocal = (id?: Model['id']) => {
-    return data?.find((e) => e.id === id)
+    return data.find((e) => e.id === id)
   }
 
   const findOne = async ({id}: {id?: Model['id']}) => {
-    if (!id || !data) return undefined
+    if (!id) return undefined
 
     const local = findOneLocal(id)
     if (local) return local
@@ -66,16 +66,16 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
   }
 
   const findBy = async (searchBy?: SearchBy<Model>) => {
-    if (!searchBy || !data || data.length < 1) return undefined
+    if (!searchBy) return undefined
 
-    const local = filterBy<Model>(data ?? [], searchBy as Partial<Model>)
+    const local = filterBy<Model>(data, searchBy as Partial<Model>)
     if (local.length > 0) return local
 
     const remote = await (storage.read({
       searchBy,
     }))
     if (!remote?.data) return undefined
-    if(filterBy<Model>(data ?? [], searchBy as Partial<Model>).length < 1) {
+    if(filterBy<Model>(data, searchBy as Partial<Model>).length < 1) {
       data.push(...remote.data)
     }
     setMetadata(remote.queryUsed)
@@ -89,7 +89,7 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
       searchBy,
     }))
     if (mode === 'merge') {
-      setData([...data ?? [], ...res?.data ?? []])
+      setData([...data, ...res?.data ?? []])
     }
     if (mode === 'clean') {
       setData(res?.data ?? [])

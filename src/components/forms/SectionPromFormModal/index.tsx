@@ -1,17 +1,17 @@
 import { Modal } from '../../../containers/Modal'
 import { Box } from '@mui/material';
 import { Form } from './form'
-import { ISchoolProm, ISectionProm } from '../../../api/models_school';
+import { ISchool, ISchoolProm, ISectionProm } from '../../../api/models_school';
 import { BtnContainer, BtnPropsContainer } from '../../../containers/types';
 
 interface Params {
   btn?: React.ReactNode,
   idForUpdate?: ISectionProm['id']
-  schoolPromId: ISchoolProm['id']
+  schoolId: ISchool['id']
 }
 
 export const SectionPromFormModal = (params: Params) => {
-  const { btn, idForUpdate, schoolPromId } = params
+  const { btn, idForUpdate, schoolId } = params
   const mBtn = (): BtnContainer | BtnPropsContainer => {
     if(btn) {
       return {
@@ -27,14 +27,12 @@ export const SectionPromFormModal = (params: Params) => {
   }
 
   return (
-    <Modal {...mBtn()} title={`${idForUpdate ? 'Editar' : 'Agregar'} sección`}>
+    <Modal fullScreen {...mBtn()} title={`${idForUpdate ? 'Editar' : 'Agregar'} sección`}>
       <Box
         marginY={4}
-        minWidth={500}
-        minHeight={500}
         marginX={4}
       >
-        <Form idForUpdate={idForUpdate} schoolPromId={schoolPromId}/>
+        <Form idForUpdate={idForUpdate} schoolId={schoolId}/>
       </Box>
     </Modal>
   );

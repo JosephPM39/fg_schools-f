@@ -1,6 +1,6 @@
 import { Grid } from "@mui/material"
 import { useContext, useEffect, useState } from "react"
-import { ISectionProm } from "../../api/models_school"
+import { ISchool, ISectionProm } from "../../api/models_school"
 import { SchoolPromContext } from "../../context/api/schools"
 import { useSectionProm } from "../../hooks/api/schools/useSectionProm"
 import { YearSelect } from "./YearSelect"
@@ -10,25 +10,29 @@ import { CustomError, ErrorType } from "../../api/handlers/errors"
 
 interface params {
   onSelect: (selected?: ISectionProm) => void
+  schoolId: ISchool['id']
 }
 
-export const SelectSectionPromYear = ({onSelect}: params) => {
+export const SelectSectionPromYear = ({ onSelect, schoolId }: params) => {
   const globalYear = useContext(SchoolPromContext)?.year
 
   const [list, setList] = useState<ISectionProm[]>([])
   const [year, setYear] = useState<number>((globalYear ?? new Date().getFullYear()) - 1)
-  const useSchoolProms = useSchoolProm({ year })
-  const useSectionProms = useSectionProm()
+  const useSchoolProms = useSchoolProm({ autoFetch: false })
+  const useSectionProms = useSectionProm({ autoFetch: false })
 
   useEffect(() => {
-    useSchoolProms.fetch({searchBy: { year }})
+    useSchoolProms.fetch({searchBy: { year, schoolId }}).then((res) => res).catch((err) => console.log(err.cause))
   }, [year])
 
   useEffect(() => {
     const conf = async () => {
       const res = await Promise.all(useSchoolProms.data.map(async (p) => {
         const section = await useSectionProms.findBy({ schoolPromId: p.id })
-        if (!section) throw new CustomError(ErrorType.apiResponse, 'Api problems')
+        if (!section) {
+          console.log(p)
+          throw new CustomError(ErrorType.apiResponse, 'Api problems')
+        }
         return section
       }))
       setList(res.flat())

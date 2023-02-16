@@ -22,7 +22,11 @@ export const validateIdBy = async <Model extends {}>(params: ValidateIdOptions<M
 
   const propertiesAllowed = Object.keys(valid)
   const dtoProperties = Object.keys(searchBy)
-  const rejectedProperties = dtoProperties.filter((p) => !propertiesAllowed.includes(p))
+  const rejectedProperties = dtoProperties.filter((p) => {
+    const isAllowed = propertiesAllowed.includes(p)
+    const isDefined = typeof searchBy[p as keyof typeof searchBy] !== 'undefined'
+    return !isAllowed && isDefined
+  })
 
   if (rejectedProperties.length > 0) {
     const error = new Error('Invalid Search Object or id')

@@ -1,11 +1,11 @@
 import { Button, IconButton, Tooltip } from '@mui/material';
-import { ChangeEvent, useContext, useState } from 'react';
+import { ChangeEvent, useContext, useEffect, useState } from 'react';
 import { ISchool } from '../../api/models_school';
 import { Dialog } from '../../containers/Dialog';
 import DefaultPreview from '../../assets/signature.png'
 import { StorageFileContext } from '../../context/files/StorageFilesContext';
 import { BtnContainer, BtnPropsContainer } from '../../containers/types';
-import { SubDir } from '../../hooks/files/useStorageFile';
+import { SubDir, useStorageFile } from '../../hooks/files/useStorageFile';
 import { CustomError, ErrorType } from '../../api/handlers/errors';
 import { v4 as uuidV4 } from 'uuid'
 import { getFileExtension } from '../../api/services/utils';
@@ -21,6 +21,8 @@ export const ChangeIconDialog = ({school, ...btns}: ChangeIconDialogParams) => {
   const [open, setOpen] = useState(false);
   const [icon, setIcon] = useState<File | null>(null)
   const [uploading, setUploading] = useState(false)
+  const [prevIcon, setPrevIcon] = useState<string>(DefaultPreview)
+  const storage = useStorage?.newStorage(SubDir.schoolIcons)
 
   const onUpload = async () => {
     setUploading(true)
@@ -28,7 +30,6 @@ export const ChangeIconDialog = ({school, ...btns}: ChangeIconDialogParams) => {
       type: icon.type
     }) : null
     if (finalIcon) {
-      const storage = useStorage?.newStorage(SubDir.schoolIcons)
       if (!storage) throw new CustomError(ErrorType.unknow, 'Storage inssuses')
       await storage.save(finalIcon)
     }
@@ -49,12 +50,18 @@ export const ChangeIconDialog = ({school, ...btns}: ChangeIconDialogParams) => {
     }
   }
 
-  const getPreview = () => {
-    if (!!icon) {
-      return URL.createObjectURL(icon)
+  useEffect(() => {
+    const getData = async () => {
+      if (!!icon) {
+        return setPrevIcon(URL.createObjectURL(icon))
+      }
+      if (!school?.icon || school.icon === 'default') return
+      const url = await storage?.getPreviewUrl(school.icon)
+      if (!url) return
+      setPrevIcon(url)
     }
-    return DefaultPreview
-  }
+    getData()
+  }, [school])
 
   const UploadBtn = () => <Button disabled={uploading} onClick={onUpload}>
     {uploading ? 'Guardando...' : 'Guardar'}
@@ -78,7 +85,12 @@ export const ChangeIconDialog = ({school, ...btns}: ChangeIconDialogParams) => {
             name="school_icon"
             onChange={onSelectIcon}
           />
-          <img alt={icon?.name} height='128' width='auto' src={getPreview()}/>
+          <img alt={icon?.name} height='128' width='auto' src={prevIcon} onError={(e) => {
+            e.preventDefault()
+            e.currentTarget.onerror = null
+            e.currentTarget.src = DefaultPreview
+          }}
+          />
         </IconButton>
       </Tooltip>
     </Dialog>

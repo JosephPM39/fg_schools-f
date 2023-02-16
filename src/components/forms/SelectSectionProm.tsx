@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react"
-import { CustomError, ErrorType } from "../../api/handlers/errors"
 import { ISectionProm } from "../../api/models_school"
 import { useGroup } from "../../hooks/api/schools/useGroup"
 import { useTitle } from "../../hooks/api/schools/useTitle"
@@ -22,14 +21,13 @@ export const SelectSectionProm = ({onSelect, defaultValue, list: defaultList}: p
       const res = await Promise.all(defaultList.map(async (item) => {
         if (item.title && item.group) return item
 
-        const title = await useTitles.findOne({ id: item.titleId })
-        const group = await useGroups.findOne({ id: item.groupId})
-        if (!title || !group) throw new CustomError(ErrorType.apiResponse, 'Api problems')
+        const title = await useTitles.findOne({ id: item.titleId }) ?? {}
+        const group = await useGroups.findOne({ id: item.groupId}) ?? {}
         return {
           ...item,
           title,
           group
-        }
+        } as ISectionProm
       }))
       setList(res)
     }

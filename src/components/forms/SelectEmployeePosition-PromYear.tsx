@@ -78,7 +78,7 @@ const SelectEPBySectionProms = (params: BaseParams & WithSectionsProms) => {
       setList(res)
     }
     conf()
-  }, [sectionProms, usePositions, useEmployees, useEP])
+  }, [sectionProms, usePositions.data, useEmployees.data, useEP.data])
 
   return <Select
     list={list}
@@ -118,7 +118,7 @@ const SelectEPBySchoolProms = (params: BaseParams & WithProms) => {
       setList(res)
     }
     conf()
-  }, [proms, usePositions, useEmployees, useEP])
+  }, [proms, usePositions.data, useEmployees.data, useEP.data])
 
   return <Select
     list={list}
