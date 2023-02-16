@@ -48,8 +48,13 @@ export const Modal = (params: Params) => {
         fullScreen={params.fullScreen}
         open={show}
         TransitionComponent={Transition}
+        fullWidth
+        sx={{
+          maxWidth: '100vw',
+          maxHeight: '100vh'
+        }}
       >
-        <AppBar sx={{ position: 'relative', margin: 0 }}>
+        <AppBar sx={{ position: 'sticky', margin: 0, padding: 0 }}>
           <Toolbar>
             <IconButton
               edge="start"

@@ -6,10 +6,19 @@ interface TabPanelProps {
   value: number;
   orientation: "vertical" | "horizontal"
   idPrefix: string
+  contentPadding?: number | string
 }
 
 export const TabPanel = (props: TabPanelProps) => {
-  const { children, value, index, orientation, idPrefix, ...other } = props;
+  const {
+    children,
+    value,
+    index,
+    orientation,
+    idPrefix,
+    contentPadding = 3,
+    ...other
+  } = props;
 
   return (
     <>
@@ -22,7 +31,7 @@ export const TabPanel = (props: TabPanelProps) => {
         {...other}
       >
         {value === index && (
-          <Box sx={{ p: 3 }}>
+          <Box sx={{ p: contentPadding }}>
             {children}
           </Box>
         )}

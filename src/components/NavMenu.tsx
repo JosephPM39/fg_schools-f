@@ -10,6 +10,7 @@ import { SchoolPromFormModal } from './forms/SchoolPromFormModal';
 import { SchoolPromContext } from '../context/api/schools';
 import { YearSelect } from './forms/YearSelect';
 import { useNetStatus } from '../hooks/useNetStatus';
+import { SettingsModal } from './SettingsModal';
 
 export const NavMenu = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -65,10 +66,12 @@ export const NavMenu = () => {
           &#8288;Respaldar todo
         </MenuItem>}
 
-        <MenuItem onClick={handleClose} disableRipple>
-          <SettingsIcon/>
+        <SettingsModal btn={
+          <MenuItem>
+            <SettingsIcon/>
           &#8288;Ajustes
-        </MenuItem>
+          </MenuItem>
+        }/>
         <Divider sx={{ my: 0.5 }} />
         <MenuItem onClick={toggleOfflineMode} disableRipple disableTouchRipple>
           <FormControlLabel control={<Switch checked={isAppOffline()}/>} label="&#8288;Modo offline" />

@@ -4,14 +4,19 @@ import {Tab} from './Tab'
 import Box from '@mui/material/Box';
 import { TabPanel } from './TabPanel';
 
-interface TabsProps {
+type TabsProps = {
   data: Array<{
     label: string
     content: JSX.Element
   }>
-  orientation: "vertical" | "horizontal"
   idPrefix: string
-}
+  contentPadding?: number | string
+} & ({
+  orientation: "horizontal"
+} | {
+  orientation: "vertical"
+  height?: string
+})
 
 export const Tabs = (props: TabsProps) => {
   const [value, setValue] = React.useState(0);
@@ -29,6 +34,7 @@ export const Tabs = (props: TabsProps) => {
         idPrefix={idPrefix}
         value={value}
         key={`${idPrefix}-${i}`}
+        contentPadding={props.contentPadding}
       >
         {dto.content}
       </TabPanel>
@@ -36,7 +42,7 @@ export const Tabs = (props: TabsProps) => {
     </>
   }
 
-  const boxH = orientation === 'vertical' ? 224 : undefined
+  const boxH = orientation === 'vertical' ? (props.height ?? '100vh') : undefined
 
   return (
     <Box sx={{ width: '100%' }}>

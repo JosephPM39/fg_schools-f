@@ -5,7 +5,11 @@ import Icon from '../assets/icon.png'
 
 export const NavBar = ({children}:{children?: JSX.Element[] | JSX.Element}) => {
   return (
-    <AppBar position='sticky' component='nav'>
+    <AppBar sx={{
+      maxWidth: '100vw',
+      maxHeight: '100vh'
+    }}
+    position='sticky' component='nav'>
       <Toolbar>
         <p style={{ flexGrow: 1, margin: 0}} >
           <IconButton>
