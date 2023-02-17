@@ -28,10 +28,14 @@ export const TabPanel = (props: TabPanelProps) => {
         hidden={value !== index}
         id={`${idPrefix}-${orientation}-tabpanel-${index}`}
         aria-labelledby={`${idPrefix}-${orientation}-tab-${index}`}
+        style={{
+          flex: 1,
+          overflow: 'auto'
+        }}
         {...other}
       >
         {value === index && (
-          <Box sx={{ p: contentPadding }}>
+          <Box sx={{ p: contentPadding, flex: 1 }}>
             {children}
           </Box>
         )}

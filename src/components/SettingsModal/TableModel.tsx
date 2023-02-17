@@ -8,9 +8,16 @@ export const TableModel = () => {
 
   const columns: GridColDef[] = [
     {
+      field: 'id',
+      headerName: "ID",
+      type: 'string',
+      disableExport: true,
+    },
+    {
       field: 'name',
       headerName: 'Nombre',
       type: 'string',
+      flex: 1,
     },
     {
       field: 'price',
@@ -31,5 +38,5 @@ export const TableModel = () => {
 
   const rows: Array<{}> = useModels.data
 
-  return <Table columns={columns} rows={rows}/>
+  return <Table columns={columns} rows={rows} name="Modelos de productos"/>
 }
