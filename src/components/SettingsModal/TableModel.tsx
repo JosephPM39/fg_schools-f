@@ -12,6 +12,7 @@ export const TableModel = () => {
       headerName: "ID",
       type: 'string',
       disableExport: true,
+      flex: 1
     },
     {
       field: 'name',
@@ -38,5 +39,11 @@ export const TableModel = () => {
 
   const rows: Array<{}> = useModels.data
 
-  return <Table columns={columns} rows={rows} name="Modelos de productos"/>
+  return <Table
+    columns={columns}
+    rows={rows}
+    name="Modelos de productos"
+    deleteAction={(id) => console.log(id)}
+    editAction={(id) => console.log(id)}
+  />
 }

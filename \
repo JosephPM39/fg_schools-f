@@ -1,4 +1,4 @@
-import { Button, IconButton, Link, MenuItem } from "@mui/material"
+import { Button, ButtonGroup, IconButton, Link, MenuItem } from "@mui/material"
 import { Box } from "@mui/system"
 import {
   DataGrid,
@@ -24,7 +24,8 @@ import csv from 'csvtojson'
 
 import { useEffect, useState } from "react"
 import { IBaseModel } from "../api/models_school/base.model"
-import { Add, Delete, Edit } from "@mui/icons-material"
+import { Delete, Edit } from "@mui/icons-material"
+import { ConfirmDialog } from "./ConfirmDialog"
 import { Dialog } from "../containers/Dialog"
 
 type Params<T extends IBaseModel> = {
@@ -32,13 +33,12 @@ type Params<T extends IBaseModel> = {
   rows: Array<T>
   name: string
   disableNumberCol?: true
-  newAction?: () => void
 } & ({
   disableDefaultActions: true
 } | {
   disableDefaultActions?: false
-  deleteAction: (id: T['id']) => void
-  editAction: (id: T['id']) => void
+  deleteAction?: (id: T['id']) => void
+  editAction?: (id: T['id']) => void
 })
 
 export const GetExpandableCell = ({limit}:{limit:number}) => {
@@ -150,7 +150,7 @@ const PdfExport = (props: GridExportMenuItemProps<{
 
 export const Table = <T extends IBaseModel>(params: Params<T>) => {
 
-  const { name, newAction } = params
+  const { name } = params
 
   const [openConfirm, setOpenConfirm] = useState(false)
   const [idSelected, setIdSelected] = useState<T['id']>()
@@ -207,6 +207,8 @@ export const Table = <T extends IBaseModel>(params: Params<T>) => {
     ]
   }
 
+  console.log('test')
+
   const Toolbar = () => (
     <GridToolbarContainer>
       <GridToolbarDensitySelector/>
@@ -226,9 +228,6 @@ export const Table = <T extends IBaseModel>(params: Params<T>) => {
           hideToolbar: true,
         }}/>
       </GridToolbarExportContainer>
-      <Button startIcon={<Add/>} onClick={newAction}>
-        Nuevo
-      </Button>
     </GridToolbarContainer>
   )
 
