@@ -19,7 +19,7 @@ export const Principal = () => {
       const prom = schoolProms?.data.at(i)
       cardsFinded.push(
         <Grid item key={i}>
-          <SchoolCard schoolProm={prom} fetchNext={() => schoolProms?.setNeedFetchNext(true)}/>
+          <SchoolCard schoolProm={prom} paginationNext={() => schoolProms?.setNeedFetchNext(true)}/>
         </Grid>
       )
     }

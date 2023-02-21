@@ -27,7 +27,7 @@ import { ChangeIconDialog } from './forms/ChangeSchoolIconDialog';
 
 interface Params {
   schoolProm?: ISchoolProm
-  fetchNext?: () => void
+  paginationNext?: () => void
 }
 
 export const SchoolCard = (params: Params) => {
@@ -59,9 +59,8 @@ export const SchoolCard = (params: Params) => {
   useEffect(() => {
     if(!show) return
     if(params.schoolProm) return
-    if (!params.fetchNext) return
-    console.log('fetching next')
-    params.fetchNext()
+    if (!params.paginationNext) return
+    params.paginationNext()
   }, [show])
 
   useEffect(() => {
