@@ -5,12 +5,12 @@ import { ModelClassType, QueryUsed } from '../../api/types'
 import { filterBy } from '../../api/services/utils'
 import { useDebounce } from '../useDebouce'
 import { useNetStatus, AppNetStatus } from '../useNetStatus'
-import { SearchBy } from '../../api/services/types'
+import { SearchBy, SearchById } from '../../api/services/types'
 
 export interface BaseParams<Model extends IBaseModel> {
   path: string
   model: ModelClassType<Model>
-  autoFetch?: boolean
+  initFetch?: boolean
 }
 
 type FetchParams<Model extends IBaseModel> = {
@@ -21,16 +21,19 @@ type CreateParams<Model extends IBaseModel> = Model | Model[]
 
 export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => {
   // ========== DATA HOOKS ==========
-  const [metadata, setMetadata] = useState<QueryUsed | undefined>(undefined)
+  const [metadata, setMetadata] = useState<(QueryUsed & {
+    searchByUsed?: SearchBy<Model> | SearchById<Model>
+  }) | undefined>(undefined)
   const [data, setData] = useState<Model[]>([])
 
   // ========== HELPER HOOKS ==========
   const { setAppNetStatus, isAppOffline, isAppNetStatus } = useNetStatus()
   const { debounce } = useDebounce()
+  const [needFetchNext, setNeedFetchNext] = useState(false)
 
   // ========== CONFIG ==========
-  const { path, autoFetch = true, model } = params
-  const [needFetching, setNeedFetching] = useState(true)
+  const { path, initFetch = true, model } = params
+  const [isInit, setIsInit] = useState(true)
   const offline = isAppOffline()
   const storage = useMemo(() => new StorageRequest<Model>({
     path,
@@ -78,7 +81,10 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
     if(filterBy<Model>(data, searchBy as Partial<Model>).length < 1) {
       data.push(...remote.data)
     }
-    setMetadata(remote.queryUsed)
+    setMetadata({
+      ...remote.queryUsed,
+      searchByUsed: searchBy
+    })
     return remote.data
   }
 
@@ -95,20 +101,37 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
       setData(res?.data ?? [])
     }
     setMetadata(res?.queryUsed)
-    setNeedFetching(false)
+    setMetadata({
+      ...res?.queryUsed,
+      searchByUsed: searchBy
+    })
     return res
   }
 
   const fetch = useCallback(fetchF, [storage, data])
 
+  const fetchNext = useCallback(async () => {
+    try {
+      if (!metadata) return
+      const { searchByUsed, ...rest } = metadata
+      return await fetch({ mode: 'merge', query: {
+        ...rest,
+        offset: String(parseInt(metadata?.offset ?? '0') + parseInt(metadata?.limit ?? '10'))
+      }, searchBy: searchByUsed})
+    } catch (err) {
+      throw err
+    }
+
+  }, [fetch, metadata])
+
   // ========================================
   // ============= UPDATE HOOKS =============
   // ========================================
 
-  const configAutoFetching = () => {
-    if (!autoFetch) return
-    if (!needFetching) return
+  const configInitFetching = () => {
+    if (!isInit || !initFetch) return
     fetch({})
+    return setIsInit(false)
   }
 
   const configAppMode = () => {
@@ -124,8 +147,16 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
     }
   }
 
-  useEffect(configAutoFetching, [autoFetch, offline, fetch, needFetching])
+  const configFetchNext = () => {
+    if (!needFetchNext) return
+    fetchNext().then(() => {
+      setNeedFetchNext(false)
+    })
+  }
+
+  useEffect(configInitFetching, [initFetch, offline, fetch, isInit])
   useEffect(configAppMode, [offline, storage, isAppNetStatus, setAppNetStatus, debounce])
+  useEffect(configFetchNext, [needFetchNext, fetchNext])
 
   // ============================================
   // ============= CREATE FUNCTIONS =============
@@ -183,6 +214,8 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
     findOne,
     findBy,
     fetch,
+    fetchNext,
+    setNeedFetchNext,
     create,
     update,
     delete: remove

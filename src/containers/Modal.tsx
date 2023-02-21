@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { SetStateAction, Dispatch, forwardRef } from 'react';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import AppBar from '@mui/material/AppBar';
@@ -9,9 +9,9 @@ import CloseIcon from '@mui/icons-material/Close';
 import Slide from '@mui/material/Slide';
 import { TransitionProps } from '@mui/material/transitions';
 import { useShow } from '../hooks/useShow';
-import { BtnContainer, BtnPropsContainer, isBtnContainer } from './types';
+import { BtnContainer, BtnPropsContainer, isBtnContainer, isNoBtnContainer, NoBtnContainer } from './types';
 
-const Transition = React.forwardRef(function Transition(
+const Transition = forwardRef(function Transition(
   props: TransitionProps & {
     children: React.ReactElement;
   },
@@ -26,14 +26,19 @@ export type ModalParams = {
   children: JSX.Element | JSX.Element[]
   fullScreen?: boolean
   actionsToolbar?:React. ReactNode
+  state?: [boolean, Dispatch<SetStateAction<boolean>>]
 }
 
-type Params = ModalParams & (BtnPropsContainer | BtnContainer)
+type Params = ModalParams & (BtnPropsContainer | BtnContainer | NoBtnContainer)
 
 export const Modal = (params: Params) => {
-  const {show, setShow} = useShow(params.initOpen ?? false)
+  const useShows = useShow(params.initOpen ?? false)
+  const [show, setShow] = params.state ?? [useShows.show, useShows.setShow]
 
   const Btn = () => {
+    if (isNoBtnContainer(params)) {
+      return <></>
+    }
     if (isBtnContainer(params)) {
       const Btn = params.btn
       return <div onClick={() => setShow(true)}> {Btn} </div>

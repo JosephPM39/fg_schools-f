@@ -43,6 +43,7 @@ export class Query {
     byoperator: ByOperator
 
   @Expose()
+  @Type(() => Number)
   @IsInt()
   @IsOptional()
     offset: string

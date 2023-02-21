@@ -97,7 +97,7 @@ const SelectEPBySchoolProms = (params: BaseParams & WithProms) => {
   const useEP = useEmployeePosition()
   const useEmployees = useEmployee()
   const usePositions = usePosition()
-  const useSchoolProms = useSchoolProm({year})
+  const useSchoolProms = useSchoolProm({ year })
 
   useEffect(() => {
     if (promsProp) return setProms(promsProp)

@@ -22,7 +22,7 @@ import jsPDF from "jspdf"
 import autoTable from 'jspdf-autotable'
 import csv from 'csvtojson'
 
-import { useEffect, useState } from "react"
+import { ReactNode, useEffect, useState } from "react"
 import { IBaseModel } from "../api/models_school/base.model"
 import { Add, Delete, Edit } from "@mui/icons-material"
 import { Dialog } from "../containers/Dialog"
@@ -32,7 +32,9 @@ type Params<T extends IBaseModel> = {
   rows: Array<T>
   name: string
   disableNumberCol?: true
-  newAction?: () => void
+  toolbar?: {
+    add?: ReactNode
+  }
 } & ({
   disableDefaultActions: true
 } | {
@@ -150,7 +152,7 @@ const PdfExport = (props: GridExportMenuItemProps<{
 
 export const Table = <T extends IBaseModel>(params: Params<T>) => {
 
-  const { name, newAction } = params
+  const { name } = params
 
   const [openConfirm, setOpenConfirm] = useState(false)
   const [idSelected, setIdSelected] = useState<T['id']>()
@@ -226,9 +228,7 @@ export const Table = <T extends IBaseModel>(params: Params<T>) => {
           hideToolbar: true,
         }}/>
       </GridToolbarExportContainer>
-      <Button startIcon={<Add/>} onClick={newAction}>
-        Nuevo
-      </Button>
+      {params?.toolbar?.add}
     </GridToolbarContainer>
   )
 

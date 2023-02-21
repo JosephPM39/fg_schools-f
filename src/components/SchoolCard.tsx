@@ -26,7 +26,8 @@ import { SubDir } from '../hooks/files/useStorageFile';
 import { ChangeIconDialog } from './forms/ChangeSchoolIconDialog';
 
 interface Params {
-  schoolProm: ISchoolProm
+  schoolProm?: ISchoolProm
+  fetchNext?: () => void
 }
 
 export const SchoolCard = (params: Params) => {
@@ -56,6 +57,14 @@ export const SchoolCard = (params: Params) => {
   }
 
   useEffect(() => {
+    if(!show) return
+    if(params.schoolProm) return
+    if (!params.fetchNext) return
+    console.log('fetching next')
+    params.fetchNext()
+  }, [show])
+
+  useEffect(() => {
     const getData = async () => {
       if (!school?.icon || school.icon === 'default') return
       const iconUrl = await useStorage?.getPreviewUrl(school.icon)
@@ -67,6 +76,7 @@ export const SchoolCard = (params: Params) => {
   useEffect(() => {
     if (!show) return
     const get = async () => {
+      if (!params.schoolProm) return
       const school = await useSchool?.findOne({ id: params.schoolProm.schoolId })
       if (!school) {
         const school = await promiseHelper(useSchool?.findOne({ id: params.schoolProm.schoolId }), 5000)
@@ -81,6 +91,7 @@ export const SchoolCard = (params: Params) => {
   useEffect(() => {
     if (!show) return
     const get = async () => {
+      if (!params.schoolProm) return
       const principal = await useEmployeePosition?.findOne({ id: params.schoolProm.principalId })
       setPrincipal(principal)
     }
@@ -144,7 +155,7 @@ export const SchoolCard = (params: Params) => {
           </> }
         </Typography>
       </CardContent>
-      {show ? <CardActions>
+      {show && params.schoolProm ? <CardActions>
         <SectionsModal
           btnProps={{
             children: 'Abrir',

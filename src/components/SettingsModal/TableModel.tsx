@@ -1,5 +1,10 @@
+import { Add } from "@mui/icons-material"
+import { Button } from "@mui/material"
 import { GridColDef } from "@mui/x-data-grid"
+import { useEffect, useState } from "react"
+import { IModel } from "../../api/models_school"
 import { useModel } from "../../hooks/api/products/useModel"
+import { ModelFormModal } from "../forms/ModelFormModal"
 import { Table } from "../Table"
 
 export const TableModel = () => {
@@ -37,13 +42,31 @@ export const TableModel = () => {
     }
   ]
 
-  const rows: Array<{}> = useModels.data
+  const rows: Array<IModel> = useModels.data
+  const [open, setOpen] = useState(false)
+  const [idForUpdate, setIdForUpdate] = useState<IModel['id']>()
 
-  return <Table
-    columns={columns}
-    rows={rows}
-    name="Modelos de productos"
-    deleteAction={(id) => console.log(id)}
-    editAction={(id) => console.log(id)}
-  />
+
+  useEffect(() => {
+    if (idForUpdate) {
+      setOpen(true)
+    }
+  }, [idForUpdate])
+
+  return <>
+    <ModelFormModal state={[open, setOpen]} idForUpdate={idForUpdate} noButton/>
+    <Table
+      columns={columns}
+      rows={rows}
+      name="Modelos de productos"
+      deleteAction={(id) => console.log(id)}
+      editAction={(id) => setIdForUpdate(id)}
+      toolbar={{
+        add: <Button startIcon={<Add/>} onClick={() => setOpen(true)}>
+          Nuevo
+        </Button>
+      }}
+
+    />
+  </>
 }

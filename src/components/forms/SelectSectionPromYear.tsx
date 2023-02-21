@@ -18,8 +18,8 @@ export const SelectSectionPromYear = ({ onSelect, schoolId }: params) => {
 
   const [list, setList] = useState<ISectionProm[]>([])
   const [year, setYear] = useState<number>((globalYear ?? new Date().getFullYear()) - 1)
-  const useSchoolProms = useSchoolProm({ autoFetch: false })
-  const useSectionProms = useSectionProm({ autoFetch: false })
+  const useSchoolProms = useSchoolProm({ initFetch: false })
+  const useSectionProms = useSectionProm({ initFetch: false })
 
   useEffect(() => {
     useSchoolProms.fetch({searchBy: { year, schoolId }}).then((res) => res).catch((err) => console.log(err.cause))
