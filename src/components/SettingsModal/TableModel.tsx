@@ -42,7 +42,6 @@ export const TableModel = () => {
     }
   ]
 
-  const rows: Array<IModel> = useModels.data
   const [open, setOpen] = useState(false)
   const [idForUpdate, setIdForUpdate] = useState<IModel['id']>()
 
@@ -57,7 +56,14 @@ export const TableModel = () => {
     <ModelFormModal state={[open, setOpen]} idForUpdate={idForUpdate} noButton/>
     <Table
       columns={columns}
-      rows={rows}
+      rows={useModels.data}
+      onPageSizeChange={(size) => useModels.launchNextFetch({ limit: size })}
+      onPageChange={(index) => {
+        const limit = useModels.fetchNextParams.limit ?? parseInt(useModels.metadata?.limit || '10')
+        useModels.launchNextFetch({ offset: index * limit })
+      }}
+      isLoading={useModels.data.length < 1 || useModels.needFetchNext}
+      count={useModels.metadata?.count ?? 0}
       name="Modelos de productos"
       deleteAction={(id) => console.log(id)}
       editAction={(id) => setIdForUpdate(id)}

@@ -24,7 +24,7 @@ import csv from 'csvtojson'
 
 import { ReactNode, useEffect, useState } from "react"
 import { IBaseModel } from "../api/models_school/base.model"
-import { Add, Delete, Edit } from "@mui/icons-material"
+import { Delete, Edit } from "@mui/icons-material"
 import { Dialog } from "../containers/Dialog"
 
 type Params<T extends IBaseModel> = {
@@ -35,6 +35,10 @@ type Params<T extends IBaseModel> = {
   toolbar?: {
     add?: ReactNode
   }
+  isLoading: boolean
+  count: number
+  onPageChange: (index: number) => void
+  onPageSizeChange: (size: number) => void
 } & ({
   disableDefaultActions: true
 } | {
@@ -152,7 +156,13 @@ const PdfExport = (props: GridExportMenuItemProps<{
 
 export const Table = <T extends IBaseModel>(params: Params<T>) => {
 
-  const { name } = params
+  const {
+    name,
+    isLoading,
+    onPageChange,
+    onPageSizeChange,
+    count
+  } = params
 
   const [openConfirm, setOpenConfirm] = useState(false)
   const [idSelected, setIdSelected] = useState<T['id']>()
@@ -252,10 +262,14 @@ export const Table = <T extends IBaseModel>(params: Params<T>) => {
       columns={columns}
       rows={rows}
       autoHeight
+      rowCount={count}
+      loading={isLoading}
+      onPageChange={onPageChange}
+      onPageSizeChange={onPageSizeChange}
       disableColumnFilter
       // getRowHeight={() => 'auto'}
       disableSelectionOnClick
-      rowsPerPageOptions={[5, 10, 25, 50, 100]}
+      rowsPerPageOptions={[10, 25, 50, 100]}
       initialState={{
         columns: {
           columnVisibilityModel: { id: false }

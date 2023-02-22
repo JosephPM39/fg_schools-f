@@ -17,7 +17,19 @@ type FetchParams<Model extends IBaseModel> = {
   mode?: 'clean' | 'merge',
 } & ReadParams<Model>
 
+interface FetchNextParams {
+  offset?: number,
+  limit?: number
+}
+
 type CreateParams<Model extends IBaseModel> = Model | Model[]
+
+const secureMerge = <T extends IBaseModel>(listOne: Array<T>, listTwo: Array<T>) => {
+  const list = [...listOne, ...listTwo]
+  return list.filter((item, index) => {
+    return list.findIndex((s) => s.id === item.id) === index
+  })
+}
 
 export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => {
   // ========== DATA HOOKS ==========
@@ -30,6 +42,7 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
   const { setAppNetStatus, isAppOffline, isAppNetStatus } = useNetStatus()
   const { debounce } = useDebounce()
   const [needFetchNext, setNeedFetchNext] = useState(false)
+  const [fetchNextParams, setFetchNextParams] = useState<FetchNextParams>({})
 
   // ========== CONFIG ==========
   const { path, initFetch = true, model } = params
@@ -95,7 +108,8 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
       searchBy,
     }))
     if (mode === 'merge') {
-      setData([...data, ...res?.data ?? []])
+      const merged = secureMerge(data, res.data ?? [])
+      setData(merged)
     }
     if (mode === 'clean') {
       setData(res?.data ?? [])
@@ -113,18 +127,33 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
   const fetchNext = useCallback(async () => {
     try {
       if (!metadata) return
-      const offset = parseInt(metadata?.offset ?? '0') + parseInt(metadata?.limit ?? '10')
+
+      const limit = fetchNextParams.limit ?? parseInt(metadata.limit || '10')
+      const metadataOffset = parseInt(metadata?.offset ?? '0') + limit
+      const offset = fetchNextParams.offset ?? metadataOffset
+
+      console.log('offset', offset)
       if (offset > metadata.count) return
+      if (metadataOffset > metadata.count) return
       const { searchByUsed, ...rest } = metadata
       return await fetch({ mode: 'merge', query: {
         ...rest,
-        offset: String(offset)
+        offset: String(offset),
+        limit: String(limit)
       }, searchBy: searchByUsed})
     } catch (err) {
       throw err
     }
 
-  }, [fetch, metadata])
+  }, [fetch, metadata, fetchNextParams])
+
+  const launchNextFetch = (params?: FetchNextParams) => {
+    setFetchNextParams({
+      ...fetchNextParams,
+      ...params ?? {}
+    })
+    setNeedFetchNext(true)
+  }
 
   // ========================================
   // ============= UPDATE HOOKS =============
@@ -217,7 +246,10 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
     findBy,
     fetch,
     fetchNext,
+    launchNextFetch,
+    fetchNextParams,
     setNeedFetchNext,
+    needFetchNext,
     create,
     update,
     delete: remove
