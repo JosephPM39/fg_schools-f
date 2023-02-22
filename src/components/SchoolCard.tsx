@@ -65,9 +65,10 @@ export const SchoolCard = (params: Params) => {
 
   useEffect(() => {
     const getData = async () => {
-      if (!school?.icon || school.icon === 'default') return
-      const iconUrl = await useStorage?.makePreviewUrl(school.icon)
-      setIcon(iconUrl)
+      if (!school) return
+      if (school.icon === 'default') return setIcon(DefaultIcon)
+      const iconUrl = await useStorage?.getPreviewUrl(school.icon)
+      setIcon(iconUrl || ImageError)
     }
     getData()
   }, [school])
@@ -117,16 +118,11 @@ export const SchoolCard = (params: Params) => {
 
   return (
     <Card ref={element} sx={{ maxWidth: 345 }}>
-      { school ? <CardMedia
+      { icon ? <CardMedia
         component="img"
         alt={school?.name}
         height="140"
-        image={icon || DefaultIcon}
-        onError={(e) => {
-          e.preventDefault()
-          e.currentTarget.onerror = null
-          e.currentTarget.src = ImageError
-        }}
+        image={icon}
       /> : <Box height='140px' width='345px' display='flex' alignItems='center' justifyContent='center'>
         <CircularProgress/>
       </Box>
