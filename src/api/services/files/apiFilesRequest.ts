@@ -50,8 +50,32 @@ export class ApiFilesRequest {
     return await res.json() as FileList
   }
 
-  getPreviewUrl = (name: string) => `${CONFIG.schoolsFilesUrl}/${this.path}/${name}?imgwidth=300`
-  getDownloadUrl = (name: string) => `${CONFIG.schoolsFilesUrl}/${this.path}/download/${name}`
+  getFile = async (url: string, name: string) => {
+    const res = await fetchOnce(url)
+    if (res.status !== 200) throwApiResponseError(res.status)
+    return new File([await res.blob()], name)
+  }
+
+  makePreviewUrl = (name: string) => `${CONFIG.schoolsFilesUrl}/${this.path}/${name}?imgwidth=300`
+  makeDownloadUrl = (name: string) => `${CONFIG.schoolsFilesUrl}/${this.path}/download/${name}`
+
+  preDownloadAsUrl = (path: string, name: string) => new Promise<string | undefined>((res) => {
+    this.getFile(path, name).then((file) => {
+      res(URL.createObjectURL(file))
+    }).catch(() => {
+      res(undefined)
+    })
+  })
+
+  getPreviewUrl = (name: string) => {
+    const path = this.makePreviewUrl(name)
+    return this.preDownloadAsUrl(path, name)
+  }
+
+  getDownloadUrl = (name: string) => {
+    const path = this.makeDownloadUrl(name)
+    return this.preDownloadAsUrl(path, name)
+  }
 
   delete = async (name: string) => {
     const path = `${CONFIG.schoolsFilesUrl}/${this.path}/${name}`

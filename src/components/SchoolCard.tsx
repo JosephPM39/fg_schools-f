@@ -66,7 +66,7 @@ export const SchoolCard = (params: Params) => {
   useEffect(() => {
     const getData = async () => {
       if (!school?.icon || school.icon === 'default') return
-      const iconUrl = await useStorage?.getPreviewUrl(school.icon)
+      const iconUrl = await useStorage?.makePreviewUrl(school.icon)
       setIcon(iconUrl)
     }
     getData()

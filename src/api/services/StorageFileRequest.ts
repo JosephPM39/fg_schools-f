@@ -32,6 +32,20 @@ export class StorageFileRequest {
     return await this.local.getFileUrl(name)
   }
 
+  makeUrl = async (name: string) => {
+    if (!this.offline) {
+      return this.api.makeDownloadUrl(name)
+    }
+    return await this.local.getFileUrl(name)
+  }
+
+  makePreviewUrl = async (name: string) => {
+    if (!this.offline) {
+      return this.api.makePreviewUrl(name)
+    }
+    return await this.local.getFileUrl(name)
+  }
+
   delete = (name: string): Promise<boolean> => {
     if (!this.offline) {
       return this.api.delete(name)
