@@ -113,10 +113,12 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
   const fetchNext = useCallback(async () => {
     try {
       if (!metadata) return
+      const offset = parseInt(metadata?.offset ?? '0') + parseInt(metadata?.limit ?? '10')
+      if (offset > metadata.count) return
       const { searchByUsed, ...rest } = metadata
       return await fetch({ mode: 'merge', query: {
         ...rest,
-        offset: String(parseInt(metadata?.offset ?? '0') + parseInt(metadata?.limit ?? '10'))
+        offset: String(offset)
       }, searchBy: searchByUsed})
     } catch (err) {
       throw err

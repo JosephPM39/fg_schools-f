@@ -1,10 +1,15 @@
 import { IPosition, Position } from '../../../api/models_school'
 import { useBase } from '../useBase'
 
-export const usePosition = () => {
+type Params = {
+  initFetch?: boolean
+}
+
+export const usePosition = (params?: Params) => {
   const hook = useBase<IPosition>({
     path: 'schools/position',
-    model: Position
+    model: Position,
+    initFetch: params?.initFetch
   })
 
   return hook
