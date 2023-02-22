@@ -1,10 +1,11 @@
-import { TextField, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, Grid } from "@mui/material"
+import { TextField, Grid } from "@mui/material"
 import { ChangeEvent, useEffect, useState } from "react"
 import { IEmployee, IEmployeePosition, IPosition } from "../../api/models_school"
 import { useEmployee } from "../../hooks/api/schools/useEmployee"
 import { useEmployeePosition } from "../../hooks/api/schools/useEmployeePosition"
 import { usePosition } from "../../hooks/api/schools/usePosition"
 import { v4 as uuidV4 } from 'uuid'
+import { SelectPosition } from "./SelectPosition"
 
 interface EPFIParams {
   type?: IPosition['type']
@@ -14,7 +15,7 @@ interface EPFIParams {
 export const EmployeePositionFormInputs = (params?: EPFIParams) => {
   const [obj, setObj] = useState<Partial<IEmployeePosition>>()
   const useEmployeePositions = useEmployeePosition()
-  const usePositions = usePosition()
+  const usePositions = usePosition({ initFetch: false })
   const useEmployees = useEmployee()
   const [positionId, setPositionId] = useState<IPosition['id'] | undefined>()
 
@@ -38,8 +39,8 @@ export const EmployeePositionFormInputs = (params?: EPFIParams) => {
     }
   }, [params, useEmployees, usePositions, obj, useEmployeePositions])
 
-  const handleChange = (event: SelectChangeEvent) => {
-    setPositionId(event?.target?.value as IPosition['id'])
+  const handleChange = (p?: IPosition) => {
+    setPositionId(p?.id)
   }
 
   const onTxtChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, nam: keyof IEmployee) => {
@@ -146,33 +147,13 @@ export const EmployeePositionFormInputs = (params?: EPFIParams) => {
         />
       </Grid>
       <Grid item xs={12} sm={12}>
-        <FormControl required fullWidth>
-          <InputLabel id="select-position-label">Cargo</InputLabel>
-          <Select
-            labelId="select-position-label"
-            id="select-position"
-            value={positionId || ''}
-            fullWidth
-            label="Cargo"
-            name="position_id"
-            onChange={handleChange}
-            required
-          >
-            <MenuItem value={''} key={`menu-item-position-null`}>
-              --- Selecione el cargo ---
-            </MenuItem>
-
-            {usePositions.data.map((position, index) => (
-              <MenuItem value={position.id} key={`menu-item-position-${index}`}>
-                {position.name}
-              </MenuItem>
-            ))}
-
-            <MenuItem value='' key={`menu-item-position-new`}>
-              Nuevo
-            </MenuItem>
-          </Select>
-        </FormControl>
+        <SelectPosition
+          defaultValue={positionId}
+          list={usePositions.data}
+          onSelect={handleChange}
+          count={usePositions.metadata?.count ?? 0}
+          paginationNext={() => usePositions.setNeedFetchNext(true)}
+        />
       </Grid>
     </Grid>
   </>

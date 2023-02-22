@@ -10,37 +10,65 @@ import { useSectionProm } from "../../hooks/api/schools/useSectionProm"
 import { SelectEmployeePosition } from "./SelectEmployeePosition"
 import { YearSelect } from "./YearSelect"
 
-interface WithProms {
-  type: PositionType.PRINCIPAL
-  proms?: ISchoolProm[]
+type Pagination = {
+  paginationNext: () => void
+  count: number
 }
 
-interface WithSectionsProms {
-  sections?: ISectionProm[]
-  type: PositionType.PROFESOR
-}
+type WithSection = {
+  sectionProms: ISectionProm[]
+} & Pagination
+
+type WithProm = {
+  schoolProms: ISchoolProm[]
+} & Pagination
 
 interface BaseParams {
   onSelect?: (selected?: IEmployeePosition) => void
   yearSelect: boolean
+  type: PositionType
 }
 
-type Params = BaseParams & (WithProms | WithSectionsProms)
+type Data = WithProm | WithSection
+
+type Params = BaseParams & (WithProm | WithSection | {})
 
 type SelectParams = {
   type: PositionType,
   list: IEmployeePosition[],
   state: [number, Dispatch<SetStateAction<number>>]
+} & Pagination
+
+function isWithProm(p: Params): p is BaseParams & WithProm {
+  return typeof (p as BaseParams & WithProm).schoolProms !== 'undefined'
+}
+
+function isWithSection(p: Params): p is BaseParams & WithSection {
+  return typeof (p as BaseParams & WithSection).sectionProms !== 'undefined'
 }
 
 const Select = (params: BaseParams & SelectParams) => {
-  const { onSelect, yearSelect, type, list, state } = params
+  const {
+    onSelect,
+    yearSelect,
+    type,
+    list,
+    state,
+    paginationNext,
+    count
+  } = params
   const [year, setYear] = state
 
   return <>
     <Grid container spacing={2}>
       <Grid item xs={12} sm={!yearSelect ? 12 : 6}>
-        <SelectEmployeePosition onSelect={onSelect} list={list} type={type}/>
+        <SelectEmployeePosition
+          onSelect={onSelect}
+          list={list}
+          type={type}
+          paginationNext={paginationNext}
+          count={count}
+        />
       </Grid>
       {yearSelect && <Grid item xs={12} sm={6}>
         <YearSelect onSelect={setYear} defaultValue={year}/>
@@ -49,20 +77,42 @@ const Select = (params: BaseParams & SelectParams) => {
   </>
 }
 
-const SelectEPBySectionProms = (params: BaseParams & WithSectionsProms) => {
-  const { onSelect, yearSelect, sections: sectionsProp, type } = params
+type SelectProfesorParams = BaseParams & Data & Pick<SelectParams, 'state'>
+
+const SelectProfesor = (params: SelectProfesorParams) => {
+  const {
+    onSelect,
+    yearSelect,
+    paginationNext,
+    count,
+    state
+  } = params
+
+  const { schoolProms, sectionProms: sp } = isWithProm(params) ? {
+    schoolProms: params.schoolProms,
+    sectionProms: undefined
+  } : {
+    schoolProms: undefined,
+    sectionProms: params.sectionProms
+  }
+
   const [list, setList] = useState<IEmployeePosition[]>([])
-  const [year, setYear] = useState<number>(new Date().getFullYear() -1)
-  const [sectionProms, setSectionProms] = useState<ISectionProm[]>([])
+  const [sectionProms, setSectionProms] = useState<ISectionProm[]>(sp ?? [])
   const useEP = useEmployeePosition()
   const useEmployees = useEmployee()
   const usePositions = usePosition()
   const useSectionProms = useSectionProm()
 
   useEffect(() => {
-    if (sectionsProp) return setSectionProms(sectionsProp)
-    setSectionProms(useSectionProms.data)
-  }, [sectionsProp, useSectionProms.data])
+    if (!schoolProms) return
+    Promise.all(schoolProms.map(async (prom) => {
+      const res = await useSectionProms.findBy({ schoolPromId: prom.id}) ?? []
+      return res
+    })).then((res) => {
+      const sections = res.flat()
+      setSectionProms(sections)
+    })
+  }, [schoolProms])
 
   useEffect(() => {
     const conf = async () => {
@@ -81,28 +131,33 @@ const SelectEPBySectionProms = (params: BaseParams & WithSectionsProms) => {
   }, [sectionProms, usePositions.data, useEmployees.data, useEP.data])
 
   return <Select
+    paginationNext={paginationNext}
+    count={count}
     list={list}
     yearSelect={yearSelect}
     onSelect={onSelect}
-    type={type}
-    state={[year, setYear]}
+    type={PositionType.PROFESOR}
+    state={state}
   />
 }
 
-const SelectEPBySchoolProms = (params: BaseParams & WithProms) => {
-  const { onSelect, type, yearSelect, proms: promsProp } = params
+type SelectPrincipalParams = Omit<BaseParams, 'type'>
+& WithProm
+& Pick<SelectParams, 'state'>
+
+const SelectPrincipal = (params: SelectPrincipalParams) => {
+  const {
+    onSelect,
+    yearSelect,
+    schoolProms: proms,
+    paginationNext,
+    count,
+    state
+  } = params
   const [list, setList] = useState<IEmployeePosition[]>([])
-  const [year, setYear] = useState<number>(promsProp?.[0]?.year ?? (new Date().getFullYear() -1))
-  const [proms, setProms] = useState<ISchoolProm[]>([])
   const useEP = useEmployeePosition()
   const useEmployees = useEmployee()
   const usePositions = usePosition()
-  const useSchoolProms = useSchoolProm({ year })
-
-  useEffect(() => {
-    if (promsProp) return setProms(promsProp)
-    setProms(useSchoolProms.data)
-  }, [promsProp, useSchoolProms.data])
 
   useEffect(() => {
     const conf = async () => {
@@ -121,17 +176,58 @@ const SelectEPBySchoolProms = (params: BaseParams & WithProms) => {
   }, [proms, usePositions.data, useEmployees.data, useEP.data])
 
   return <Select
+    paginationNext={paginationNext}
+    count={count}
     list={list}
     yearSelect={yearSelect}
     onSelect={onSelect}
-    type={type}
-    state={[year, setYear]}
+    type={PositionType.PRINCIPAL}
+    state={state}
   />
 }
 
 export const SelectEmployeePositionPromYear = (params: Params) => {
-  if (params.type === PositionType.PRINCIPAL) {
-    return <SelectEPBySchoolProms {...params}/>
+  const defaultYear = (new Date().getFullYear() - 1)
+  const useSchoolProms = useSchoolProm({ year: defaultYear })
+
+  const { type, schoolProms: proms, sectionProms, ...restParams } = isWithProm(params) ? {
+    ...params,
+    sectionProms: undefined
+  } : isWithSection(params) ? {
+    ...params,
+    schoolProms: undefined
+  } : {
+    ...params,
+    sectionProms: undefined,
+    schoolProms: undefined,
+    paginationNext: () => useSchoolProms.setNeedFetchNext(true),
+    count: useSchoolProms.metadata?.count ?? 0
   }
-  return <SelectEPBySectionProms {...params}/>
+  const [schoolProms, setSchoolProms] = useState<ISchoolProm[]>([])
+  const [year, setYear] = useState<number>(schoolProms?.[0]?.year ?? defaultYear)
+
+  useEffect(() => {
+    if (proms) return setSchoolProms(proms)
+    setSchoolProms(useSchoolProms.data)
+  }, [useSchoolProms.data, proms])
+
+  useEffect(() => {
+    useSchoolProms.setYear(year)
+  }, [year])
+
+  if (type === PositionType.PRINCIPAL) {
+    return <SelectPrincipal
+      state={[year, setYear]}
+      schoolProms={schoolProms}
+      {...restParams}
+    />
+  }
+
+  const props = sectionProms ? { sectionProms } : { schoolProms }
+  return <SelectProfesor
+    type={type}
+    state={[year, setYear]}
+    {...props}
+    {...restParams}
+  />
 }

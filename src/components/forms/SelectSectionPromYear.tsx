@@ -43,7 +43,12 @@ export const SelectSectionPromYear = ({ onSelect, schoolId }: params) => {
   return <>
     <Grid container spacing={2}>
       <Grid item xs={12} sm={6}>
-        <SelectSectionProm list={list} onSelect={onSelect}/>
+        <SelectSectionProm
+          list={list}
+          onSelect={onSelect}
+          count={useSchoolProms.metadata?.count ?? 0}
+          paginationNext={() => useSchoolProms.setNeedFetchNext(true)}
+        />
       </Grid>
       <Grid item xs={12} sm={6}>
         <YearSelect onSelect={(y) => setYear(y)} defaultValue={year}/>

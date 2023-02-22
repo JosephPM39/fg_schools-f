@@ -4,14 +4,23 @@ import { useGroup } from "../../hooks/api/schools/useGroup"
 import { useTitle } from "../../hooks/api/schools/useTitle"
 import { SelectFromList } from "../inputs/SelectFromList"
 
-interface params {
+interface Params {
   onSelect: (select?: ISectionProm) => void
   list: Array<ISectionProm>
   defaultValue?: ISectionProm['id']
+  paginationNext: () => void
+  count: number
 }
 
 
-export const SelectSectionProm = ({onSelect, defaultValue, list: defaultList}: params) => {
+export const SelectSectionProm = (params: Params) => {
+  const {
+    onSelect,
+    defaultValue,
+    list: defaultList,
+    paginationNext,
+    count
+  } = params
   const [list, setList] = useState<Array<ISectionProm>>([])
   const useTitles = useTitle()
   const useGroups = useGroup()
@@ -43,6 +52,8 @@ export const SelectSectionProm = ({onSelect, defaultValue, list: defaultList}: p
     name="section_prom_id"
     title="Sección"
     itemNameFormat={nameFormat}
+    paginationNext={paginationNext}
+    count={count}
     list={list}
     defaultValue={defaultValue}
     onSelect={onSelect}

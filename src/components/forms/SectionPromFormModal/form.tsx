@@ -93,7 +93,7 @@ export const Form = (params: Params) => {
 
     return setProfesorInput(
       <SelectEmployeePositionPromYear
-        sections={getSectionProm()}
+        sectionProms={getSectionProm()}
         yearSelect={needYearSelect()}
         type={PositionType.PROFESOR}
       />

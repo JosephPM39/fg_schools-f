@@ -71,10 +71,22 @@ export const SectionInputs = (params: Params) => {
   return <div>
     <Grid container spacing={2}>
       <Grid item xs={12} sm={6}>
-        <SelectTitle defaultValue={sectionSelected?.titleId} list={useTitles.data} onSelect={onSelectTitle}/>
+        <SelectTitle
+          defaultValue={sectionSelected?.titleId}
+          list={useTitles.data}
+          onSelect={onSelectTitle}
+          count={useTitles.metadata?.count ?? 0}
+          paginationNext={() => useTitles.setNeedFetchNext(true)}
+        />
       </Grid>
       <Grid item xs={12} sm={6}>
-        <SelectGroup defaultValue={sectionSelected?.groupId} list={useGroups.data} onSelect={onSelectGroup}/>
+        <SelectGroup
+          defaultValue={sectionSelected?.groupId}
+          list={useGroups.data}
+          onSelect={onSelectGroup}
+          count={useGroups.metadata?.count ?? 0}
+          paginationNext={() => useGroups.setNeedFetchNext(true)}
+        />
       </Grid>
     </Grid>
   </div>

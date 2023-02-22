@@ -1,6 +1,7 @@
 import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from "@mui/material"
 import { useEffect, useState } from "react"
 import { IBaseModel } from "../../api/models_school/base.model"
+import { useNearScreen } from "../../hooks/useNearScreen"
 
 interface WithFormat<T extends IBaseModel> {
   itemNameFormat: (item: T) => string
@@ -20,12 +21,42 @@ interface BaseParams<T extends IBaseModel> {
   defaultValue?: T['id']
   valueBy?: keyof T
   size?: 'small' | 'medium'
+  paginationNext: () => void
+  count: number
 }
 
 type Params<T extends IBaseModel> = BaseParams<T> & (WithFormat<T> | WithProp<T>)
 
 function isWithProp<T extends IBaseModel>(p: Params<T>): p is BaseParams<T> & WithProp<T> {
   return typeof (p as BaseParams<T> & WithProp<T>).itemNameBy !== 'undefined'
+}
+
+interface ItemParams {
+  value?: string,
+  key?: string
+  children?: string
+  paginationNext?: () => void
+}
+
+const Item = (params: ItemParams) => {
+  const { value, key, children, paginationNext } = params
+  const { show, element } = useNearScreen()
+
+  useEffect(() => {
+    if (!show || value) return
+    if (!paginationNext) return
+    paginationNext()
+  }, [show])
+
+  return (
+    <MenuItem
+      ref={element}
+      value={value ?? ''}
+      key={`menu-item-${key}`}
+    >
+      {children}
+    </MenuItem>
+  )
 }
 
 export const SelectFromList = <T extends IBaseModel>(params: Params<T>) => {
@@ -38,10 +69,29 @@ export const SelectFromList = <T extends IBaseModel>(params: Params<T>) => {
     valueBy = 'id' as keyof T,
     name,
     size,
-    omitCreateOption
+    omitCreateOption,
+    paginationNext,
+    count
   } = params
   const [selected, setSelected] = useState<T>()
-  console.log('geting name')
+  const [items, setItems] = useState<Array<JSX.Element>>([])
+
+  useEffect(() => {
+    const itms: Array<JSX.Element> = []
+    for (let i = 0; i < count; i++) {
+      const item = list.at(i)
+      itms.push(
+        <Item
+          value={String(item?.[valueBy])}
+          key={`${id}-${i}`}
+          paginationNext={paginationNext}
+        >
+          {item ? getItemName(item) : 'Cargando...'}
+        </Item>
+      )
+    }
+    setItems(itms)
+  }, [list, count])
 
   const getItemName = (item: T) => {
     if (isWithProp(params)) {
@@ -80,6 +130,7 @@ export const SelectFromList = <T extends IBaseModel>(params: Params<T>) => {
         labelId={`${id}-select-label`}
         id={`${id}-select`}
         name={name}
+        MenuProps={{ PaperProps: { sx: { maxHeight: 250 }} }}
         defaultValue={defaultValue}
         value={defaultId(selected?.[valueBy]) ?? ''}
         label={`${title}`}
@@ -89,14 +140,7 @@ export const SelectFromList = <T extends IBaseModel>(params: Params<T>) => {
         <MenuItem value={''} key={`menu-item-${id}-null`}>
           {list.length < 1 ? 'No hay registros' : 'Sin seleccionar'}
         </MenuItem>
-        {list.map(
-          (item, index) => <MenuItem
-            value={String(item[valueBy])}
-            key={`menu-item-${id}-${index}`}
-          >
-            {getItemName(item)}
-          </MenuItem>
-        )}
+        {items}
         {!omitCreateOption && <MenuItem value='new' key={`menu-item-${id}-new`}>
           Nuevo
         </MenuItem>}

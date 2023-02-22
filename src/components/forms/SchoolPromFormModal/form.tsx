@@ -72,9 +72,12 @@ export const Form = (params?: { idForUpdate?: ISchoolProm['id'] }) => {
     }
 
     const getSchoolProm = () => {
-      if (principalOrigin === 'previous') {
-        if (!schoolSelected) return
-        return [schoolSelected]
+      if (principalOrigin !== 'previous') return {}
+      if (!schoolSelected) return {}
+      return {
+        schoolProms: [schoolSelected],
+        paginationNext: () => {},
+        count: 1
       }
     }
 
@@ -84,7 +87,8 @@ export const Form = (params?: { idForUpdate?: ISchoolProm['id'] }) => {
 
     return setPrincipalInput(
       <SelectEmployeePositionPromYear
-        proms={getSchoolProm()}
+        {...getSchoolProm()}
+        paginationNext={() => {}}
         yearSelect={needYearSelect()}
         type={PositionType.PRINCIPAL}
       />

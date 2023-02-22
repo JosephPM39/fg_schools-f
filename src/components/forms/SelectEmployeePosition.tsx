@@ -6,10 +6,18 @@ interface params {
   onSelect?: (selected?: IEmployeePosition) => void
   list: IEmployeePosition[]
   type: PositionType
+  paginationNext: () => void
+  count: number
 }
 
 export const SelectEmployeePosition = (params: params) => {
-  const { onSelect = () => {}, list, type } = params
+  const {
+    onSelect = () => {},
+    list,
+    type,
+    paginationNext,
+    count
+  } = params
 
   const findEPName = (ep: IEmployeePosition) => {
     return `${ep.employee?.profesion} ${ep.employee?.firstName} ${ep.employee?.lastName} (${ep?.position?.name})`
@@ -28,6 +36,8 @@ export const SelectEmployeePosition = (params: params) => {
     itemNameFormat={findEPName}
     omitCreateOption
     onSelect={onSelect}
+    paginationNext={paginationNext}
+    count={count}
     list={list}
   />
 }

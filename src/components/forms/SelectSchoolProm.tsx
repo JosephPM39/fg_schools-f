@@ -4,10 +4,12 @@ import { SelectFromList } from "../inputs/SelectFromList"
 interface params {
   onSelect?: (selected?: ISchoolProm) => void
   list: ISchoolProm[]
+  paginationNext: () => void
+  count: number
 }
 
 export const SelectSchoolProm = (params: params) => {
-  const { onSelect = () => {}, list } = params
+  const { onSelect = () => {}, ...rest} = params
 
   const findSPName = (item: ISchoolProm) => {
     return `${item.school?.name} (Código: ${item.school?.code})`
@@ -20,7 +22,7 @@ export const SelectSchoolProm = (params: params) => {
     valueBy="schoolId"
     omitCreateOption
     itemNameFormat={findSPName}
-    list={list}
     onSelect={onSelect}
+    {...rest}
   />
 }

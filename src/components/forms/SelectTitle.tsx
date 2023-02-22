@@ -5,6 +5,8 @@ interface Params {
   onSelect: (select?: ITitle) => void
   list: Array<ITitle>
   defaultValue?: ITitle['id']
+  paginationNext: () => void
+  count: number
 }
 
 export const SelectTitle = (params: Params) => {
