@@ -22,7 +22,7 @@ import jsPDF from "jspdf"
 import autoTable from 'jspdf-autotable'
 import csv from 'csvtojson'
 
-import { ReactNode, useEffect, useState } from "react"
+import { ReactNode, useCallback, useEffect, useState } from "react"
 import { IBaseModel } from "../api/models_school/base.model"
 import { Delete, Edit } from "@mui/icons-material"
 import { Dialog } from "../containers/Dialog"
@@ -37,8 +37,9 @@ type Params<T extends IBaseModel> = {
   }
   isLoading: boolean
   count: number
-  onPageChange: (index: number) => void
-  onPageSizeChange: (size: number) => void
+  onPagination?: (limit:number, offset:number) => void
+  onPageChange?: (index: number) => void
+  onPageSizeChange?: (size: number) => void
 } & ({
   disableDefaultActions: true
 } | {
@@ -128,7 +129,7 @@ const PdfExport = (props: GridExportMenuItemProps<{
         const date = new Date()
         const fullDate = `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`
         const time = `${date.getHours()}:${date.getMinutes()}`
-        const footer = `Página ${i+1} de ${pagesCount} | (${fullDate} - ${time})`;
+        const footer = `Página ${i+1} de ${pagesCount} | (${fullDate} - ${time}) | Fg Cloud Escuelas`;
 
         // Header
         doc.text(header, 15, 10, { baseline: 'top' });
@@ -141,7 +142,6 @@ const PdfExport = (props: GridExportMenuItemProps<{
           { baseline: 'bottom' }
         );
       }
-
 
       doc.save(filename)
       hideMenu?.();
@@ -159,13 +159,23 @@ export const Table = <T extends IBaseModel>(params: Params<T>) => {
   const {
     name,
     isLoading,
-    onPageChange,
-    onPageSizeChange,
+    onPageChange = () => {},
+    onPageSizeChange = () => {},
+    onPagination = () => {},
     count
   } = params
 
   const [openConfirm, setOpenConfirm] = useState(false)
   const [idSelected, setIdSelected] = useState<T['id']>()
+  const [page, setPage] = useState(0)
+  const [pageSize, setPageSize] = useState(10)
+
+  useEffect(() => {
+    const limit = pageSize
+    const pageIndex = page >= 0 ? page : 0
+    const offset = pageSize * pageIndex
+    onPagination(limit, offset)
+  }, [page, pageSize])
 
   useEffect(() => {
     if (idSelected) {
@@ -264,18 +274,26 @@ export const Table = <T extends IBaseModel>(params: Params<T>) => {
       autoHeight
       rowCount={count}
       loading={isLoading}
-      onPageChange={onPageChange}
-      onPageSizeChange={onPageSizeChange}
+      onPageChange={(newPage) => {
+        if (page < 0 || newPage < 0) return setPage(0)
+        setPage(newPage)
+        onPageChange(newPage)
+      }}
+      onPageSizeChange={(pageSize) => {
+        setPageSize(pageSize)
+        setPage(-1)
+        onPageSizeChange(pageSize)
+      }}
       disableColumnFilter
       // getRowHeight={() => 'auto'}
       disableSelectionOnClick
+      page={page}
+      pagination
+      pageSize={pageSize}
       rowsPerPageOptions={[10, 25, 50, 100]}
       initialState={{
         columns: {
           columnVisibilityModel: { id: false }
-        },
-        pagination: {
-          pageSize: 10
         }
       }}
       components={{

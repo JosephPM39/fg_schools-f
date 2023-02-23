@@ -18,8 +18,8 @@ type FetchParams<Model extends IBaseModel> = {
 } & ReadParams<Model>
 
 interface FetchNextParams {
-  offset?: number,
-  limit?: number
+  offset: number,
+  limit: number
 }
 
 type CreateParams<Model extends IBaseModel> = Model | Model[]
@@ -42,7 +42,10 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
   const { setAppNetStatus, isAppOffline, isAppNetStatus } = useNetStatus()
   const { debounce } = useDebounce()
   const [needFetchNext, setNeedFetchNext] = useState(false)
-  const [fetchNextParams, setFetchNextParams] = useState<FetchNextParams>({})
+  const [fetchNextParams, setFetchNextParams] = useState<FetchNextParams>({
+    offset: 0,
+    limit: 10
+  })
 
   // ========== CONFIG ==========
   const { path, initFetch = true, model } = params
@@ -128,13 +131,15 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
     try {
       if (!metadata) return
 
-      const limit = fetchNextParams.limit ?? parseInt(metadata.limit || '10')
-      const metadataOffset = parseInt(metadata?.offset ?? '0') + limit
-      const offset = fetchNextParams.offset ?? metadataOffset
 
-      console.log('offset', offset)
+      //const limit = fetchNextParams.limit ?? parseInt(metadata.limit || '10')
+      //const metadataOffset = parseInt(metadata?.offset ?? '0') + limit
+      //const offset = fetchNextParams.offset ?? metadataOffset
+
+      const { limit, offset } = fetchNextParams
+
       if (offset > metadata.count) return
-      if (metadataOffset > metadata.count) return
+      //if (metadataOffset > metadata.count) return
       const { searchByUsed, ...rest } = metadata
       return await fetch({ mode: 'merge', query: {
         ...rest,
@@ -147,11 +152,33 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
 
   }, [fetch, metadata, fetchNextParams])
 
-  const launchNextFetch = (params?: FetchNextParams) => {
-    setFetchNextParams({
-      ...fetchNextParams,
-      ...params ?? {}
-    })
+  const launchNextFetch = (params?: Partial<{
+    limit?: FetchNextParams['limit'],
+    offset?: FetchNextParams['offset'] | 'auto' | 'previous'
+  }>) => {
+    const { offset: previousOffset, limit: previousLimit } = fetchNextParams
+    const { offset: newOffset, limit: newLimit } = params ?? {
+      limit: undefined,
+      offset: undefined
+    }
+    const makeParams = () => {
+      const limit = newLimit ?? previousLimit
+      if (typeof newOffset === 'undefined' || newOffset === 'auto') {
+        return {
+          limit,
+          offset: (previousOffset + limit)
+        }
+      }
+      if (newOffset === 'previous') {
+        return {
+          limit,
+          offset: previousOffset
+        }
+      }
+      return {limit, offset: newOffset}
+    }
+
+    setFetchNextParams(makeParams())
     setNeedFetchNext(true)
   }
 

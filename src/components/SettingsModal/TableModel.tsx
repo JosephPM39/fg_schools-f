@@ -57,10 +57,8 @@ export const TableModel = () => {
     <Table
       columns={columns}
       rows={useModels.data}
-      onPageSizeChange={(size) => useModels.launchNextFetch({ limit: size })}
-      onPageChange={(index) => {
-        const limit = useModels.fetchNextParams.limit ?? parseInt(useModels.metadata?.limit || '10')
-        useModels.launchNextFetch({ offset: index * limit })
+      onPagination={(limit, offset) => {
+        useModels.launchNextFetch({limit, offset})
       }}
       isLoading={useModels.data.length < 1 || useModels.needFetchNext}
       count={useModels.metadata?.count ?? 0}
