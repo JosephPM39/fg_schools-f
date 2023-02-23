@@ -66,7 +66,10 @@ export const TableModel = () => {
       deleteAction={(id) => console.log(id)}
       editAction={(id) => setIdForUpdate(id)}
       toolbar={{
-        add: <Button startIcon={<Add/>} onClick={() => setOpen(true)}>
+        add: <Button startIcon={<Add/>} onClick={() => {
+          setIdForUpdate(undefined)
+          setOpen(true)
+        }}>
           Nuevo
         </Button>
       }}
