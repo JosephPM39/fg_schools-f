@@ -200,7 +200,7 @@ export const SelectEmployeePositionPromYear = (params: Params) => {
     ...params,
     sectionProms: undefined,
     schoolProms: undefined,
-    paginationNext: () => useSchoolProms.setNeedFetchNext(true),
+    paginationNext: () => useSchoolProms.launchNextFetch(),
     count: useSchoolProms.metadata?.count ?? 0
   }
   const [schoolProms, setSchoolProms] = useState<ISchoolProm[]>([])

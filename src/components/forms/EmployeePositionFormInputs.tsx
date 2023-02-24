@@ -152,7 +152,7 @@ export const EmployeePositionFormInputs = (params?: EPFIParams) => {
           list={usePositions.data}
           onSelect={handleChange}
           count={usePositions.metadata?.count ?? 0}
-          paginationNext={() => usePositions.setNeedFetchNext(true)}
+          paginationNext={() => usePositions.launchNextFetch()}
         />
       </Grid>
     </Grid>
