@@ -76,7 +76,7 @@ export const SectionInputs = (params: Params) => {
           list={useTitles.data}
           onSelect={onSelectTitle}
           count={useTitles.metadata?.count ?? 0}
-          paginationNext={() => useTitles.launchNextFetch()}
+          paginationNext={useTitles.launchNextFetch}
         />
       </Grid>
       <Grid item xs={12} sm={6}>
@@ -85,7 +85,7 @@ export const SectionInputs = (params: Params) => {
           list={useGroups.data}
           onSelect={onSelectGroup}
           count={useGroups.metadata?.count ?? 0}
-          paginationNext={() => useGroups.launchNextFetch()}
+          paginationNext={useGroups.launchNextFetch}
         />
       </Grid>
     </Grid>

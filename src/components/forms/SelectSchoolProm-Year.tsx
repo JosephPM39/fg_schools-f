@@ -40,7 +40,7 @@ export const SelectSchoolPromYear = ({onSelect}: params) => {
           list={list}
           onSelect={onSelect}
           count={proms.metadata?.count ?? 0}
-          paginationNext={() => proms.launchNextFetch()}
+          paginationNext={proms.launchNextFetch}
         />
       </Grid>
       <Grid item xs={12} sm={6}>

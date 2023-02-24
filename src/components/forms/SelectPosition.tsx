@@ -5,7 +5,7 @@ interface Params {
   onSelect: (select?: IPosition) => void
   list: Array<IPosition>
   defaultValue?: IPosition['id']
-  paginationNext: () => void
+  paginationNext: (p:{limit: number, offset:number}) => void
   count: number
 }
 

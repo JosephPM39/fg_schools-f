@@ -11,7 +11,7 @@ import { SelectEmployeePosition } from "./SelectEmployeePosition"
 import { YearSelect } from "./YearSelect"
 
 type Pagination = {
-  paginationNext: () => void
+  paginationNext: (p:{limit: number, offset:number}) => void
   count: number
 }
 

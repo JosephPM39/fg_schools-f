@@ -130,16 +130,8 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
   const fetchNext = useCallback(async () => {
     try {
       if (!metadata) return
-
-
-      //const limit = fetchNextParams.limit ?? parseInt(metadata.limit || '10')
-      //const metadataOffset = parseInt(metadata?.offset ?? '0') + limit
-      //const offset = fetchNextParams.offset ?? metadataOffset
-
       const { limit, offset } = fetchNextParams
-
       if (offset > metadata.count) return
-      //if (metadataOffset > metadata.count) return
       const { searchByUsed, ...rest } = metadata
       return await fetch({ mode: 'merge', query: {
         ...rest,
@@ -177,7 +169,6 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
       }
       return {limit, offset: newOffset}
     }
-
     setFetchNextParams(makeParams())
     setNeedFetchNext(true)
   }
@@ -214,7 +205,7 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
 
   useEffect(configInitFetching, [initFetch, offline, fetch, isInit])
   useEffect(configAppMode, [offline, storage, isAppNetStatus, setAppNetStatus, debounce])
-  useEffect(configFetchNext, [needFetchNext, fetchNext])
+  useEffect(configFetchNext, [needFetchNext, fetchNext, fetchNextParams])
 
   // ============================================
   // ============= CREATE FUNCTIONS =============

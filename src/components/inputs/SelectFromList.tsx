@@ -21,7 +21,7 @@ interface BaseParams<T extends IBaseModel> {
   defaultValue?: T['id']
   valueBy?: keyof T
   size?: 'small' | 'medium'
-  paginationNext: () => void
+  paginationNext?: (params:{offset: number, limit: number}) => void
   count: number
 }
 
@@ -35,18 +35,20 @@ interface ItemParams {
   value?: string,
   key?: string
   children?: string
-  paginationNext?: () => void
+  index: number
+  onNeedFetch?: (index: number) => void
 }
 
 const Item = (params: ItemParams) => {
-  const { value, key, children, paginationNext } = params
+  const { value, key, children, onNeedFetch, index} = params
   const { show, element } = useNearScreen()
 
   useEffect(() => {
     if (!show || value) return
-    if (!paginationNext) return
-    paginationNext()
-  }, [show])
+    if (!onNeedFetch) return
+    onNeedFetch(index)
+    console.log(value, 'value')
+  }, [show, value])
 
   return (
     <MenuItem
@@ -70,28 +72,11 @@ export const SelectFromList = <T extends IBaseModel>(params: Params<T>) => {
     name,
     size,
     omitCreateOption,
-    paginationNext,
+    paginationNext = () => {},
     count
   } = params
   const [selected, setSelected] = useState<T>()
   const [items, setItems] = useState<Array<JSX.Element>>([])
-
-  useEffect(() => {
-    const itms: Array<JSX.Element> = []
-    for (let i = 0; i < count; i++) {
-      const item = list.at(i)
-      itms.push(
-        <Item
-          value={String(item?.[valueBy])}
-          key={`${id}-${i}`}
-          paginationNext={paginationNext}
-        >
-          {item ? getItemName(item) : 'Cargando...'}
-        </Item>
-      )
-    }
-    setItems(itms)
-  }, [list, count])
 
   const getItemName = (item: T) => {
     if (isWithProp(params)) {
@@ -99,6 +84,36 @@ export const SelectFromList = <T extends IBaseModel>(params: Params<T>) => {
     }
     return params.itemNameFormat(item)
   }
+
+  const onNeedFetch = (index: number) => {
+    if (index < (list.length - 1)) return
+    if ((index%10) !== 0) return
+    console.log({limit: 10, offset: index}, 'before')
+    paginationNext({
+      offset: index,
+      limit: 10
+    })
+  }
+
+  useEffect(() => {
+    if (list.length < 1) return
+    console.log(list, 'lista')
+    const itms: Array<JSX.Element> = []
+    for (let i = 0; i < count; i++) {
+      const item = list.at(i)
+      itms.push(
+        <Item
+          value={String(item?.[valueBy])}
+          key={`${id}-${i}`}
+          index={i}
+          onNeedFetch={onNeedFetch}
+        >
+          {item ? getItemName(item) : 'Cargando...'}
+        </Item>
+      )
+    }
+    setItems(itms)
+  }, [list, count])
 
   useEffect(() => {
     onSelect(selected)

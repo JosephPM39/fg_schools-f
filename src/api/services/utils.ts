@@ -29,6 +29,18 @@ export const fetchOnce = async (input: RequestInfo, init?: RequestInit) => {
   return response
 }
 
+export const toPromise = <T extends (...any: any) => any>(
+  cb: T,
+  p: Parameters<T>
+) => new Promise<ReturnType<T>>((res, rej) => {
+  try {
+    console.log('fetching')
+    setTimeout(() => res(cb(p)), 0)
+  } catch(e) {
+    rej(e)
+  }
+})
+
 export const throwApiResponseError = (status: number) => {
   const st: Status = Object
     .keys(Responses).includes(String(status)) ? status as Status : 999

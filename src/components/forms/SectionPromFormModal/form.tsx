@@ -53,6 +53,8 @@ export const Form = (params: Params) => {
     if (notify) setShowNofity(true)
   }, [notify])
 
+  console.log('loop')
+
   useEffect(() => {
     const getData = async () => {
       if (!idForUpdate || !!sectionPromForUpdate) return

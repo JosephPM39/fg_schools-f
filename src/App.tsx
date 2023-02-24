@@ -7,6 +7,7 @@ import {
 import { SessionContext, SessionProvider } from './context/SessionContext';
 import { Unauthorized } from './pages/Unauthorized';
 import { StorageFileProvider } from './context/files/StorageFilesContext';
+import { ProductsProviders } from './context/api/products';
 
 function App() {
 
@@ -18,7 +19,9 @@ function App() {
     }
 
     return <SchoolComponentProviders>
-      {children}
+      <ProductsProviders>
+        {children}
+      </ProductsProviders>
     </SchoolComponentProviders>
   }
 

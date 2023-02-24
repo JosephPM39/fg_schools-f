@@ -2,7 +2,7 @@ import { ResponseError, Responses } from '../../handlers/errors'
 import { IBaseModel } from '../../models_school/base.model'
 import { QueryUsed } from '../../types'
 import { PostParams, DeleteParams, PatchParams, ReadParams } from '../types'
-import { debounce, filterBy, queryFilter } from '../utils'
+import { debounce, filterBy, queryFilter, toPromise } from '../utils'
 
 interface Crud<Model extends IBaseModel> {
   read: (p: ReadParams<Model>) => Promise<{
@@ -20,7 +20,7 @@ export class LocalRequest<Model extends IBaseModel> implements Crud<Model> {
     private path: string
   ) {}
 
-  read = ({searchBy,query}: ReadParams<Model>) => debounce(() => {
+  read = ({searchBy,query}: ReadParams<Model>) => toPromise(() => {
     const existent = this.get(this.path)
     if (!searchBy) {
       return queryFilter(existent ?? [], query)

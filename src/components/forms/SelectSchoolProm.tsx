@@ -4,7 +4,7 @@ import { SelectFromList } from "../inputs/SelectFromList"
 interface params {
   onSelect?: (selected?: ISchoolProm) => void
   list: ISchoolProm[]
-  paginationNext: () => void
+  paginationNext: (p:{limit: number, offset:number}) => void
   count: number
 }
 
