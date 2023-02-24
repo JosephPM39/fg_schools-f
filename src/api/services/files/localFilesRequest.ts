@@ -77,12 +77,17 @@ export class LocalFilesRequest {
   }
 
   getFile = async (name: string) => {
-    const handle = await this.subDirHandler.getFileHandle(name)
-    return await handle.getFile()
+    try {
+      const handle = await this.subDirHandler.getFileHandle(name)
+      return await handle.getFile()
+    } catch (e) {
+      return undefined
+    }
   }
 
   getFileUrl = async (name: string) => {
     const file = await this.getFile(name)
+    if (!file) return
     return URL.createObjectURL(file)
   }
 

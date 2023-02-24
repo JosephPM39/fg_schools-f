@@ -122,7 +122,7 @@ export const Table = <T extends IBaseModel>(params: Params<T>) => {
       loading={isLoading}
       pagination
       rowCount={count}
-      page={page}
+      page={(page >= 0) ? page : 0}
       pageSize={pageSize}
       rowsPerPageOptions={[10, 25, 50, 100]}
       onPageChange={onPageChangeHandle}
