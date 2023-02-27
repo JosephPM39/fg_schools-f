@@ -121,6 +121,11 @@ export class StorageRequest<Model extends IBaseModel> implements Crud<Model> {
     return await this.api.getFiltered({searchBy, query})
   }
 
+  isOfflineRegister = async ({id}:{id: Model['id']}) => {
+    const res = await this.local.read({searchBy: { id }})
+    return (!!res.data?.[0].offline)
+  }
+
   update = async (params: UpdateParams<Model>) => {
     const {data: dto, id } = params
     const {model, offline } = this.config
@@ -133,6 +138,10 @@ export class StorageRequest<Model extends IBaseModel> implements Crud<Model> {
     const config = { id, data }
 
     if (offline) {
+      if (!this.isOfflineRegister({id})) {
+        throw new Error('No se puede actualizar un registro Online')
+      }
+
       const res = await this.local.patch(config)
       if (!res) { throw new Error('No se pudo actualizar') }
       return res
@@ -148,6 +157,9 @@ export class StorageRequest<Model extends IBaseModel> implements Crud<Model> {
     const { offline } = this.config
 
     if (offline) {
+      if (!this.isOfflineRegister({id})) {
+        throw new Error('No se puede eliminar un registro Online')
+      }
       const res = await this.local.delete({id})
       if (!res) { throw new Error('No se pudo eliminar') }
       return res
