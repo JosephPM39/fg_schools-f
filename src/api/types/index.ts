@@ -8,8 +8,9 @@ export enum EXPOSE_VERSIONS {
   CREATE = 2,
   FULL = 3,
   GET = 4,
-  CREATE_NESTED = 5,
-  DELETE = 6
+  GET_OPERATOR=5,
+  CREATE_NESTED = 6,
+  DELETE = 7
 }
 
 export interface CreateParams<Model extends IBaseModel> {
