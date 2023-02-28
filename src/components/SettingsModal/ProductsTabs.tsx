@@ -1,5 +1,9 @@
 import { Tabs } from "../../containers/Tabs";
+import { TableBorder } from "./TableBorder";
+import { TableColor } from "./TableColor";
 import { TableModel } from "./TableModel";
+import { TableSize } from "./TableSize";
+import { TableType } from "./TableType";
 
 export const ProductsTabs = () => {
 
@@ -14,19 +18,19 @@ export const ProductsTabs = () => {
     },
     {
       label: 'Tipos',
-      content: <>Put here Types Table</>
+      content: <TableType/>
     },
     {
       label: 'Tamaños',
-      content: <>Put here Sizes Table</>
+      content: <TableSize/>
     },
     {
       label: 'Colores',
-      content: <>Put here Colors Table</>
+      content: <TableColor/>
     },
     {
       label: 'Bordes',
-      content: <>Put here Borders Table</>
+      content: <TableBorder/>
     }
   ]
 

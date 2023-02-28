@@ -1,11 +1,15 @@
 import { useState } from "react"
-import { Link } from "@mui/material"
+import { Button, Link } from "@mui/material"
 import { Box } from "@mui/system"
 import { GridRenderCellParams } from "@mui/x-data-grid"
 
 
+type Value = {
+  value?: GridRenderCellParams['value']
+}
+
 export const GetExpandableCell = ({ limit }:{ limit:number }) => {
-  const ExpandableCell = ({ value }: GridRenderCellParams) => {
+  const ExpandableCell = ({ value }: Value) => {
     const [expanded, setExpanded] = useState(false);
 
     return (
@@ -25,4 +29,18 @@ export const GetExpandableCell = ({ limit }:{ limit:number }) => {
     );
   };
   return ExpandableCell
+}
+
+export const GetColorCell = () => {
+  const ColorCell = ({value}: Value) => {
+    return <Box sx={{ background: value, width: '20px', height: '20px' }} />
+  }
+  return ColorCell
+}
+
+export const GetButtonCell = ({onClick, label}: {onClick: ({value}: Value) => void, label:string}) => {
+  const ButtonCell = ({value}: Value) => {
+    return <Button onClick={() => onClick({value})}>{label}</Button>
+  }
+  return ButtonCell
 }
