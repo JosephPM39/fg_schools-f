@@ -1,5 +1,5 @@
-import {Principal} from './pages/Principal'
-import {ReactNode, useContext} from 'react'
+import { Principal } from './pages/Principal'
+import { ReactNode, useContext } from 'react'
 
 import {
   SchoolComponentProviders,
@@ -9,6 +9,7 @@ import { Unauthorized } from './pages/Unauthorized';
 import { StorageFileProvider } from './context/files/StorageFilesContext';
 import { ProductsProviders } from './context/api/products';
 import { StoreProviders } from './context/api/store';
+import { PhotoProviders } from './context/api/photo';
 
 function App() {
 
@@ -22,7 +23,9 @@ function App() {
     return <SchoolComponentProviders>
       <ProductsProviders>
         <StoreProviders>
-          {children}
+          <PhotoProviders>
+            {children}
+          </PhotoProviders>
         </StoreProviders>
       </ProductsProviders>
     </SchoolComponentProviders>
