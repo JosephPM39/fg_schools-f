@@ -57,3 +57,20 @@ export type {
   IProductOrder ,
   IStudent
 } from './store'
+
+
+export {
+  Qr,
+  PhotoProduct,
+  Album ,
+  Gallery ,
+  GalleryAlbum
+} from './photo'
+
+export type {
+  IQr ,
+  IPhotoProduct ,
+  IAlbum ,
+  IGallery ,
+  IGalleryAlbum
+} from './photo'
