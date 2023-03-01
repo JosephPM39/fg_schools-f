@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import { ISchoolProm, SchoolProm } from '../../../api/models_school'
 import { useBase } from '../useBase'
+import { DefaultApiHookParams } from '../types'
 
-interface Params {
+interface Params extends DefaultApiHookParams {
   year?: number
-  initFetch?: boolean
 }
 
 const defaultYear = new Date().getFullYear()

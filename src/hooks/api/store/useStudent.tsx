@@ -1,9 +1,6 @@
 import { IStudent, Student } from '../../../api/models_school'
 import { useBase } from '../useBase'
-
-type Params = {
-  initFetch?: boolean
-}
+import { DefaultApiHookParams as Params } from '../types'
 
 export const useStudent = (params?: Params) => {
   const hook = useBase<IStudent>({

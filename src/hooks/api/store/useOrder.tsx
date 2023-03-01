@@ -1,9 +1,6 @@
 import { Order, IOrder } from '../../../api/models_school'
 import { useBase } from '../useBase'
-
-type Params = {
-  initFetch?: boolean
-}
+import { DefaultApiHookParams as Params } from '../types'
 
 export const useOrder = (params?: Params) => {
   const hook = useBase<IOrder>({
