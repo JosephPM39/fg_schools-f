@@ -120,8 +120,8 @@ const SelectProfesor = (params: SelectProfesorParams) => {
         const profesor = await useEP.findOne({id: prom.profesorId}) as IEmployeePosition
         const ep = {
           ...profesor,
-          employee: await useEmployees.findOne({id: profesor?.employeeId}),
-          position: await usePositions.findOne({id: profesor?.positionId})
+          employee: await useEmployees.findOne({id: profesor?.employeeId}) ?? undefined,
+          position: await usePositions.findOne({id: profesor?.positionId}) ?? undefined
         }
         return ep
       }))
@@ -165,8 +165,8 @@ const SelectPrincipal = (params: SelectPrincipalParams) => {
         const principal = await useEP.findOne({id: prom.principalId}) as IEmployeePosition
         const ep = {
           ...principal,
-          employee: await useEmployees.findOne({id: principal?.employeeId}),
-          position: await usePositions.findOne({id: principal?.positionId})
+          employee: await useEmployees.findOne({id: principal?.employeeId}) ?? undefined,
+          position: await usePositions.findOne({id: principal?.positionId}) ?? undefined
         }
         return ep
       }))

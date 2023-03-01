@@ -29,8 +29,8 @@ export const EmployeePositionFormInputs = (params?: EPFIParams) => {
       }
       setObj({
         ...ep,
-        employee,
-        position
+        employee: employee ?? undefined,
+        position: position ?? undefined
       })
       setPositionId(position?.id)
     }

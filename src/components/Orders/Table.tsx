@@ -47,7 +47,7 @@ export const TableOrder = (params: Params) => {
     if (!!orders?.[0]?.student || !orders) return
     Promise.all(orders.map(async (order) => ({
       ...order,
-      student: await useStudents.findOne({id: order.studentId})
+      student: await useStudents.findOne({id: order.studentId}) ?? undefined
     }))).then(res => {
       setOrders(res)
     })

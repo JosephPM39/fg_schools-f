@@ -17,10 +17,9 @@ export const useEmployeePosition = () => {
   const fetchDepends = async ({ useEmployee, usePosition }: FetchDepends) => {
     const res = await Promise.all(hook.data.map(async (ep) => ({
       ...ep,
-      employee: await useEmployee.findOne({id: ep.employeeId}),
-      position: await usePosition.findOne({id: ep.positionId}),
+      employee: await useEmployee.findOne({id: ep.employeeId}) ?? undefined,
+      position: await usePosition.findOne({id: ep.positionId}) ?? undefined,
     })))
-    console.log(res.length, 'res', hook.data.length, 'pre')
     hook.setData(res)
   }
 

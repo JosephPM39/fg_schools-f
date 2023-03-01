@@ -19,7 +19,7 @@ export const SectionInputs = (params: Params) => {
   // const [groupList, setGroupList] = useState<Array<IGroup>>([])
   const [titleSelected, setTitleSelected] = useState<ITitle>()
   const [groupSelected, setGroupSelected] = useState<IGroup>()
-  const [sectionSelected, setSectionSelected] = useState<ISectionProm>()
+  const [sectionSelected, setSectionSelected] = useState<ISectionProm | null>(null)
 
   const useTitles = useTitle()
   const useGroups = useGroup()

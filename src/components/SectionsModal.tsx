@@ -11,7 +11,7 @@ import { Button } from '@mui/material';
 interface Params {
   initOpen: boolean,
   schoolPromId: ISchoolProm['id'],
-  school?: ISchool,
+  school?: ISchool | null,
   btnProps: BtnPropsContainer['btnProps']
 }
 

@@ -47,7 +47,6 @@ const Item = (params: ItemParams) => {
     if (!show || value) return
     if (!onNeedFetch) return
     onNeedFetch(index)
-    console.log(value, 'value')
   }, [show, value])
 
   return (
@@ -88,7 +87,6 @@ export const SelectFromList = <T extends IBaseModel>(params: Params<T>) => {
   const onNeedFetch = (index: number) => {
     if (index < (list.length - 1)) return
     if ((index%10) !== 0) return
-    console.log({limit: 10, offset: index}, 'before')
     paginationNext({
       offset: index,
       limit: 10
@@ -97,7 +95,6 @@ export const SelectFromList = <T extends IBaseModel>(params: Params<T>) => {
 
   useEffect(() => {
     if (list.length < 1) return
-    console.log(list, 'lista')
     const itms: Array<JSX.Element> = []
     for (let i = 0; i < count; i++) {
       const item = list.at(i)

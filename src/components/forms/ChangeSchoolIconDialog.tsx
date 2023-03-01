@@ -12,7 +12,7 @@ import { getFileExtension } from '../../api/services/utils';
 import { SchoolContext } from '../../context/api/schools';
 
 type ChangeIconDialogParams = {
-  school?: ISchool
+  school?: ISchool | null
 } & (BtnContainer | BtnPropsContainer)
 
 export const ChangeIconDialog = ({school, ...btns}: ChangeIconDialogParams) => {

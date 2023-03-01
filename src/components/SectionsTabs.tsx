@@ -28,8 +28,8 @@ export const SectionsTabs = (params: Params) => {
         params.sectionProms.map(
           async (prom) => ({
             sectionPromId: prom.id,
-            title: await useTitle?.findOne({id: prom.titleId}),
-            group: await useGroup?.findOne({id: prom.groupId})
+            title: await useTitle?.findOne({id: prom.titleId}) ?? undefined,
+            group: await useGroup?.findOne({id: prom.groupId}) ?? undefined
           })
         )
       )

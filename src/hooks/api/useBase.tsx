@@ -68,7 +68,7 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
   }
 
   const findOne = async ({id}: {id?: Model['id']}) => {
-    if (!id) return undefined
+    if (!id) return null
 
     const local = findOneLocal(id)
     if (local) return local
@@ -76,7 +76,7 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
     const remote = await storage.read({
       searchBy: { id },
     })
-    if (!remote?.data || remote?.data?.length < 1) return undefined
+    if (!remote?.data || remote?.data?.length < 1) return null
 
     if (!findOneLocal(id)){
       data.push(...remote.data)
@@ -85,7 +85,7 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
   }
 
   const findBy = async (searchBy?: SearchBy<Model>) => {
-    if (!searchBy) return undefined
+    if (!searchBy) return null
 
     const local = filterBy<Model>(data, searchBy as Partial<Model>)
     if (local.length > 0) return local
@@ -93,7 +93,7 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
     const remote = await (storage.read({
       searchBy,
     }))
-    if (!remote?.data) return undefined
+    if (!remote?.data) return null
     if(filterBy<Model>(data, searchBy as Partial<Model>).length < 1) {
       data.push(...remote.data)
     }

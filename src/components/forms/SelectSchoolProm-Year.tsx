@@ -21,11 +21,15 @@ export const SelectSchoolPromYear = ({onSelect}: params) => {
   const useSchools = useSchool()
 
   useEffect(() => {
+    proms.fetch({searchBy: { year }})
+  }, [year])
+
+  useEffect(() => {
     const conf = async () => {
       const res = await Promise.all(proms.data.map(async (p) => {
         return {
           ...p,
-          school: await useSchools.findOne({id: p.schoolId})
+          school: await useSchools.findOne({id: p.schoolId}) ?? undefined
         }
       }))
       setList(res)

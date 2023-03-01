@@ -31,10 +31,10 @@ interface Params {
 }
 
 export const SchoolCard = (params: Params) => {
-  const [school, setSchool] = useState<ISchool>()
-  const [principal, setPrincipal] = useState<IEmployeePosition>()
-  const [employee, setEmployee] = useState<IEmployee>()
-  const [position, setPosition] = useState<IPosition>()
+  const [school, setSchool] = useState<ISchool | null>(null)
+  const [principal, setPrincipal] = useState<IEmployeePosition | null>(null)
+  const [employee, setEmployee] = useState<IEmployee | null>(null)
+  const [position, setPosition] = useState<IPosition | null>(null)
 
   const [icon, setIcon] = useState<string>()
 
@@ -76,10 +76,10 @@ export const SchoolCard = (params: Params) => {
   useEffect(() => {
     if (!show) return
     const get = async () => {
-      if (!params.schoolProm) return
-      const school = await useSchool?.findOne({ id: params.schoolProm.schoolId })
+      if (!params.schoolProm || !useSchool) return
+      const school = await useSchool.findOne({ id: params.schoolProm.schoolId })
       if (!school) {
-        const school = await promiseHelper(useSchool?.findOne({ id: params.schoolProm.schoolId }), 5000)
+        const school = await promiseHelper(useSchool.findOne({ id: params.schoolProm.schoolId }), 5000)
 
         return setSchool(school)
       }
@@ -91,26 +91,26 @@ export const SchoolCard = (params: Params) => {
   useEffect(() => {
     if (!show) return
     const get = async () => {
-      if (!params.schoolProm) return
-      const principal = await useEmployeePosition?.findOne({ id: params.schoolProm.principalId })
+      if (!params.schoolProm || !useEmployeePosition) return
+      const principal = await useEmployeePosition.findOne({ id: params.schoolProm.principalId })
       setPrincipal(principal)
     }
     get()
   }, [show, params, useEmployeePosition?.data])
 
   useEffect(() => {
-    if (!show) return
+    if (!show || !useEmployee) return
     const get = async () => {
-      const employee = await useEmployee?.findOne({ id: principal?.employeeId })
+      const employee = await useEmployee.findOne({ id: principal?.employeeId })
       setEmployee(employee)
     }
     get()
   }, [show, params, useEmployee?.data, principal])
 
   useEffect(() => {
-    if (!show) return
+    if (!show || !usePosition) return
     const get = async () => {
-      const position = await usePosition?.findOne({ id: principal?.positionId })
+      const position = await usePosition.findOne({ id: principal?.positionId })
       setPosition(position)
     }
     get()

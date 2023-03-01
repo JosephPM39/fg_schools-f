@@ -10,8 +10,7 @@ export const useDebounce = () => {
     }, time ?? 500)
   }
 
-  function promiseHelper<T>(cb?: Promise<T>, time?: number) {
-    if (!cb) return
+  function promiseHelper<T>(cb: Promise<T>, time?: number) {
     return new Promise<T>((res, rej) => debounce(() => {
       cb.then(
         (r) => res(r)
