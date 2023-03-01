@@ -1,7 +1,10 @@
+import { Box, Typography } from '@mui/material';
 import { useState, useEffect, useContext } from 'react';
 import { ITitle, IGroup, ISectionProm } from '../api/models_school';
+import { OrderType } from '../api/models_school/store/order.model';
 import { Tabs } from '../containers/Tabs';
 import { GroupContext, TitleContext } from '../context/api/schools';
+import { Orders } from './Orders';
 
 interface Params {
   sectionProms: ISectionProm[]
@@ -43,18 +46,30 @@ export const SectionsTabs = (params: Params) => {
     }
 
     const getSectionName = (section?: Section) => {
-      return `${section?.title?.name} - ${section?.group?.name}`
+      const title = section?.title?.name
+      const group = section?.group?.name
+      if (!title || !group) return 'cargando...'
+      return `${title} - ${group}`
     }
 
     const fillTabsData = () => {
       return params.sectionProms.map((prom) => ({
         label: getSectionName(getSection(prom)),
-        content: <>{prom.id}</>
+        content: <Orders sectionPromId={prom.id} type={OrderType.SCHOOL} />
       }))
     }
     const res = fillTabsData()
     setList(res)
   }, [sections, params.sectionProms])
+
+  if (params.sectionProms.length < 1) {
+    return <Box display='flex' width='100%' height='100%' justifyContent='center' alignItems='stretch'>
+      <Box display='flex' flexDirection='column' justifyContent='center' alignItems='center'>
+        <Typography variant='h5'>Sin secciones</Typography>
+        <Typography variant='subtitle1'>Agregue (o habilite) una</Typography>
+      </Box>
+    </Box>
+  }
 
   return <Tabs data={list} orientation='horizontal' idPrefix='sections' />
 }

@@ -1,16 +1,36 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button, Link } from "@mui/material"
 import { Box } from "@mui/system"
-import { GridRenderCellParams } from "@mui/x-data-grid"
+import { GridRenderCellParams, GridRowId } from "@mui/x-data-grid"
+import { Dialog, DialogParams } from "../../containers/Dialog"
+import { OpenInFull } from "@mui/icons-material"
 
 
 type Value = {
   value?: GridRenderCellParams['value']
 }
 
-export const GetExpandableCell = ({ limit }:{ limit:number }) => {
-  const ExpandableCell = ({ value }: Value) => {
+interface OnToggleParams {
+  expanded: boolean,
+  id: GridRowId
+}
+
+interface Params {
+  limit:number,
+  onToggle?: (p: OnToggleParams) => void
+}
+
+export const GetExpandableCell = (params:Params) => {
+  const { limit, onToggle = () => {} } = params
+  const ExpandableCell = (params: GridRenderCellParams) => {
+    const {value, id} = params
     const [expanded, setExpanded] = useState(false);
+    useEffect(() => {
+      onToggle({
+        expanded,
+        id
+      })
+    }, [expanded])
 
     return (
       <Box>
@@ -36,6 +56,26 @@ export const GetColorCell = () => {
     return <Box sx={{ background: value, width: '20px', height: '20px' }} />
   }
   return ColorCell
+}
+
+export const getDialogCell = (params: Omit<DialogParams, 'state' | 'children'> & { previewLimit?: number}) => {
+  const {previewLimit: limit = 0} = params
+  const DialogCell = ({value}: Value)  => {
+    const [open, setOpen] = useState(false)
+    return <>
+      <Dialog state={[open, setOpen]} {...params} btnProps={{
+        variant: 'text',
+        size: 'small',
+        sx: { fontSize: 'inherit' },
+        startIcon: <OpenInFull/>,
+        type: 'button'
+      }} >
+        {value}
+      </Dialog>
+      {value.slice(0, limit)}...&nbsp;
+    </>
+  }
+  return DialogCell
 }
 
 export const GetButtonCell = ({onClick, label}: {onClick: ({value}: Value) => void, label:string}) => {

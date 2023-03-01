@@ -6,7 +6,10 @@ import {
   GridColDef,
   esES,
   GridSlotsComponent,
-  GridInitialState
+  GridInitialState,
+  GridColumnVisibilityModel,
+  GridRowHeightParams,
+  GridRowHeightReturnValue
 } from "@mui/x-data-grid"
 import { IBaseModel } from "../../api/models_school/base.model"
 import { Dialog } from "../../containers/Dialog"
@@ -18,6 +21,7 @@ type Params<T extends IBaseModel> = {
   rows: Array<T>
   name: string
   disableNumberCol?: true
+  handleRowHeight?: (params: GridRowHeightParams) => GridRowHeightReturnValue
   toolbar?: {
     add?: ReactNode
   }
@@ -26,6 +30,7 @@ type Params<T extends IBaseModel> = {
   onPagination?: (limit:number, offset:number) => void
   onPageChange?: (index: number) => void
   onPageSizeChange?: (size: number) => void
+  columnVisibilityModel?: GridColumnVisibilityModel
 } & ({
   disableDefaultActions: true
 } | {
@@ -45,7 +50,9 @@ export const Table = <T extends IBaseModel>(params: Params<T>) => {
     onPageChange = () => {},
     onPageSizeChange = () => {},
     onPagination = () => {},
-    count
+    count,
+    columnVisibilityModel,
+    handleRowHeight
   } = params
 
   useEffect(() => {
@@ -85,7 +92,10 @@ export const Table = <T extends IBaseModel>(params: Params<T>) => {
 
   const initialState: GridInitialState = {
     columns: {
-      columnVisibilityModel: { id: false }
+      columnVisibilityModel: {
+        id: false,
+        ...columnVisibilityModel
+      }
     }
   }
 
@@ -121,6 +131,7 @@ export const Table = <T extends IBaseModel>(params: Params<T>) => {
       autoHeight
       loading={isLoading}
       pagination
+      getRowHeight={handleRowHeight}
       rowCount={count}
       page={(page >= 0) ? page : 0}
       pageSize={pageSize}

@@ -7,7 +7,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { BtnContainer, BtnPropsContainer, isBtnContainer, isNoBtnContainer, NoBtnContainer } from './types';
 
-interface DialogParams {
+export interface DialogParams {
   title: string,
   description?: string
   children?: ReactNode
