@@ -3,7 +3,7 @@ import { useBase } from '../useBase'
 
 export const useQr = () => {
   const hook = useBase<IQr>({
-    path: 'photo/qr',
+    path: 'photos/qr',
     model: Qr
   })
 

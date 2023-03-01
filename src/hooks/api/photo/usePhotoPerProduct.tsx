@@ -3,7 +3,7 @@ import { useBase } from '../useBase'
 
 export const usePhotoPerProduct = () => {
   const hook = useBase<IPhotoProduct>({
-    path: 'photo/photo-product',
+    path: 'photos/photo-product',
     model: PhotoProduct
   })
 

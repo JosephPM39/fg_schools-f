@@ -3,7 +3,7 @@ import { useBase } from '../useBase'
 
 export const useGallery = () => {
   const hook = useBase<IGallery>({
-    path: 'photo/gallery',
+    path: 'photos/gallery',
     model: Gallery
   })
 

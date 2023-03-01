@@ -3,7 +3,7 @@ import { useBase } from '../useBase'
 
 export const useAlbum = () => {
   const hook = useBase<IAlbum>({
-    path: 'photo/album',
+    path: 'photos/album',
     model: Album
   })
 
