@@ -49,6 +49,7 @@ export const PDFExport = (props: GridExportMenuItemProps<{
         orientation: 'landscape',
         format: 'letter'
       })
+      doc.setFontSize(14);
       doc.text(title, 15, 30)
       doc.setFontSize(12);
       handler(doc)

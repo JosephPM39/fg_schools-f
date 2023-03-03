@@ -5,7 +5,7 @@ import { useEffect, useState } from "react"
 import { IBorder } from "../../api/models_school"
 import { useBorder } from "../../hooks/api/products/useBorder"
 import { Table } from "../Table"
-import { GetButtonCell } from "../Table/renders"
+import { getButtonCell } from "../Table/renders"
 
 export const TableBorder = () => {
 
@@ -29,7 +29,7 @@ export const TableBorder = () => {
       field: 'file',
       headerName: 'Archivo',
       type: 'string',
-      renderCell: GetButtonCell({
+      renderCell: getButtonCell({
         onClick({ value }) {
           alert(value)
         },

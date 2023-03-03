@@ -49,7 +49,7 @@ export const Dialog = (params: Params) => {
   return (
     <div>
       {Btn()}
-      <DialogMUI open={open} onClose={closeOnClickOut}>
+      <DialogMUI maxWidth='xl' open={open} onClose={closeOnClickOut}>
         <DialogTitle>{params.title}</DialogTitle>
         <DialogContent>
           {params.description && <DialogContentText>

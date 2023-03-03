@@ -31,6 +31,7 @@ type Params<T extends IBaseModel> = {
   onPageChange?: (index: number) => void
   onPageSizeChange?: (size: number) => void
   columnVisibilityModel?: GridColumnVisibilityModel
+  hideFooterPagination?: boolean
 } & ({
   disableDefaultActions: true
 } | {
@@ -52,7 +53,8 @@ export const Table = <T extends IBaseModel>(params: Params<T>) => {
     onPagination = () => {},
     count,
     columnVisibilityModel,
-    handleRowHeight
+    handleRowHeight,
+    hideFooterPagination
   } = params
 
   useEffect(() => {
@@ -131,6 +133,7 @@ export const Table = <T extends IBaseModel>(params: Params<T>) => {
       autoHeight
       loading={isLoading}
       pagination
+      hideFooterPagination={hideFooterPagination}
       getRowHeight={handleRowHeight}
       rowCount={count}
       page={(page >= 0) ? page : 0}

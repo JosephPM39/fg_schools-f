@@ -1,16 +1,64 @@
 import { Add } from "@mui/icons-material"
 import { Button } from "@mui/material"
-import { GridColDef, GridValueGetterParams } from "@mui/x-data-grid"
+import { GridColDef, GridRenderCellParams, GridValueGetterParams } from "@mui/x-data-grid"
 import { useEffect, useState } from "react"
-import { IOrder, IStudent } from "../../api/models_school"
+import { ICombo, IComboOrder, IOrder, IStudent } from "../../api/models_school"
 import { OrderType } from "../../api/models_school/store/order.model"
-import { Dialog } from "../../containers/Dialog"
 import { useCombo } from "../../hooks/api/store/useCombo"
 import { useComboPerOrder } from "../../hooks/api/store/useComboPerOrder"
 import { useOrder } from "../../hooks/api/store/useOrder"
 import { useStudent } from "../../hooks/api/store/useStudent"
 import { Table } from "../Table"
 import { getDialogCell } from "../Table/renders"
+import { OrderProducts } from "./OrderProducts"
+
+const ComboDetails = (params: GridRenderCellParams<any, IOrder>) => {
+  const orderId = params.row.id
+  const studentName = params.row?.student?.nickName
+  const useComboPerOrders = useComboPerOrder({initFetch: false})
+  const useCombos = useCombo({initFetch: false})
+  const [comboPerOrders, setComboPerOrder] = useState<Array<IComboOrder> | null>([])
+  const [isCustom, setIsCustom] = useState(false)
+
+  useEffect(() => {
+    useComboPerOrders.fetch({searchBy: { orderId }})
+  }, [params])
+
+  useEffect(() => {
+    if (!useComboPerOrders.data) return
+    Promise.all(useComboPerOrders.data.map(async (comboPerOrder) => {
+      return {
+        ...comboPerOrder,
+        combo: await useCombos.findOne({id: comboPerOrder.comboId}) ?? undefined
+      }
+    })).then((res) => {
+      setComboPerOrder(res)
+    })
+  }, [useComboPerOrders.data, useCombos.data])
+
+  useEffect(() => {
+    setIsCustom((comboPerOrders?.length || -1) < 1)
+  }, [comboPerOrders])
+
+  return {
+    dialogContent: <OrderProducts
+      { ... isCustom ? { orderId } : { comboId: comboPerOrders?.at(0)?.comboId } }
+      studentName={studentName ?? ''}
+    />,
+    preview: `${comboPerOrders?.at(0)?.combo?.name || 'Perzonalizado'}`
+  }
+}
+
+const DetailsDialogCell = getDialogCell<IOrder>({
+  title: 'Detalles',
+  actions: { omitCancel: true },
+})
+
+const ComboDialogCell = getDialogCell<IOrder>({
+  title: 'Detalles del combo',
+  actions: { omitCancel: true },
+  handleChildren: (p) => ComboDetails(p)
+})
 
 type Params = {
   type: OrderType.STUDIO
@@ -19,11 +67,13 @@ type Params = {
   sectionPromId: IOrder['sectionPromId']
 }
 
+interface IOrderTable extends IOrder {
+  comboName: string
+}
+
 export const TableOrder = (params: Params) => {
   const useOrders = useOrder({initFetch: false})
   const useStudents = useStudent({initFetch: false})
-  // const useCombos = useCombo({initFetch: false})
-  // const useComboPerOrders = useComboPerOrder({initFetch: false})
 
   const [open, setOpen] = useState(false)
   const [idForUpdate, setIdForUpdate] = useState<IOrder['id']>()
@@ -59,12 +109,6 @@ export const TableOrder = (params: Params) => {
     }
   }, [idForUpdate])
 
-  const DialogCell = getDialogCell({
-    title: 'Detalles',
-    actions: { omitCancel: true },
-    previewLimit: 20
-  })
-
   const columns: GridColDef[] = [
     {
       field: 'id',
@@ -82,6 +126,15 @@ export const TableOrder = (params: Params) => {
       },
       hideable: false,
       type: 'string'
+    },
+    {
+      field: 'combo',
+      headerName: 'Combo',
+      valueFormatter: (p) => {
+        return p.value
+      },
+      renderCell: (p) => <ComboDialogCell {...p}/>,
+      flex: 1
     },
     {
       field: 'firstName',
@@ -114,7 +167,7 @@ export const TableOrder = (params: Params) => {
     {
       field: 'details',
       headerName: 'Detalles',
-      renderCell: (p) => <DialogCell {...p}/>,
+      renderCell: (p) => <DetailsDialogCell {...p}/>,
       flex: 1
     }
   ]
@@ -145,7 +198,6 @@ export const TableOrder = (params: Params) => {
           Nuevo
         </Button>
       }}
-
     />
   </>
 }

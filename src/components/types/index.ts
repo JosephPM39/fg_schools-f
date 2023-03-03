@@ -8,3 +8,12 @@ export interface SchoolsCardData {
     relation?: IEmployeePosition
   }
 }
+
+export type ArrayElement<ArrayType extends readonly unknown[]> =
+  ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
+
+export type WithRequired<T, K extends keyof T> = {
+  [P in keyof T]?: T[P] | undefined
+} & {
+  [P in K]-?: T[P]
+}

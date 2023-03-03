@@ -5,7 +5,7 @@ import { useEffect, useState } from "react"
 import { IColor } from "../../api/models_school"
 import { useColor } from "../../hooks/api/products/useColor"
 import { Table } from "../Table"
-import { GetColorCell } from "../Table/renders"
+import { getColorCell } from "../Table/renders"
 
 export const TableColor = () => {
 
@@ -29,7 +29,7 @@ export const TableColor = () => {
       field: 'hex',
       headerName: 'Muestra',
       type: 'string',
-      renderCell: GetColorCell()
+      renderCell: getColorCell()
     },
     {
       field: 'available',
