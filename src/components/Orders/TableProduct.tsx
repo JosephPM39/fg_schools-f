@@ -1,7 +1,5 @@
-import { Add } from "@mui/icons-material"
-import { Button } from "@mui/material"
 import { GridColDef, GridRenderCellParams, GridValueGetterParams } from "@mui/x-data-grid"
-import { ElementType, useEffect, useState } from "react"
+import { ElementType, useCallback, useEffect, useState } from "react"
 import { IBorder, IOrder, IProduct, IProductCombo, IProductOrder } from "../../api/models_school"
 import { useBorder } from "../../hooks/api/products/useBorder"
 import { useColor } from "../../hooks/api/products/useColor"
@@ -16,7 +14,7 @@ import { ArrayElement, WithRequired } from "../types"
 type List = Array<WithRequired<IProductCombo | IProductOrder, 'product'>>
 
 interface Params {
-  list: List
+  list?: List | null
   studentName: string
 }
 
@@ -32,6 +30,7 @@ export const TableProduct = (params: Params) => {
   const studentName = formatTextWrap(params.studentName, 60)
 
   useEffect(() => {
+    if (!list) return setProducts(null)
     Promise.all(list.map(async (item) => ({
       ...item,
       product: {
@@ -127,13 +126,19 @@ export const TableProduct = (params: Params) => {
     }
   }, [idForUpdate])
 
+  const isLoading = useCallback(() => {
+    console.log(products, 'prod')
+    if (products === null) return false
+    return (products.length < 1)
+  }, [products])
+
   return <>
     {// <BorderFormModal state={[open, setOpen]} idForUpdate={idForUpdate} noButton/>
     }
     <Table
       columns={columns}
       rows={products ?? []}
-      isLoading={(products?.length || 0) < 1}
+      isLoading={isLoading()}
       count={products?.length || 0}
       name={`Detalles del combo de: ${studentName}`}
       disableDefaultActions

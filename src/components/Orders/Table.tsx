@@ -1,6 +1,6 @@
 import { Add } from "@mui/icons-material"
 import { Button } from "@mui/material"
-import { GridColDef, GridRenderCellParams, GridValueGetterParams } from "@mui/x-data-grid"
+import { GridColDef, GridRenderCellParams, GridValueFormatterParams, GridValueGetterParams } from "@mui/x-data-grid"
 import { useEffect, useState } from "react"
 import { ICombo, IComboOrder, IOrder, IStudent } from "../../api/models_school"
 import { OrderType } from "../../api/models_school/store/order.model"
@@ -12,17 +12,16 @@ import { Table } from "../Table"
 import { getDialogCell } from "../Table/renders"
 import { OrderProducts } from "./OrderProducts"
 
-const ComboDetails = (params: GridRenderCellParams<any, IOrder>) => {
-  const orderId = params.row.id
-  const studentName = params.row?.student?.nickName
+const useComboPerOrdersH = (orderIdP?: IOrder['id']) => {
   const useComboPerOrders = useComboPerOrder({initFetch: false})
   const useCombos = useCombo({initFetch: false})
   const [comboPerOrders, setComboPerOrder] = useState<Array<IComboOrder> | null>([])
   const [isCustom, setIsCustom] = useState(false)
+  const [orderId, setOrderId] = useState(orderIdP)
 
   useEffect(() => {
     useComboPerOrders.fetch({searchBy: { orderId }})
-  }, [params])
+  }, [orderId])
 
   useEffect(() => {
     if (!useComboPerOrders.data) return
@@ -40,6 +39,49 @@ const ComboDetails = (params: GridRenderCellParams<any, IOrder>) => {
     setIsCustom((comboPerOrders?.length || -1) < 1)
   }, [comboPerOrders])
 
+  const getCombosByOrderId = async (orderId: IOrder['id']) => {
+    const cpo = await useComboPerOrders.findBy({orderId})
+    if (!cpo) return
+    const combos = await Promise.all(cpo.map(async (c) => ({
+      ...await useCombos.findOne({id: c.comboId})
+    })))
+    return combos
+  }
+
+  const getCombosByOrdersId = async (orderId: Array<IOrder['id']>) => {
+    return await Promise.all(orderId.map((id) => ({
+      combos: getCombosByOrderId(id),
+      orderId: id
+    })))
+  }
+
+  const getCombosByOrders = async (orderId: Array<IOrder>): Promise<CombosByOrders> => {
+    return await Promise.all(orderId.map( async (order) => ({
+      combos: await getCombosByOrderId(order.id),
+      orderId: order.id
+    })))
+  }
+
+  return {
+    comboPerOrders,
+    getCombosByOrderId,
+    getCombosByOrdersId,
+    getCombosByOrders,
+    isCustom,
+    setOrderId
+  }
+}
+
+type CombosByOrders = Array<{
+    combos?: Array<Partial<ICombo>>,
+    orderId: IOrder['id']
+}>
+
+const ComboDetails = (params: GridRenderCellParams<any, IOrder>) => {
+  const orderId = params.row.id
+  const studentName = params.row?.student?.nickName
+  const { isCustom, comboPerOrders } = useComboPerOrdersH(orderId)
+
   return {
     dialogContent: <OrderProducts
       { ... isCustom ? { orderId } : { comboId: comboPerOrders?.at(0)?.comboId } }
@@ -47,6 +89,17 @@ const ComboDetails = (params: GridRenderCellParams<any, IOrder>) => {
     />,
     preview: `${comboPerOrders?.at(0)?.combo?.name || 'Perzonalizado'}`
   }
+}
+
+const ComboValueGetter = (params: GridValueGetterParams<any, IOrder>) => {
+  const orderId = params.row.id
+  const { comboPerOrders } = useComboPerOrdersH(orderId)
+
+  if (!comboPerOrders) return 'Perzonalizado'
+
+  return comboPerOrders.reduce((c, p) => {
+    return `${c}, ${p.combo?.name}`
+  }, '')
 }
 
 const DetailsDialogCell = getDialogCell<IOrder>({
@@ -74,11 +127,13 @@ interface IOrderTable extends IOrder {
 export const TableOrder = (params: Params) => {
   const useOrders = useOrder({initFetch: false})
   const useStudents = useStudent({initFetch: false})
+  const { getCombosByOrders } = useComboPerOrdersH()
 
   const [open, setOpen] = useState(false)
   const [idForUpdate, setIdForUpdate] = useState<IOrder['id']>()
   const [orders, setOrders] = useState<Array<IOrder> | null>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [combosPerOrder, setCombosPerOrders] = useState<CombosByOrders>([])
 
   useEffect(() => {
     useOrders.fetch({ searchBy: {...params} })
@@ -102,6 +157,13 @@ export const TableOrder = (params: Params) => {
       setOrders(res)
     })
   }, [orders, useStudents.data])
+
+  useEffect(() => {
+    if (!orders) return
+    getCombosByOrders(orders).then((res) => {
+      setCombosPerOrders(res)
+    })
+  }, [orders])
 
   useEffect(() => {
     if (idForUpdate) {
@@ -128,10 +190,16 @@ export const TableOrder = (params: Params) => {
       type: 'string'
     },
     {
-      field: 'combo',
+      field: 'combo.name',
       headerName: 'Combo',
-      valueFormatter: (p) => {
-        return p.value
+      valueGetter: ({row}: GridValueGetterParams<any, IOrder>) => {
+        const cpo = combosPerOrder.find((cpo) => cpo.orderId === row.id)
+        const combos = cpo?.combos
+        if (!combos) return 'Personalizado'
+        return combos.reduce((p, c) => {
+          if (p.length < 1) return c.name ?? ''
+          return `${p}, ${c.name}`
+        }, '')
       },
       renderCell: (p) => <ComboDialogCell {...p}/>,
       flex: 1

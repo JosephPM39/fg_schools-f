@@ -20,6 +20,7 @@ type BaseParams = {
 }
 
 type Params = (ByOrder | ByCombo) & BaseParams
+export type { Params as OrderProductsParams }
 
 function isByCombo(p: Params): p is ByCombo & BaseParams {
   return typeof (p as ByCombo & BaseParams).comboId !== 'undefined'
@@ -71,6 +72,6 @@ export const OrderProducts = (params: Params) => {
   console.log(productsOrder?.length, 'longitud')
 
   return <Box minWidth='600px'>
-    <TableProduct list={productsOrder ?? []} studentName={params.studentName}/>
+    <TableProduct list={productsOrder ?? null} studentName={params.studentName}/>
   </Box>
 }
