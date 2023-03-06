@@ -1,14 +1,11 @@
-import { Add, AttachMoney, Money, OpenInFull, OpenInNew, Payment, Photo } from "@mui/icons-material"
+import { Add, AttachMoney, OpenInFull, Photo } from "@mui/icons-material"
 import { Button, IconButton } from "@mui/material"
 import { GridColDef, GridRenderCellParams, GridValueGetterParams } from "@mui/x-data-grid"
 import { useEffect, useState } from "react"
 import { IOrder, IStudent } from "../../../api/models_school"
-import { OrderType } from "../../../api/models_school/store/order.model"
-import { useOrder } from "../../../hooks/api/store/useOrder"
 import { useStudent } from "../../../hooks/api/store/useStudent"
 import { Table } from "../../Table"
 import { getDialogCell } from "../../Table/renders"
-import { WithRequired } from "../../types"
 import { CombosByOrders, OnClickNestedParams } from "./types"
 import { useGetComboPerOrders } from './useGetCombosPerOrder'
 

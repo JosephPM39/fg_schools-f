@@ -8,6 +8,7 @@ import { OnClickNestedParams } from "./TableOrder/types"
 import { TableOrderProducts } from './TableOrderProducts'
 import { useGetComboPerOrders } from "./TableOrder/useGetCombosPerOrder"
 import { useOrder } from "../../hooks/api/store/useOrder"
+import { PaymentDialog } from "./Payment/PaymentDialog"
 
 type Params = {
   type: OrderType.STUDIO
@@ -34,6 +35,7 @@ export const Orders = (params: Params) => {
 
   const [isLoading, setIsLoading] = useState(true)
   const [openCombos, setOpenCombos] = useState<boolean>(false)
+  const [openPayments, setOpenPayments] = useState<boolean>(false)
   const [rowSelected, setRowSelected] = useState<GridRenderCellParams<any, IOrder>>()
 
   useEffect(() => {
@@ -53,6 +55,12 @@ export const Orders = (params: Params) => {
     if (p.field === 'combo') {
       setRowSelected(p.renderParams)
       setOpenCombos(true)
+      return
+    }
+
+    if (p.field === 'payment') {
+      setRowSelected(p.renderParams)
+      setOpenPayments(true)
     }
   }
 
@@ -70,6 +78,12 @@ export const Orders = (params: Params) => {
     >
       <ComboDetails {...rowSelected} />
     </Dialog>
+    <PaymentDialog
+      noButton
+      state={[openPayments, setOpenPayments]}
+      title={`Pagos de: ${rowSelected?.row.student?.nickName}`}
+      orderId={rowSelected?.row.id}
+    />
     <TableOrder
       {...params}
       list={orders}
