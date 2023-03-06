@@ -47,6 +47,7 @@ export const TableOrderProducts = (params: Params) => {
   useEffect(() => {
     if (isByCombo(params)) {
       const {comboId} = params
+      if (!comboId) return setProductsOrder(null)
       useProductPerCombos.fetch({ searchBy: { comboId } })
         .then((res) => {
           fetchDepends(res.data).then((data) => setProductsOrder(data))
@@ -54,6 +55,7 @@ export const TableOrderProducts = (params: Params) => {
       return
     }
     const {orderId} = params
+    if (!orderId) return setProductsOrder(null)
     useProductPerOrders.fetch({ searchBy: { orderId } })
       .then((res) => {
         fetchDepends(res.data).then((data) => setProductsOrder(data))
