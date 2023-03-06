@@ -38,6 +38,7 @@ type Params<T extends IBaseModel> = {
   disableDefaultActions?: false
   deleteAction: (id: T['id']) => void
   editAction: (id: T['id']) => void
+  otherAction?: (p: {id: T['id']}) => JSX.Element
 })
 
 export const Table = <T extends IBaseModel>(params: Params<T>) => {
@@ -54,7 +55,9 @@ export const Table = <T extends IBaseModel>(params: Params<T>) => {
     count,
     columnVisibilityModel,
     handleRowHeight,
-    hideFooterPagination
+    hideFooterPagination,
+    toolbar,
+    ...defineGridDataConf
   } = params
 
   useEffect(() => {
@@ -102,7 +105,7 @@ export const Table = <T extends IBaseModel>(params: Params<T>) => {
   }
 
   const { columns, rows } = defineGridData({
-    ...params,
+    ...defineGridDataConf,
     ...{ deleteAction: (id) => setIdToDelete(id) }
   })
 

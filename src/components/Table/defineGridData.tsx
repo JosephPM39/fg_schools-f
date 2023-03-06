@@ -14,6 +14,7 @@ type Params<T extends IBaseModel> = {
   disableDefaultActions?: false
   deleteAction: (id: T['id']) => void
   editAction: (id: T['id']) => void
+  otherAction?: (p: {id: T['id']}) => JSX.Element
 })
 
 export const defineGridData = <T extends IBaseModel>(params: Params<T>) => {
@@ -25,14 +26,13 @@ export const defineGridData = <T extends IBaseModel>(params: Params<T>) => {
       let col: GridColDef = {
         ...column
       }
-      if (!column.renderCell && column.type === 'string') {
+      if (!column?.renderCell && column?.type === 'string') {
         col = {
           ...col,
           renderCell: getOverflowCell({ valueGetter: col.valueGetter })
         }
-        const tes = column.renderCell
       }
-      if (!column.valueFormatter) {
+      if (!column?.valueFormatter) {
         col = {
           ...col,
           valueFormatter: ({value}) => value
@@ -61,7 +61,8 @@ export const defineGridData = <T extends IBaseModel>(params: Params<T>) => {
   if (!params.disableDefaultActions) {
     const {
       editAction = () => {},
-      deleteAction = () => {}
+      deleteAction = () => {},
+      otherAction: OtherAction = () => <></>
     } = params
     columns = [
       ...columns,
@@ -79,6 +80,7 @@ export const defineGridData = <T extends IBaseModel>(params: Params<T>) => {
             <IconButton onClick={() => deleteAction(id as T['id'])}>
               <Delete/>
             </IconButton>
+            <OtherAction id={id as T['id']}/>
           </>
         }
       }

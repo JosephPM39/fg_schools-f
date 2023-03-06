@@ -27,16 +27,16 @@ function isByCombo(p: Params): p is ByCombo & BaseParams {
 }
 
 type ProductsList = Array<IProductOrder | IProductCombo> | null
-type ProductsListR = Array<WithRequired<IProductOrder | IProductCombo, 'product'>> | null
+type ProductsListR = Array<WithRequired<IProductOrder | IProductCombo, 'product'>> | null | undefined
 
-export const OrderProducts = (params: Params) => {
+export const TableOrderProducts = (params: Params) => {
   const useProductPerOrders = useProductPerOrder({initFetch: false})
   const useProductPerCombos = useProductPerCombo({initFetch: false})
   const useProducts = useProduct({initFetch: false})
   const [productsOrder, setProductsOrder] = useState<ProductsListR>([])
 
   const fetchDepends = async (list: ProductsList) => {
-    if (!list) return null
+    if (!list) return list
     const res = await Promise.all(list.map(async (item) => ({
       ...item,
       product: await useProducts.findOne({ id: item.productId }) ?? undefined
@@ -49,7 +49,6 @@ export const OrderProducts = (params: Params) => {
       const {comboId} = params
       useProductPerCombos.fetch({ searchBy: { comboId } })
         .then((res) => {
-          console.log(res, 'res')
           fetchDepends(res.data).then((data) => setProductsOrder(data))
         })
       return
@@ -57,7 +56,6 @@ export const OrderProducts = (params: Params) => {
     const {orderId} = params
     useProductPerOrders.fetch({ searchBy: { orderId } })
       .then((res) => {
-        console.log(res, 'res')
         fetchDepends(res.data).then((data) => setProductsOrder(data))
       })
     return
@@ -69,9 +67,9 @@ export const OrderProducts = (params: Params) => {
     })
   }, [productsOrder])
 
-  console.log(productsOrder?.length, 'longitud')
+  console.log(productsOrder, 'longitud')
 
   return <Box minWidth='600px'>
-    <TableProduct list={productsOrder ?? null} studentName={params.studentName}/>
+    <TableProduct list={productsOrder} studentName={params.studentName}/>
   </Box>
 }

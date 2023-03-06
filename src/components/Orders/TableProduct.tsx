@@ -1,6 +1,6 @@
 import { GridColDef, GridRenderCellParams, GridValueGetterParams } from "@mui/x-data-grid"
-import { ElementType, useCallback, useEffect, useState } from "react"
-import { IBorder, IOrder, IProduct, IProductCombo, IProductOrder } from "../../api/models_school"
+import { useEffect, useState } from "react"
+import { IProductCombo, IProductOrder } from "../../api/models_school"
 import { useBorder } from "../../hooks/api/products/useBorder"
 import { useColor } from "../../hooks/api/products/useColor"
 import { useModel } from "../../hooks/api/products/useModel"
@@ -28,9 +28,10 @@ export const TableProduct = (params: Params) => {
   const [products, setProducts] = useState<List | null>([])
   const { formatTextWrap } = useTextWrap()
   const studentName = formatTextWrap(params.studentName, 60)
+  const [isLoading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!list) return setProducts(null)
+    if (!list) return
     Promise.all(list.map(async (item) => ({
       ...item,
       product: {
@@ -45,6 +46,13 @@ export const TableProduct = (params: Params) => {
       setProducts(res)
     })
   }, [list, useSizes.data, useTypes.data, useColors.data, useBorders.data, useModels.data])
+
+  useEffect(() => {
+    if (list === null) return setLoading(false)
+    if (products === null) return setLoading(false)
+    const loading = products.length < 1
+    setLoading(loading)
+  }, [products, list])
 
   const columns: GridColDef[] = [
     {
@@ -82,11 +90,11 @@ export const TableProduct = (params: Params) => {
       type: 'string'
     },
     {
-      field: 'type',
+      field: 'typeProduct',
       headerName: 'Tipo',
       flex: 1,
       valueGetter: ({row}: GridValueGetterParams<any, ArrayElement<List>>) => {
-        return `${row.product.type?.name}`
+        return `${row.product?.type?.name ?? ''}`
       },
       type: 'string'
     },
@@ -108,41 +116,32 @@ export const TableProduct = (params: Params) => {
         return <>
           <Render value={params.row.product.color?.hex} />
         </>
-      }
+      },
+      type: 'actions'
     },
     {
-      field: 'available',
-      headerName: 'Disponible',
-      type: 'boolean',
+      field: 'amount',
+      headerName: 'Cantidad',
+      flex: 1,
+      type: 'number'
+    },
+    {
+      field: 'inOffer',
+      headerName: 'Precio Promo',
+      flex: 1,
+      type: 'boolean'
     }
   ]
 
-  const [open, setOpen] = useState(false)
-  const [idForUpdate, setIdForUpdate] = useState<IBorder['id']>()
-
-  useEffect(() => {
-    if (idForUpdate) {
-      setOpen(true)
-    }
-  }, [idForUpdate])
-
-  const isLoading = useCallback(() => {
-    console.log(products, 'prod')
-    if (products === null) return false
-    return (products.length < 1)
-  }, [products])
-
   return <>
-    {// <BorderFormModal state={[open, setOpen]} idForUpdate={idForUpdate} noButton/>
-    }
     <Table
       columns={columns}
       rows={products ?? []}
-      isLoading={isLoading()}
+      isLoading={isLoading}
       count={products?.length || 0}
       name={`Detalles del combo de: ${studentName}`}
-      disableDefaultActions
       hideFooterPagination
+      disableDefaultActions
     />
   </>
 }

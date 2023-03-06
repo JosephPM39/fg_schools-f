@@ -1,105 +1,29 @@
-import { Add } from "@mui/icons-material"
-import { Button } from "@mui/material"
-import { GridColDef, GridRenderCellParams, GridValueFormatterParams, GridValueGetterParams } from "@mui/x-data-grid"
+import { Add, AttachMoney, Money, OpenInFull, OpenInNew, Payment, Photo } from "@mui/icons-material"
+import { Button, IconButton } from "@mui/material"
+import { GridColDef, GridRenderCellParams, GridValueGetterParams } from "@mui/x-data-grid"
 import { useEffect, useState } from "react"
-import { ICombo, IComboOrder, IOrder, IStudent } from "../../api/models_school"
-import { OrderType } from "../../api/models_school/store/order.model"
-import { useCombo } from "../../hooks/api/store/useCombo"
-import { useComboPerOrder } from "../../hooks/api/store/useComboPerOrder"
-import { useOrder } from "../../hooks/api/store/useOrder"
-import { useStudent } from "../../hooks/api/store/useStudent"
-import { Table } from "../Table"
-import { getDialogCell } from "../Table/renders"
-import { OrderProducts } from "./OrderProducts"
-
-const useComboPerOrdersH = (orderIdP?: IOrder['id']) => {
-  const useComboPerOrders = useComboPerOrder({initFetch: false})
-  const useCombos = useCombo({initFetch: false})
-  const [comboPerOrders, setComboPerOrder] = useState<Array<IComboOrder> | null>([])
-  const [isCustom, setIsCustom] = useState(false)
-  const [orderId, setOrderId] = useState(orderIdP)
-
-  useEffect(() => {
-    useComboPerOrders.fetch({searchBy: { orderId }})
-  }, [orderId])
-
-  useEffect(() => {
-    if (!useComboPerOrders.data) return
-    Promise.all(useComboPerOrders.data.map(async (comboPerOrder) => {
-      return {
-        ...comboPerOrder,
-        combo: await useCombos.findOne({id: comboPerOrder.comboId}) ?? undefined
-      }
-    })).then((res) => {
-      setComboPerOrder(res)
-    })
-  }, [useComboPerOrders.data, useCombos.data])
-
-  useEffect(() => {
-    setIsCustom((comboPerOrders?.length || -1) < 1)
-  }, [comboPerOrders])
-
-  const getCombosByOrderId = async (orderId: IOrder['id']) => {
-    const cpo = await useComboPerOrders.findBy({orderId})
-    if (!cpo) return
-    const combos = await Promise.all(cpo.map(async (c) => ({
-      ...await useCombos.findOne({id: c.comboId})
-    })))
-    return combos
-  }
-
-  const getCombosByOrdersId = async (orderId: Array<IOrder['id']>) => {
-    return await Promise.all(orderId.map((id) => ({
-      combos: getCombosByOrderId(id),
-      orderId: id
-    })))
-  }
-
-  const getCombosByOrders = async (orderId: Array<IOrder>): Promise<CombosByOrders> => {
-    return await Promise.all(orderId.map( async (order) => ({
-      combos: await getCombosByOrderId(order.id),
-      orderId: order.id
-    })))
-  }
-
-  return {
-    comboPerOrders,
-    getCombosByOrderId,
-    getCombosByOrdersId,
-    getCombosByOrders,
-    isCustom,
-    setOrderId
-  }
-}
-
-type CombosByOrders = Array<{
-    combos?: Array<Partial<ICombo>>,
-    orderId: IOrder['id']
-}>
+import { IOrder, IStudent } from "../../../api/models_school"
+import { OrderType } from "../../../api/models_school/store/order.model"
+import { useOrder } from "../../../hooks/api/store/useOrder"
+import { useStudent } from "../../../hooks/api/store/useStudent"
+import { Table } from "../../Table"
+import { getDialogCell } from "../../Table/renders"
+import { TableOrderProducts } from "../TableOrderProducts"
+import { CombosByOrders, NestedField, OnClickNestedParams } from "./types"
+import { useGetComboPerOrders } from './useGetCombosPerOrder'
 
 const ComboDetails = (params: GridRenderCellParams<any, IOrder>) => {
   const orderId = params.row.id
   const studentName = params.row?.student?.nickName
-  const { isCustom, comboPerOrders } = useComboPerOrdersH(orderId)
+  const { isCustom, comboPerOrders } = useGetComboPerOrders(orderId)
 
   return {
-    dialogContent: <OrderProducts
+    dialogContent: <TableOrderProducts
       { ... isCustom ? { orderId } : { comboId: comboPerOrders?.at(0)?.comboId } }
       studentName={studentName ?? ''}
     />,
     preview: `${comboPerOrders?.at(0)?.combo?.name || 'Perzonalizado'}`
   }
-}
-
-const ComboValueGetter = (params: GridValueGetterParams<any, IOrder>) => {
-  const orderId = params.row.id
-  const { comboPerOrders } = useComboPerOrdersH(orderId)
-
-  if (!comboPerOrders) return 'Perzonalizado'
-
-  return comboPerOrders.reduce((c, p) => {
-    return `${c}, ${p.combo?.name}`
-  }, '')
 }
 
 const DetailsDialogCell = getDialogCell<IOrder>({
@@ -113,21 +37,20 @@ const ComboDialogCell = getDialogCell<IOrder>({
   handleChildren: (p) => ComboDetails(p)
 })
 
-type Params = {
+type Params = ({
   type: OrderType.STUDIO
 } | {
   type: OrderType.SCHOOL
   sectionPromId: IOrder['sectionPromId']
-}
-
-interface IOrderTable extends IOrder {
-  comboName: string
+}) & {
+  onClickNested: (p: OnClickNestedParams) => void
 }
 
 export const TableOrder = (params: Params) => {
   const useOrders = useOrder({initFetch: false})
   const useStudents = useStudent({initFetch: false})
-  const { getCombosByOrders } = useComboPerOrdersH()
+  const { getCombosByOrders } = useGetComboPerOrders()
+  const { onClickNested, ...orderParams } = params
 
   const [open, setOpen] = useState(false)
   const [idForUpdate, setIdForUpdate] = useState<IOrder['id']>()
@@ -136,7 +59,7 @@ export const TableOrder = (params: Params) => {
   const [combosPerOrder, setCombosPerOrders] = useState<CombosByOrders>([])
 
   useEffect(() => {
-    useOrders.fetch({ searchBy: {...params} })
+    useOrders.fetch({ searchBy: {...orderParams} })
       .then((res) => {
         setOrders(res.data)
       })
@@ -190,21 +113,6 @@ export const TableOrder = (params: Params) => {
       type: 'string'
     },
     {
-      field: 'combo.name',
-      headerName: 'Combo',
-      valueGetter: ({row}: GridValueGetterParams<any, IOrder>) => {
-        const cpo = combosPerOrder.find((cpo) => cpo.orderId === row.id)
-        const combos = cpo?.combos
-        if (!combos) return 'Personalizado'
-        return combos.reduce((p, c) => {
-          if (p.length < 1) return c.name ?? ''
-          return `${p}, ${c.name}`
-        }, '')
-      },
-      renderCell: (p) => <ComboDialogCell {...p}/>,
-      flex: 1
-    },
-    {
       field: 'firstName',
       headerName: 'Nombre(s)',
       flex: 1,
@@ -223,6 +131,34 @@ export const TableOrder = (params: Params) => {
       type: 'string'
     },
     {
+      field: 'combo',
+      headerName: 'Combo',
+      type: 'string',
+      valueGetter: ({row}: GridValueGetterParams<any, IOrder>) => {
+        const cpo = combosPerOrder.find((cpo) => cpo.orderId === row.id)
+        const combos = cpo?.combos
+        if (!combos) return 'Personalizado'
+        return combos.reduce((p, c) => {
+          if (p.length < 1) return c.name ?? ''
+          return `${p}, ${c.name}`
+        }, '')
+      },
+      renderCell: (p) => {
+        const onClick = () => {
+          onClickNested({renderParams: p, field: 'combo'})
+        }
+        const preview = String(p.value).slice(0, 10)
+        const label = preview.length < String(p.value).length ? `${preview}...` : preview
+
+        return <Button onClick={onClick} startIcon={
+          <OpenInFull/>
+        }>
+          {label}
+        </Button>
+      },
+      width: 140
+    },
+    {
       field: 'total',
       headerName: 'Total',
       type: 'number'
@@ -233,10 +169,43 @@ export const TableOrder = (params: Params) => {
       type: 'number'
     },
     {
+      field: 'payment',
+      headerName: 'Pagos',
+      type: 'actions',
+      disableExport: true,
+      renderCell: (p: GridRenderCellParams<any, IOrder>) => {
+        const onClick = () => {
+          onClickNested({renderParams: p, field: 'payment'})
+        }
+        return <IconButton onClick={onClick} color='primary'>
+          <AttachMoney/>
+        </IconButton>
+      },
+      width: 65
+    },
+    {
+      field: 'photo',
+      headerName: 'Fotos',
+      type: 'actions',
+      disableExport: true,
+      renderCell: (p: GridRenderCellParams<any, IOrder>) => {
+        const onClick = () => {
+          onClickNested({renderParams: p, field: 'photo'})
+        }
+        return <IconButton onClick={onClick} color='primary'>
+          <Photo/>
+        </IconButton>
+      },
+      width: 65
+    },
+    {
       field: 'details',
       headerName: 'Detalles',
+      valueFormatter: (p) => {
+        return p.value
+      },
       renderCell: (p) => <DetailsDialogCell {...p}/>,
-      flex: 1
+      width: 150
     }
   ]
 
@@ -251,7 +220,9 @@ export const TableOrder = (params: Params) => {
       }}
       columnVisibilityModel={{
         lastName: false,
-        firstName: false
+        firstName: false,
+        remaining: false,
+        total: false
       }}
       isLoading={isLoading}
       count={useOrders.metadata?.count ?? 0}

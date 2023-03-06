@@ -80,11 +80,11 @@ export const getDialogCell = <T extends IBaseModel>(params: Omit<DialogParams, '
         size: 'small',
         sx: { fontSize: 'inherit' },
         startIcon: <OpenInFull/>,
-        type: 'button'
+        type: 'button',
+        children: `${data.preview}`
       }} >
         {data.dialogContent}
       </Dialog>
-      {data.preview}&nbsp;
     </>
   }
   return DialogCell
