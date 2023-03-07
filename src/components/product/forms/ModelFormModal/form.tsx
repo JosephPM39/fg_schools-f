@@ -4,6 +4,7 @@ import { IModel } from '../../../../api/models_school';
 import { Alert, AlertProps, AlertWithError } from '../../../Alert';
 import { useModel } from '../../../../hooks/api/products/useModel';
 import { getData } from './getData';
+import { InvalidDataError, promiseHandleError } from '../../../../api/handlers/errors';
 
 interface Params {
   idForUpdate?: IModel['id'],
@@ -44,24 +45,30 @@ export const Form = (params: Params) => {
     e.preventDefault()
   }
 
-  const submit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const submit = async () => {
     setSending(true)
     const data = getData(new FormData(form.current ?? undefined))
+    await useModels.validate({ data })
     if (!idForUpdate) {
-      useModels.create(data).finally(() => {
-        setSending(false)
-      })
-      return
+      await useModels.create(data)
+      return setSending(false)
     }
     const {id, ...rest} = data
-    useModels.update({id, data: rest}).finally(() => {
+    await useModels.update({id, data: rest})
+    return setSending(false)
+  }
+
+  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    promiseHandleError((error) => {
+      console.log((error as InvalidDataError).getErrors())
+      setNotify({error})
       setSending(false)
-    })
+    }, submit)
   }
 
   return <>
-    <form ref={form} onSubmit={submit}>
+    <form ref={form} onSubmit={onSubmit}>
       <input
         name="model_id"
         type='text'
@@ -98,8 +105,9 @@ export const Form = (params: Params) => {
             label="Precio"
             type='number'
             inputProps={{
-              minLength: 1,
-              maxLength: 40,
+              min: 0.01,
+              max: 9999.99,
+              step: 0.01
             }}
             InputProps={{
               startAdornment: <InputAdornment position='start' children='$'/>
@@ -117,8 +125,9 @@ export const Form = (params: Params) => {
             label="Precio para promoción"
             type='number'
             inputProps={{
-              minLength: 1,
-              maxLength: 55,
+              min: 0.01,
+              max: 9999.99,
+              step: 0.01
             }}
             InputProps={{
               startAdornment: <InputAdornment position='start' children='$'/>
