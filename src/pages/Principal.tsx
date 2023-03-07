@@ -1,7 +1,7 @@
 import { Grid } from '@mui/material'
 import { NavBar } from '../containers/NavBar'
 import { SearchField } from '../components/SearchField'
-import { SchoolCard } from '../components/SchoolCard'
+import { SchoolCard } from '../components/school/SchoolCard'
 import { useContext, useEffect, useState } from 'react'
 import { SchoolPromContext } from '../context/api/schools'
 import { Container } from '@mui/system'

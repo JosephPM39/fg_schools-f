@@ -6,9 +6,9 @@ import Divider from '@mui/material/Divider';
 import { MenuStyled } from '../styles/MenuStyled'
 import { FormControlLabel, Switch } from '@mui/material';
 import { Menu as MenuIcon, SaveAlt as SaveAltIcon } from '@mui/icons-material'
-import { SchoolPromFormModal } from './forms/SchoolPromFormModal';
+import { SchoolPromFormModal } from './school/forms/SchoolPromFormModal';
 import { SchoolPromContext } from '../context/api/schools';
-import { YearSelect } from './forms/YearSelect';
+import { YearSelect } from './YearSelect';
 import { useNetStatus } from '../hooks/useNetStatus';
 import { SettingsModal } from './SettingsModal';
 
