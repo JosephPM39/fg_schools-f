@@ -248,11 +248,12 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
 
   const remove = async (params: DeleteParams<Model>) => {
     const res = await storage.delete(params)
-    if (!res) return false
     const index = data.findIndex((e) => e.id === params.id)
-    if (index === -1) return false
-    delete data[index]
-    return true
+    console.log(data.splice(index, (index+1)))
+    if (metadata?.count) {
+      metadata.count = metadata.count - 1
+    }
+    return res
   }
 
   return {

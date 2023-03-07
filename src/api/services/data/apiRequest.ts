@@ -108,7 +108,7 @@ export class ApiRequest<Model extends IBaseModel> implements Crud<Model> {
   delete = async (params: DeleteParams<Model>) => {
     const path = `${CONFIG.schoolsApiUrl}/${this.path}/${params.id}`
     const res = await fetch(path, {
-      method: 'PATCH',
+      method: 'DELETE',
       headers: getHeaders(),
     })
 

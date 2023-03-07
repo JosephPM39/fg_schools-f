@@ -32,12 +32,6 @@ export const defineGridData = <T extends IBaseModel>(params: Params<T>) => {
           renderCell: getOverflowCell({ valueGetter: col.valueGetter })
         }
       }
-      if (!column?.valueFormatter) {
-        col = {
-          ...col,
-          valueFormatter: ({value}) => value
-        }
-      }
       return col
     })
     columns = [

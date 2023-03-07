@@ -6,6 +6,8 @@ import { IModel } from "../../../api/models_school"
 import { useModel } from "../../../hooks/api/products/useModel"
 import { ModelFormModal } from "../forms/ModelFormModal"
 import { Table } from "../../Table"
+import { Alert, AlertProps, AlertWithError } from "../../Alert"
+import { promiseHandleError } from "../../../api/handlers/errors"
 
 export const TableModel = () => {
 
@@ -43,8 +45,15 @@ export const TableModel = () => {
   ]
 
   const [open, setOpen] = useState(false)
-  const [idForUpdate, setIdForUpdate] = useState<IModel['id']>()
+  const [notify, setNotify] = useState<AlertProps | AlertWithError>()
+  const [showNotify, setShowNofity] = useState(false)
 
+  useEffect(() => {
+    if (notify) setShowNofity(true)
+  }, [notify])
+
+  const [idForUpdate, setIdForUpdate] = useState<IModel['id']>()
+  const [idForDelete, setIdForDelete] = useState<IModel['id']>()
 
   useEffect(() => {
     if (idForUpdate) {
@@ -52,8 +61,29 @@ export const TableModel = () => {
     }
   }, [idForUpdate])
 
+  useEffect(() => {
+    if (!idForDelete) return
+    promiseHandleError((error) => {
+      setNotify({error})
+    }, async () => await useModels.delete({id: idForDelete})).then(() => {
+      setNotify({
+        title: 'Éxito',
+        details: `Modelo eliminado`,
+        type: 'success'
+      })
+      setIdForDelete(undefined)
+      useModels.launchNextFetch({
+        offset: 'previous'
+      })
+    })
+  }, [idForDelete])
+
   return <>
-    <ModelFormModal state={[open, setOpen]} idForUpdate={idForUpdate} noButton/>
+    <ModelFormModal state={[open, setOpen]} idForUpdate={idForUpdate} onSuccess={() => {
+      useModels.launchNextFetch({
+        offset: 'previous'
+      })
+    }} noButton/>
     <Table
       columns={columns}
       rows={useModels.data}
@@ -63,7 +93,7 @@ export const TableModel = () => {
       isLoading={useModels.data.length < 1 || useModels.needFetchNext}
       count={useModels.metadata?.count ?? 0}
       name="Modelos de productos"
-      deleteAction={(id) => console.log(id)}
+      deleteAction={(id) => setIdForDelete(id)}
       editAction={(id) => setIdForUpdate(id)}
       toolbar={{
         add: <Button startIcon={<Add/>} onClick={() => {
@@ -74,6 +104,14 @@ export const TableModel = () => {
         </Button>
       }}
 
+    />
+    <Alert
+      show={showNotify}
+      onClose={() => {
+        setShowNofity(false)
+        setNotify(undefined)
+      }}
+      {...notify}
     />
   </>
 }

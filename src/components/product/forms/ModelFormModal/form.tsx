@@ -8,10 +8,11 @@ import { InvalidDataError, promiseHandleError } from '../../../../api/handlers/e
 
 interface Params {
   idForUpdate?: IModel['id'],
+  onSuccess?: () => void
 }
 
 export const Form = (params: Params) => {
-  const { idForUpdate } = params
+  const { idForUpdate, onSuccess = () => {} } = params
   const form = useRef<HTMLFormElement | null>(null)
 
   const [data, setData] = useState<IModel>()
@@ -51,11 +52,17 @@ export const Form = (params: Params) => {
     await useModels.validate({ data })
     if (!idForUpdate) {
       await useModels.create(data)
-      return setSending(false)
+    } else {
+      const {id, ...rest} = data
+      await useModels.update({id, data: rest})
     }
-    const {id, ...rest} = data
-    await useModels.update({id, data: rest})
-    return setSending(false)
+    setSending(false)
+    setNotify({
+      title: 'Éxito',
+      details: `Modelo ${params?.idForUpdate ? 'actualizado' : 'creado'}`,
+      type: 'success'
+    })
+    return onSuccess()
   }
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {

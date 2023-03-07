@@ -15,10 +15,11 @@ export { Form as ModelForm }
 type Params = {
   idForUpdate?: IModel['id']
   state?: [boolean, Dispatch<SetStateAction<boolean>>]
+  onSuccess?: () => void
 } & ((BtnContainer | BtnPropsContainer | NoBtnContainer) | undefined)
 
 export const ModelFormModal = (params: Params) => {
-  const { idForUpdate } = params
+  const { idForUpdate, onSuccess } = params
   const mBtn = (): BtnContainer | BtnPropsContainer | NoBtnContainer => {
     if (isNoBtnContainer(params)) {
       return params
@@ -42,7 +43,7 @@ export const ModelFormModal = (params: Params) => {
       marginY={4}
       marginX={4}
     >
-      <Form idForUpdate={idForUpdate}/>
+      <Form onSuccess={onSuccess} idForUpdate={idForUpdate}/>
     </Box>
   </Modal>
 }
