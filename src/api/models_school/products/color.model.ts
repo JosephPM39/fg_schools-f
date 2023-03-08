@@ -19,7 +19,7 @@ export class Color extends BaseModel {
   @IsString()
   @IsOptional()
   @Length(1, 100)
-    sample: string
+    sample?: string
 
   @Expose({ since: EV.UPDATE, until: EV.DELETE })
   @IsBoolean()
