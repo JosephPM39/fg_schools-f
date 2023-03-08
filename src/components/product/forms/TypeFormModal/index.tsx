@@ -1,13 +1,13 @@
 import { Form } from './form'
-import { ISize } from '../../../../api/models_school';
+import { IType } from '../../../../api/models_school';
 import { BaseFormModal, BaseFormModalParams } from '../BaseFormModal';
 import { IBaseModel } from '../../../../api/models_school/base.model';
 export { Form as ModelForm }
 
 type Params<T extends IBaseModel> = Omit<BaseFormModalParams<T>, 'Form' | 'name'>
 
-export const SizeFormModal = (params: Params<ISize>) => {
+export const TypeFormModal = (params: Params<IType>) => {
   return (
-    <BaseFormModal {...params as any} Form={Form} name='Tamaño'/>
+    <BaseFormModal {...params as any} Form={Form} name='Tipo'/>
   )
 }

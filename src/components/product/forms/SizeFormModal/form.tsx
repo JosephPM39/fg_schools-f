@@ -76,7 +76,7 @@ const Inputs = ({data, onChange}: InputsParams<ISize>) => (
         <TextField
           fullWidth
           value={data?.ppp || ''}
-          onChange={(e) => onChange(e, 'height')}
+          onChange={(e) => onChange(e, 'ppp')}
           name="ppp"
           label="Píxeles por PULG"
           type='number'
