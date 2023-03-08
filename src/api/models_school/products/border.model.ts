@@ -14,7 +14,7 @@ export class Border extends BaseModel {
   @IsString()
   @IsOptional()
   @Length(1, 100)
-    file: string
+    file?: string
 
   @Expose({ since: EV.UPDATE, until: EV.DELETE })
   @IsBoolean()

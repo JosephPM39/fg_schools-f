@@ -1,13 +1,12 @@
 import { Form } from './form'
-import { IColor } from '../../../../api/models_school';
+import { IBorder } from '../../../../api/models_school';
 import { BaseFormModal, BaseFormModalParams } from '../BaseFormModal';
 import { IBaseModel } from '../../../../api/models_school/base.model';
-export { Form as ModelForm }
 
 type Params<T extends IBaseModel> = Omit<BaseFormModalParams<T>, 'Form' | 'name'>
 
-export const ColorFormModal = (params: Params<IColor>) => {
+export const BorderFormModal = (params: Params<IBorder>) => {
   return (
-    <BaseFormModal {...params as any} Form={Form} name='Color'/>
+    <BaseFormModal {...params as any} Form={Form} name={'Borde'}/>
   )
 }

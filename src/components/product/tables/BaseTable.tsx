@@ -9,7 +9,7 @@ import { useBase } from "../../../hooks/api/useBase"
 import { Table } from "../../Table"
 import { BaseFormModalParams } from "../forms/BaseFormModal"
 
-type FormModalParams<T extends IBaseModel> = Omit<BaseFormModalParams<T>, 'Form'>
+type FormModalParams<T extends IBaseModel> = Omit<BaseFormModalParams<T>, 'Form' | 'name'>
 
 interface BaseTableParams<T extends IBaseModel> {
   name: string
