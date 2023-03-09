@@ -15,6 +15,7 @@ import { IBaseModel } from '../../api/models_school/base.model'
 import { Dialog } from '../../containers/Dialog'
 import { Toolbar } from './toolbar'
 import { defineGridData } from './defineGridData'
+import { useTextWrap } from '../../hooks/useTextWrap'
 
 type Params<T extends IBaseModel> = {
   columns: GridColDef[]
@@ -85,10 +86,11 @@ export const Table = <T extends IBaseModel>(params: Params<T>) => {
   }
 
   const { localeText } = esES.components.MuiDataGrid.defaultProps
+  const useTextWrapper = useTextWrap()
 
   const components: Partial<GridSlotsComponent> = {
     Toolbar: () => <Toolbar
-      name={name}
+      name={useTextWrapper.formatTextWrap(name, 90)}
       actions={{
         other: params.toolbar?.add
       }}

@@ -79,6 +79,7 @@ export const Orders = (params: Params) => {
     </Dialog>
     <PaymentDialog
       noButton
+      studentName={rowSelected?.row.student?.nickName ?? 'Cargando...'}
       state={[openPayments, setOpenPayments]}
       title={`Pagos de: ${rowSelected?.row.student?.nickName ?? 'Cargando...'}`}
       orderId={rowSelected?.row.id}

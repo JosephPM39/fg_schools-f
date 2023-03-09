@@ -5,12 +5,13 @@ import { TablePayment } from '../tables/TablePayment'
 
 type Params = {
   orderId: IOrder['id']
+  studentName: string
 } & Omit<DialogParams, 'children'>
 & (BtnContainer | BtnPropsContainer | NoBtnContainer)
 
 export const PaymentDialog = (params: Params) => {
-  const { orderId, ...dialogParams } = params
+  const { orderId, studentName, ...dialogParams } = params
   return <Dialog {...dialogParams}>
-    <TablePayment orderId={orderId} />
+    <TablePayment orderId={orderId} studentName={studentName}/>
   </Dialog>
 }

@@ -58,7 +58,7 @@ export const Dialog = (params: Params) => {
           {params.children}
         </DialogContent>
         <DialogActions>
-          { !params?.actions?.omitCancel && <Button onClick={handleClose}>Cancelar</Button> }
+          { !params?.actions?.omitCancel && <Button onClick={handleClose}>Cerrar</Button> }
           { params?.actions?.others }
         </DialogActions>
       </DialogMUI>

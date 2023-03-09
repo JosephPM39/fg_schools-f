@@ -1,14 +1,17 @@
-import { Add } from '@mui/icons-material'
-import { Button } from '@mui/material'
+import { FormModalParams } from '../forms/PaymentFormModal'
+import { FormParams, Inputs } from '../forms/PaymentFormModal/form'
+import { getData } from '../forms/PaymentFormModal/getData'
+import { BaseTable } from './../../BaseDataTable/BaseTable'
 import { GridColDef, GridValueFormatterParams } from '@mui/x-data-grid'
-import { useEffect, useState } from 'react'
-import { IOrder, IPayment } from '../../../api/models_school'
+import { useEffect } from 'react'
+import { IOrder } from '../../../api/models_school'
 import { usePayment } from '../../../hooks/api/store/usePayment'
-import { Table } from '../../Table'
-import { getDialogCell } from '../../Table/renders'
+import { getDialogCell, getOverflowCell } from '../../Table/renders'
+import { BaseForm, BaseFormModal } from '../../BaseDataTable/BaseFormModal'
 
 interface Params {
   orderId: IOrder['id']
+  studentName: string
 }
 
 const ExpandableCell = getDialogCell({
@@ -16,12 +19,45 @@ const ExpandableCell = getDialogCell({
 })
 
 export const TablePayment = (params: Params) => {
-  const { orderId } = params
-  const [payments, setPayments] = useState<IPayment[] | null>()
-  const [isLoading, setIsLoading] = useState(true)
-  // const [idForUpdate, setIdForUpdate] = useState<IPayment['id']>()
-  // const [open, setOpen] = useState(false)
   const usePayments = usePayment({ initFetch: false })
+  const { orderId, studentName } = params
+
+  const Form = (params: FormParams) => {
+    const getPayment = (...p: Parameters<typeof getData>) => {
+      const data = getData(...p)
+      return {
+        ...data,
+        orderId
+      }
+    }
+
+    return (
+      <BaseForm {...params} Inputs={Inputs} dataFormatter={getPayment} hook={usePayments}/>
+    )
+  }
+
+  const FormModal = (params: FormModalParams) => {
+    return (
+      <BaseFormModal {...params as any} Form={Form} name='Pago'/>
+    )
+  }
+
+  const dateFormat = (value: string) => {
+    const date = new Date(value)
+    console.log(date)
+    const formated = date.toLocaleString('es-GB', {
+      hourCycle: 'h12',
+      dateStyle: 'full',
+      timeStyle: 'short',
+      timeZone: 'America/El_Salvador'
+    })
+    console.log(formated)
+    return formated
+  }
+
+  const OverflowCell = getOverflowCell({
+    valueGetter: ({ value }) => dateFormat(value)
+  })
 
   const columns: GridColDef[] = [
     {
@@ -34,59 +70,30 @@ export const TablePayment = (params: Params) => {
     {
       field: 'date',
       headerName: 'Fecha',
-      valueFormatter: ({ value }) => new Date(value),
-      type: 'date'
+      valueFormatter: ({ value }) => {
+        return dateFormat(value)
+      },
+      renderCell: (p) => <OverflowCell {...p}/>,
+      type: 'date',
+      flex: 1
     },
     {
       field: 'details',
       headerName: 'Concepto',
       renderCell: (p) => <ExpandableCell {...p}/>,
-      valueFormatter: ({ value }) => value
+      valueFormatter: ({ value }) => value,
+      flex: 1
     }
   ]
 
   useEffect(() => {
-    void usePayments.fetch({ searchBy: { orderId } }).then((res) => {
-      setPayments(res.data)
-    })
+    void usePayments.fetch({ searchBy: { orderId } })
   }, [orderId])
 
-  useEffect(() => {
-    if (payments === null) return setIsLoading(false)
-    if (payments === undefined) return
-    const loading = payments.length < 1 || usePayments.needFetchNext
-    setIsLoading(loading)
-  }, [payments, usePayments.needFetchNext])
-
-  /* useEffect(() => {
-    if (idForUpdate) {
-      setOpen(true)
-    }
-  }, [idForUpdate]) */
-
-  return <>
-    {
-      // <OrderFormModal state={[open, setOpen]} idForUpdate={idForUpdate} noButton/>
-    }
-    <Table
-      columns={columns}
-      rows={usePayments.data ?? []}
-      onPagination={(limit, offset) => {
-        usePayments.launchNextFetch({ limit, offset })
-      }}
-      isLoading={isLoading}
-      count={usePayments.metadata?.count ?? 0}
-      name="Bordes de productos"
-      deleteAction={(id) => console.log(id)}
-      editAction={(id) => console.log(id)}
-      toolbar={{
-        add: <Button startIcon={<Add/>} onClick={() => {
-          // setIdForUpdate(undefined)
-          // setOpen(true)
-        }}>
-          Nuevo
-        </Button>
-      }}
-    />
-  </>
+  return <BaseTable
+    FormModal={FormModal}
+    hook={usePayments}
+    name={`Pagos de: ${studentName}`}
+    columns={columns}
+  />
 }
