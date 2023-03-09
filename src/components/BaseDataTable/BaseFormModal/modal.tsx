@@ -9,10 +9,12 @@ import {
 } from '../../../containers/types'
 import { Dispatch, SetStateAction } from 'react'
 import { IBaseModel } from '../../../api/models_school/base.model'
+import { ErrorCatched } from '../../../api/handlers/errors'
 
 interface Base<T extends IBaseModel> {
   idForUpdate?: T['id']
   onSuccess?: () => void
+  onFail?: (error: ErrorCatched) => void
 }
 
 export type BaseFormModalParams<T extends IBaseModel> = Base<T> & {
@@ -22,7 +24,7 @@ export type BaseFormModalParams<T extends IBaseModel> = Base<T> & {
 } & ((BtnContainer | BtnPropsContainer | NoBtnContainer) | undefined)
 
 export const BaseFormModal = <T extends IBaseModel>(params: BaseFormModalParams<T>) => {
-  const { idForUpdate, onSuccess, Form, name } = params
+  const { idForUpdate, onSuccess, Form, name, onFail } = params
   const mBtn = (): BtnContainer | BtnPropsContainer | NoBtnContainer => {
     if (isNoBtnContainer(params)) {
       return {
@@ -52,7 +54,7 @@ export const BaseFormModal = <T extends IBaseModel>(params: BaseFormModalParams<
       marginY={4}
       marginX={4}
     >
-      <Form onSuccess={onSuccess} idForUpdate={idForUpdate}/>
+      <Form onSuccess={onSuccess} onFail={onFail} idForUpdate={idForUpdate}/>
     </Box>
   </Modal>
 }

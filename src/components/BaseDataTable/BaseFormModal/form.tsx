@@ -1,8 +1,7 @@
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react'
 import { Button, Divider } from '@mui/material'
 import { IColor } from '../../../api/models_school'
-import { Alert, AlertProps, AlertWithError } from '../../Alert'
-import { InvalidDataError, promiseHandleError } from '../../../api/handlers/errors'
+import { ErrorCatched, promiseHandleError } from '../../../api/handlers/errors'
 import { IBaseModel } from '../../../api/models_school/base.model'
 import { useBase } from '../../../hooks/api/useBase'
 
@@ -14,6 +13,7 @@ export interface InputsParams<T extends IBaseModel> {
 export interface BaseFormParams<T extends IBaseModel> {
   idForUpdate?: IColor['id']
   onSuccess?: () => void
+  onFail?: (error: ErrorCatched) => void
   Inputs: (p: InputsParams<T>) => JSX.Element
   dataFormatter: (form: FormData) => T
   hook: ReturnType<typeof useBase<T>>
@@ -23,6 +23,7 @@ export const BaseForm = <T extends IBaseModel>(params: BaseFormParams<T>) => {
   const {
     idForUpdate,
     onSuccess = () => {},
+    onFail = () => {},
     hook,
     dataFormatter,
     Inputs
@@ -31,13 +32,6 @@ export const BaseForm = <T extends IBaseModel>(params: BaseFormParams<T>) => {
 
   const [data, setData] = useState<T>()
   const [isSending, setSending] = useState(false)
-
-  const [notify, setNotify] = useState<AlertProps | AlertWithError>()
-  const [showNotify, setShowNofity] = useState(false)
-
-  useEffect(() => {
-    if (notify != null) setShowNofity(true)
-  }, [notify])
 
   useEffect(() => {
     const getData = async () => {
@@ -68,20 +62,14 @@ export const BaseForm = <T extends IBaseModel>(params: BaseFormParams<T>) => {
       await hook.update({ id, data: rest })
     }
     setSending(false)
-    setNotify({
-      title: 'Éxito',
-      details: `Registro ${params?.idForUpdate ? 'actualizado' : 'creado'}`,
-      type: 'success'
-    })
     return onSuccess()
   }
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     void promiseHandleError((error) => {
-      console.log((error as InvalidDataError).getErrors())
-      setNotify({ error })
       setSending(false)
+      return onFail(error)
     }, submit)
   }
 
@@ -91,17 +79,9 @@ export const BaseForm = <T extends IBaseModel>(params: BaseFormParams<T>) => {
       <br/>
       <Divider/>
       <br/>
-      <Button type='submit' variant='contained' disabled={isSending || showNotify}>
+      <Button type='submit' variant='contained' disabled={isSending}>
         {isSending ? 'Guardando...' : 'Guardar'}
       </Button>
     </form>
-    <Alert
-      show={showNotify}
-      onClose={() => {
-        setShowNofity(false)
-        setNotify(undefined)
-      }}
-      {...notify}
-    />
   </>
 }

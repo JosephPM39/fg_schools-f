@@ -8,8 +8,9 @@ import { IBaseModel } from '../../api/models_school/base.model'
 import { useBase } from '../../hooks/api/useBase'
 import { Table } from '../Table'
 import { BaseFormModalParams } from './BaseFormModal'
+import { BtnContainer, BtnPropsContainer, NoBtnContainer } from '../../containers/types'
 
-type FormModalParams<T extends IBaseModel> = Omit<BaseFormModalParams<T>, 'Form' | 'name'>
+type FormModalParams<T extends IBaseModel> = Omit<BaseFormModalParams<T>, 'Form' | 'name' > & ((BtnContainer | BtnPropsContainer | NoBtnContainer) | undefined)
 
 interface BaseTableParams<T extends IBaseModel> {
   name: string
@@ -64,7 +65,16 @@ export const BaseTable = <T extends IBaseModel>(params: BaseTableParams<T>) => {
     <FormModal
       state={[open, setOpen]}
       idForUpdate={idForUpdate}
+      onFail={(error) => {
+        setNotify({ error })
+      }}
       onSuccess={() => {
+        setNotify({
+          title: 'Éxito',
+          details: `Registro ${idForUpdate ? 'actualizado' : 'creado'}`,
+          type: 'success'
+        })
+        setOpen(false)
         hook.launchNextFetch({
           offset: 'previous'
         })
@@ -95,7 +105,9 @@ export const BaseTable = <T extends IBaseModel>(params: BaseTableParams<T>) => {
       show={showNotify}
       onClose={() => {
         setShowNofity(false)
-        setNotify(undefined)
+        setTimeout(() => {
+          setNotify(undefined)
+        }, 500)
       }}
       {...notify}
     />
