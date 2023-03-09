@@ -2,7 +2,7 @@ import { Checkbox, FormControlLabel, Grid, TextField } from '@mui/material'
 import { IColor } from '../../../../api/models_school'
 import { getData } from './getData'
 import { useColor } from '../../../../hooks/api/products/useColor'
-import { BaseForm, InputsParams } from '../BaseFormModal'
+import { BaseForm, InputsParams } from '../../../BaseDataTable/BaseFormModal'
 
 interface Params {
   idForUpdate?: IColor['id']

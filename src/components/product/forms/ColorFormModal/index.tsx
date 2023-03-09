@@ -1,6 +1,6 @@
 import { Form } from './form'
 import { IColor } from '../../../../api/models_school'
-import { BaseFormModal, BaseFormModalParams } from '../BaseFormModal'
+import { BaseFormModal, BaseFormModalParams } from '../../../BaseDataTable/BaseFormModal'
 import { IBaseModel } from '../../../../api/models_school/base.model'
 export { Form as ModelForm }
 

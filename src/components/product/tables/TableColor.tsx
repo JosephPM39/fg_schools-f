@@ -2,7 +2,7 @@ import { GridColDef } from '@mui/x-data-grid'
 import { useColor } from '../../../hooks/api/products/useColor'
 import { getColorCell } from '../../Table/renders'
 import { ColorFormModal } from '../forms/ColorFormModal'
-import { BaseTable } from './BaseTable'
+import { BaseTable } from './../../BaseDataTable/BaseTable'
 
 export const TableColor = () => {
   const useColors = useColor()

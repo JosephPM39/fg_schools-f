@@ -2,7 +2,7 @@ import { Checkbox, FormControlLabel, Grid, TextField } from '@mui/material'
 import { ISize } from '../../../../api/models_school'
 import { getData } from './getData'
 import { useSize } from '../../../../hooks/api/products/useSize'
-import { BaseForm, InputsParams } from '../BaseFormModal'
+import { BaseForm, InputsParams } from '../../../BaseDataTable/BaseFormModal'
 
 interface Params {
   idForUpdate?: ISize['id']

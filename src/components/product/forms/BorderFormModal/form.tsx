@@ -1,7 +1,7 @@
 import { Checkbox, FormControlLabel, Grid, TextField } from '@mui/material'
 import { IBorder } from '../../../../api/models_school'
 import { getData } from './getData'
-import { BaseForm, InputsParams } from '../BaseFormModal'
+import { BaseForm, InputsParams } from '../../../BaseDataTable/BaseFormModal'
 import { useBorder } from '../../../../hooks/api/products/useBorder'
 
 interface Params {

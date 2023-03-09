@@ -1,7 +1,7 @@
 import { Checkbox, FormControlLabel, Grid, TextField } from '@mui/material'
 import { IType } from '../../../../api/models_school'
 import { getData } from './getData'
-import { BaseForm, InputsParams } from '../BaseFormModal'
+import { BaseForm, InputsParams } from '../../../BaseDataTable/BaseFormModal'
 import { useType } from '../../../../hooks/api/products/useType'
 
 interface Params {

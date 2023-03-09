@@ -1,7 +1,7 @@
 import { GridColDef } from '@mui/x-data-grid'
 import { useBorder } from '../../../hooks/api/products/useBorder'
 import { BorderFormModal } from '../forms/BorderFormModal'
-import { BaseTable } from './BaseTable'
+import { BaseTable } from './../../BaseDataTable/BaseTable'
 
 export const TableBorder = () => {
   const useBorders = useBorder()

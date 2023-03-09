@@ -1,10 +1,10 @@
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react'
 import { Button, Divider } from '@mui/material'
-import { IColor } from '../../../../api/models_school'
-import { Alert, AlertProps, AlertWithError } from '../../../Alert'
-import { InvalidDataError, promiseHandleError } from '../../../../api/handlers/errors'
-import { IBaseModel } from '../../../../api/models_school/base.model'
-import { useBase } from '../../../../hooks/api/useBase'
+import { IColor } from '../../../api/models_school'
+import { Alert, AlertProps, AlertWithError } from '../../Alert'
+import { InvalidDataError, promiseHandleError } from '../../../api/handlers/errors'
+import { IBaseModel } from '../../../api/models_school/base.model'
+import { useBase } from '../../../hooks/api/useBase'
 
 export interface InputsParams<T extends IBaseModel> {
   onChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, k: keyof T) => void

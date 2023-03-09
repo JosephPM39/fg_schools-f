@@ -1,13 +1,13 @@
 import { Add } from '@mui/icons-material'
 import { Button } from '@mui/material'
-import { Alert, AlertProps, AlertWithError } from '../../Alert'
+import { Alert, AlertProps, AlertWithError } from '../Alert'
 import { GridColDef } from '@mui/x-data-grid'
 import { useEffect, useState } from 'react'
-import { promiseHandleError } from '../../../api/handlers/errors'
-import { IBaseModel } from '../../../api/models_school/base.model'
-import { useBase } from '../../../hooks/api/useBase'
-import { Table } from '../../Table'
-import { BaseFormModalParams } from '../forms/BaseFormModal'
+import { promiseHandleError } from '../../api/handlers/errors'
+import { IBaseModel } from '../../api/models_school/base.model'
+import { useBase } from '../../hooks/api/useBase'
+import { Table } from '../Table'
+import { BaseFormModalParams } from './BaseFormModal'
 
 type FormModalParams<T extends IBaseModel> = Omit<BaseFormModalParams<T>, 'Form' | 'name'>
 

@@ -1,7 +1,7 @@
 import { GridColDef } from '@mui/x-data-grid'
 import { useType } from '../../../hooks/api/products/useType'
 import { TypeFormModal } from '../forms/TypeFormModal'
-import { BaseTable } from './BaseTable'
+import { BaseTable } from './../../BaseDataTable/BaseTable'
 
 export const TableType = () => {
   const useTypes = useType()

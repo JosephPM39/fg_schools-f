@@ -1,4 +1,4 @@
-import { Modal } from '../../../../containers/Modal'
+import { Modal } from '../../../containers/Modal'
 import { Box } from '@mui/material'
 import {
   BtnContainer,
@@ -6,9 +6,9 @@ import {
   isBtnContainer,
   isNoBtnContainer,
   NoBtnContainer
-} from '../../../../containers/types'
+} from '../../../containers/types'
 import { Dispatch, SetStateAction } from 'react'
-import { IBaseModel } from '../../../../api/models_school/base.model'
+import { IBaseModel } from '../../../api/models_school/base.model'
 
 interface Base<T extends IBaseModel> {
   idForUpdate?: T['id']

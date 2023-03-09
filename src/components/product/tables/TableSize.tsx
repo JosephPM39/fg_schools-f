@@ -1,7 +1,7 @@
 import { GridColDef } from '@mui/x-data-grid'
 import { useSize } from '../../../hooks/api/products/useSize'
 import { SizeFormModal } from '../forms/SizeFormModal'
-import { BaseTable } from './BaseTable'
+import { BaseTable } from './../../BaseDataTable/BaseTable'
 
 export const TableSize = () => {
   const useSizes = useSize()
