@@ -1,21 +1,21 @@
-import { Add, AttachMoney, OpenInFull, Photo } from "@mui/icons-material"
-import { Button, IconButton } from "@mui/material"
-import { GridColDef, GridRenderCellParams, GridValueGetterParams } from "@mui/x-data-grid"
-import { useEffect, useState } from "react"
-import { IOrder, IStudent } from "../../../../api/models_school"
-import { useStudent } from "../../../../hooks/api/store/useStudent"
-import { Table } from "../../../Table"
-import { getDialogCell } from "../../../Table/renders"
-import { CombosByOrders, OnClickNestedParams } from "./types"
+import { Add, AttachMoney, OpenInFull, Photo } from '@mui/icons-material'
+import { Button, IconButton } from '@mui/material'
+import { GridColDef, GridRenderCellParams, GridValueGetterParams } from '@mui/x-data-grid'
+import { useEffect, useState } from 'react'
+import { IOrder } from '../../../../api/models_school'
+import { useStudent } from '../../../../hooks/api/store/useStudent'
+import { Table } from '../../../Table'
+import { getDialogCell } from '../../../Table/renders'
+import { CombosByOrders, OnClickNestedParams } from './types'
 import { useGetComboPerOrders } from './useGetCombosPerOrder'
 
 const DetailsDialogCell = getDialogCell<IOrder>({
   title: 'Detalles',
-  actions: { omitCancel: true },
+  actions: { omitCancel: true }
 })
 
-type Params = {
-  list: Array<IOrder> | null
+interface Params {
+  list: IOrder[] | null
   isLoading: boolean
   onClickNested: (p: OnClickNestedParams) => void
   onPagination: (limit: number, offset: number) => void
@@ -23,7 +23,7 @@ type Params = {
 }
 
 export const TableOrder = (params: Params) => {
-  const useStudents = useStudent({initFetch: false})
+  const useStudents = useStudent({ initFetch: false })
   const { getCombosByOrders } = useGetComboPerOrders()
   const {
     onClickNested,
@@ -33,38 +33,38 @@ export const TableOrder = (params: Params) => {
     isLoading
   } = params
 
-  const [open, setOpen] = useState(false)
-  const [idForUpdate, setIdForUpdate] = useState<IOrder['id']>()
-  const [orders, setOrders] = useState<Array<IOrder> | null>([])
+  // const [open, setOpen] = useState(false)
+  // const [idForUpdate, setIdForUpdate] = useState<IOrder['id']>()
+  const [orders, setOrders] = useState<IOrder[] | null>([])
   const [combosPerOrder, setCombosPerOrders] = useState<CombosByOrders>([])
 
   useEffect(() => {
-    if (!list) return
-    Promise.all(list.map(async (order) => ({
+    if (list == null) return
+    void Promise.all(list.map(async (order) => ({
       ...order,
-      student: await useStudents.findOne({id: order.studentId}) ?? undefined
+      student: await useStudents.findOne({ id: order.studentId }) ?? undefined
     }))).then(res => {
       setOrders(res)
     })
   }, [list, useStudents.data])
 
   useEffect(() => {
-    if (!orders) return
-    getCombosByOrders(orders).then((res) => {
+    if (orders == null) return
+    void getCombosByOrders(orders).then((res) => {
       setCombosPerOrders(res)
     })
   }, [orders])
 
-  useEffect(() => {
+  /* useEffect(() => {
     if (idForUpdate) {
       setOpen(true)
     }
-  }, [idForUpdate])
+  }, [idForUpdate]) */
 
   const columns: GridColDef[] = [
     {
       field: 'id',
-      headerName: "ID",
+      headerName: 'ID',
       type: 'string',
       disableExport: true,
       flex: 1
@@ -73,8 +73,8 @@ export const TableOrder = (params: Params) => {
       field: 'nickName',
       headerName: 'Nombre en cuadro',
       flex: 1,
-      valueGetter: ({row}: GridValueGetterParams<IStudent>) => {
-        return `${row?.student?.nickName}`
+      valueGetter: ({ row }: GridValueGetterParams<any, IOrder>) => {
+        return `${row?.student?.nickName ?? 'Cargando...'}`
       },
       hideable: false,
       type: 'string'
@@ -83,8 +83,8 @@ export const TableOrder = (params: Params) => {
       field: 'firstName',
       headerName: 'Nombre(s)',
       flex: 1,
-      valueGetter: ({row}: GridValueGetterParams<IStudent>) => {
-        return `${row?.student?.firstName}`
+      valueGetter: ({ row }: GridValueGetterParams<any, IOrder>) => {
+        return `${row?.student?.firstName ?? 'Cargando...'}`
       },
       type: 'string'
     },
@@ -92,8 +92,8 @@ export const TableOrder = (params: Params) => {
       field: 'lastName',
       headerName: 'Apellido(s)',
       flex: 1,
-      valueGetter: ({row}: GridValueGetterParams<IStudent>) => {
-        return `${row?.student?.lastName}`
+      valueGetter: ({ row }: GridValueGetterParams<any, IOrder>) => {
+        return `${row?.student?.lastName ?? 'Cargando...'}`
       },
       type: 'string'
     },
@@ -101,18 +101,18 @@ export const TableOrder = (params: Params) => {
       field: 'combo',
       headerName: 'Combo',
       type: 'string',
-      valueGetter: ({row}: GridValueGetterParams<any, IOrder>) => {
+      valueGetter: ({ row }: GridValueGetterParams<any, IOrder>) => {
         const cpo = combosPerOrder.find((cpo) => cpo.orderId === row.id)
         const combos = cpo?.combos
-        if (!combos) return 'Personalizado'
+        if (combos == null) return 'Personalizado'
         return combos.reduce((p, c) => {
           if (p.length < 1) return c.name ?? ''
-          return `${p}, ${c.name}`
+          return `${p}, ${c.name ?? 'Cargando...'}`
         }, '')
       },
       renderCell: (p) => {
         const onClick = () => {
-          onClickNested({renderParams: p, field: 'combo'})
+          onClickNested({ renderParams: p, field: 'combo' })
         }
         const preview = String(p.value).slice(0, 10)
         const label = preview.length < String(p.value).length ? `${preview}...` : preview
@@ -142,7 +142,7 @@ export const TableOrder = (params: Params) => {
       disableExport: true,
       renderCell: (p: GridRenderCellParams<any, IOrder>) => {
         const onClick = () => {
-          onClickNested({renderParams: p, field: 'payment'})
+          onClickNested({ renderParams: p, field: 'payment' })
         }
         return <IconButton onClick={onClick} color='primary'>
           <AttachMoney/>
@@ -157,7 +157,7 @@ export const TableOrder = (params: Params) => {
       disableExport: true,
       renderCell: (p: GridRenderCellParams<any, IOrder>) => {
         const onClick = () => {
-          onClickNested({renderParams: p, field: 'photo'})
+          onClickNested({ renderParams: p, field: 'photo' })
         }
         return <IconButton onClick={onClick} color='primary'>
           <Photo/>
@@ -193,11 +193,11 @@ export const TableOrder = (params: Params) => {
       count={count}
       name="Bordes de productos"
       deleteAction={(id) => console.log(id)}
-      editAction={(id) => setIdForUpdate(id)}
+      editAction={(id) => console.log(id)}
       toolbar={{
         add: <Button startIcon={<Add/>} onClick={() => {
-          setIdForUpdate(undefined)
-          setOpen(true)
+          // setIdForUpdate(undefined)
+          // setOpen(true)
         }}>
           Nuevo
         </Button>

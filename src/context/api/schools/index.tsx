@@ -1,4 +1,4 @@
-import {ReactNode} from 'react'
+import { ReactNode } from 'react'
 
 import {
   SchoolPromProvider,
@@ -36,8 +36,8 @@ interface children {
   children: ReactNode
 }
 
-export const SchoolComponentProviders = ({children}: children) => {
-  const P1 = ({children}: children) => <EmployeeProvider>
+export const SchoolComponentProviders = ({ children }: children) => {
+  const P1 = ({ children }: children) => <EmployeeProvider>
     <GroupProvider>
       <PositionProvider>
         <SchoolPromProvider>
@@ -47,7 +47,7 @@ export const SchoolComponentProviders = ({children}: children) => {
     </GroupProvider>
   </EmployeeProvider>
 
-  const P2 = ({children}: children) => <TitleProvider>
+  const P2 = ({ children }: children) => <TitleProvider>
     <EmployeePositionProvider>
       <SchoolProvider>
         <SectionPromProvider>

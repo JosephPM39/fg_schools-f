@@ -1,20 +1,20 @@
-import { Checkbox, FormControlLabel, Grid, TextField } from '@mui/material';
-import { IType } from '../../../../api/models_school';
-import { getData } from './getData';
-import { BaseForm, InputsParams } from '../BaseFormModal';
-import { useType } from '../../../../hooks/api/products/useType';
+import { Checkbox, FormControlLabel, Grid, TextField } from '@mui/material'
+import { IType } from '../../../../api/models_school'
+import { getData } from './getData'
+import { BaseForm, InputsParams } from '../BaseFormModal'
+import { useType } from '../../../../hooks/api/products/useType'
 
 interface Params {
-  idForUpdate?: IType['id'],
+  idForUpdate?: IType['id']
   onSuccess?: () => void
 }
 
-const Inputs = ({data, onChange}: InputsParams<IType>) => (
+const Inputs = ({ data, onChange }: InputsParams<IType>) => (
   <>
     <input
       name="type_id"
       type='text'
-      value={data?.['id'] || ''}
+      value={data?.id}
       onChange={() => {}}
       hidden
     />
@@ -22,7 +22,7 @@ const Inputs = ({data, onChange}: InputsParams<IType>) => (
       <Grid item xs={12} sm={6}>
         <TextField
           fullWidth
-          value={data?.name || ''}
+          value={data?.name}
           onChange={(e) => onChange(e, 'name')}
           InputLabelProps={{
             shrink: !!data?.name
@@ -32,7 +32,7 @@ const Inputs = ({data, onChange}: InputsParams<IType>) => (
           type='text'
           inputProps={{
             minLength: 1,
-            maxLength: 30,
+            maxLength: 30
           }}
           variant="outlined"
           required
@@ -52,9 +52,8 @@ const Inputs = ({data, onChange}: InputsParams<IType>) => (
 )
 
 export const Form = (params: Params) => {
-  const useTypes = useType({initFetch: false})
+  const useTypes = useType({ initFetch: false })
   return (
     <BaseForm {...params} Inputs={Inputs} dataFormatter={getData} hook={useTypes}/>
   )
 }
-

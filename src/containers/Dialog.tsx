@@ -1,20 +1,20 @@
-import { Dispatch, ReactNode, SetStateAction, useState } from 'react';
-import Button from '@mui/material/Button';
-import DialogMUI from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import { BtnContainer, BtnPropsContainer, isBtnContainer, isNoBtnContainer, NoBtnContainer } from './types';
+import { Dispatch, ReactNode, SetStateAction } from 'react'
+import Button from '@mui/material/Button'
+import DialogMUI from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogContentText from '@mui/material/DialogContentText'
+import DialogTitle from '@mui/material/DialogTitle'
+import { BtnContainer, BtnPropsContainer, isBtnContainer, isNoBtnContainer, NoBtnContainer } from './types'
 
 export interface DialogParams {
-  title: string,
+  title: string
   description?: string
   children?: ReactNode
   state: [boolean, Dispatch<SetStateAction<boolean>>]
   actions?: {
-    omitCloseOnClickOut?: boolean,
-    omitCancel?: boolean,
+    omitCloseOnClickOut?: boolean
+    omitCancel?: boolean
     others?: ReactNode
   }
 }
@@ -25,12 +25,12 @@ export const Dialog = (params: Params) => {
   const [open, setOpen] = params.state
 
   const handleClickOpen = () => {
-    setOpen(true);
-  };
+    setOpen(true)
+  }
 
   const handleClose = () => {
-    setOpen(false);
-  };
+    setOpen(false)
+  }
 
   const closeOnClickOut = () => {
     if (params.actions?.omitCloseOnClickOut) return
@@ -63,6 +63,5 @@ export const Dialog = (params: Params) => {
         </DialogActions>
       </DialogMUI>
     </div>
-  );
+  )
 }
-

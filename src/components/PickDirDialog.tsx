@@ -1,11 +1,11 @@
-import { useContext,useEffect,useState } from 'react';
-import Button from '@mui/material/Button';
-import { Dialog } from '../containers/Dialog';
-import { StorageFileContext } from '../context/files/StorageFilesContext';
+import { useContext, useEffect, useState } from 'react'
+import Button from '@mui/material/Button'
+import { Dialog } from '../containers/Dialog'
+import { StorageFileContext } from '../context/files/StorageFilesContext'
 
 export const PickDirDialog = () => {
   const useStorage = useContext(StorageFileContext)
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false)
 
   useEffect(() => {
     setOpen(useStorage?.needPick ?? false)
@@ -17,12 +17,12 @@ export const PickDirDialog = () => {
     setOpen(false)
   }
 
-  const description = 'Para trabajar sin conexión a internet, es necesario que seleccione una carpeta para guardar\/abrir los archivos del programa.'
+  const description = 'Para trabajar sin conexión a internet, es necesario que seleccione una carpeta para guardar abrir los archivos del programa.'
 
   return (
     <Dialog
       state={[open, setOpen]}
-      title={"Seleccione una carpeta para trabajar sin internet"}
+      title={'Seleccione una carpeta para trabajar sin internet'}
       description={description}
       actions={{
         omitCancel: true,
@@ -33,5 +33,5 @@ export const PickDirDialog = () => {
       }}
       noButton
     />
-  );
+  )
 }

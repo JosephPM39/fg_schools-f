@@ -21,7 +21,7 @@ export const useSchoolProm = (params?: Params) => {
 
   useEffect(() => {
     if (!initFetch) return
-    hook.fetch({ searchBy: { year }})
+    void hook.fetch({ searchBy: { year } })
   }, [year, initFetch])
 
   return {

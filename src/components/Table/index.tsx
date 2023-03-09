@@ -1,6 +1,6 @@
-import { ReactNode, useEffect, useState } from "react"
-import { Button } from "@mui/material"
-import { Box } from "@mui/system"
+import { ReactNode, useEffect, useState } from 'react'
+import { Button } from '@mui/material'
+import { Box } from '@mui/system'
 import {
   DataGrid,
   GridColDef,
@@ -10,15 +10,15 @@ import {
   GridColumnVisibilityModel,
   GridRowHeightParams,
   GridRowHeightReturnValue
-} from "@mui/x-data-grid"
-import { IBaseModel } from "../../api/models_school/base.model"
-import { Dialog } from "../../containers/Dialog"
+} from '@mui/x-data-grid'
+import { IBaseModel } from '../../api/models_school/base.model'
+import { Dialog } from '../../containers/Dialog'
 import { Toolbar } from './toolbar'
-import { defineGridData } from "./defineGridData"
+import { defineGridData } from './defineGridData'
 
 type Params<T extends IBaseModel> = {
-  columns: Array<GridColDef>
-  rows: Array<T>
+  columns: GridColDef[]
+  rows: T[]
   name: string
   disableNumberCol?: true
   handleRowHeight?: (params: GridRowHeightParams) => GridRowHeightReturnValue
@@ -27,7 +27,7 @@ type Params<T extends IBaseModel> = {
   }
   isLoading: boolean
   count: number
-  onPagination?: (limit:number, offset:number) => void
+  onPagination?: (limit: number, offset: number) => void
   onPageChange?: (index: number) => void
   onPageSizeChange?: (size: number) => void
   columnVisibilityModel?: GridColumnVisibilityModel
@@ -38,7 +38,7 @@ type Params<T extends IBaseModel> = {
   disableDefaultActions?: false
   deleteAction: (id: T['id']) => void
   editAction: (id: T['id']) => void
-  otherAction?: (p: {id: T['id']}) => JSX.Element
+  otherAction?: (p: { id: T['id'] }) => JSX.Element
 })
 
 export const Table = <T extends IBaseModel>(params: Params<T>) => {
@@ -92,7 +92,7 @@ export const Table = <T extends IBaseModel>(params: Params<T>) => {
       actions={{
         other: params.toolbar?.add
       }}
-    />,
+    />
   }
 
   const initialState: GridInitialState = {
@@ -128,7 +128,7 @@ export const Table = <T extends IBaseModel>(params: Params<T>) => {
     />
   }
 
-  return <Box sx={{padding: '3', flex: 1, display: 'contents'}}>
+  return <Box sx={{ padding: '3', flex: 1, display: 'contents' }}>
     <DeleteWarning/>
     <DataGrid
       columns={columns}

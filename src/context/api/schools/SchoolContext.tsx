@@ -1,12 +1,12 @@
-import { createContext } from "react";
-import { useEmployee } from "../../../hooks/api/schools/useEmployee";
-import { useEmployeePosition } from "../../../hooks/api/schools/useEmployeePosition";
-import { useGroup } from "../../../hooks/api/schools/useGroup";
-import { usePosition } from "../../../hooks/api/schools/usePosition";
-import { useSchool } from "../../../hooks/api/schools/useSchool";
-import { useSchoolProm } from "../../../hooks/api/schools/useSchoolProm";
-import { useSectionProm } from "../../../hooks/api/schools/useSectionProm";
-import { useTitle } from "../../../hooks/api/schools/useTitle";
+import { createContext } from 'react'
+import { useEmployee } from '../../../hooks/api/schools/useEmployee'
+import { useEmployeePosition } from '../../../hooks/api/schools/useEmployeePosition'
+import { useGroup } from '../../../hooks/api/schools/useGroup'
+import { usePosition } from '../../../hooks/api/schools/usePosition'
+import { useSchool } from '../../../hooks/api/schools/useSchool'
+import { useSchoolProm } from '../../../hooks/api/schools/useSchoolProm'
+import { useSectionProm } from '../../../hooks/api/schools/useSectionProm'
+import { useTitle } from '../../../hooks/api/schools/useTitle'
 
 type Ct<T extends () => object> = ReturnType<T> | undefined
 

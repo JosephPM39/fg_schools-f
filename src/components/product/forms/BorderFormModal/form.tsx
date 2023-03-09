@@ -1,20 +1,20 @@
-import { Checkbox, FormControlLabel, Grid, TextField } from '@mui/material';
-import { IBorder } from '../../../../api/models_school';
-import { getData } from './getData';
-import { BaseForm, InputsParams } from '../BaseFormModal';
-import { useBorder } from '../../../../hooks/api/products/useBorder';
+import { Checkbox, FormControlLabel, Grid, TextField } from '@mui/material'
+import { IBorder } from '../../../../api/models_school'
+import { getData } from './getData'
+import { BaseForm, InputsParams } from '../BaseFormModal'
+import { useBorder } from '../../../../hooks/api/products/useBorder'
 
 interface Params {
-  idForUpdate?: IBorder['id'],
+  idForUpdate?: IBorder['id']
   onSuccess?: () => void
 }
 
-const Inputs = ({data, onChange}: InputsParams<IBorder>) => (
+const Inputs = ({ data, onChange }: InputsParams<IBorder>) => (
   <>
     <input
       name="border_id"
       type='text'
-      value={data?.['id'] || ''}
+      value={data?.id ?? ''}
       onChange={() => {}}
       hidden
     />
@@ -22,7 +22,7 @@ const Inputs = ({data, onChange}: InputsParams<IBorder>) => (
       <Grid item xs={12} sm={6}>
         <TextField
           fullWidth
-          value={data?.name || ''}
+          value={data?.name ?? ''}
           onChange={(e) => onChange(e, 'name')}
           InputLabelProps={{
             shrink: !!data?.name
@@ -32,7 +32,7 @@ const Inputs = ({data, onChange}: InputsParams<IBorder>) => (
           type='text'
           inputProps={{
             minLength: 1,
-            maxLength: 30,
+            maxLength: 30
           }}
           variant="outlined"
           required
@@ -52,9 +52,8 @@ const Inputs = ({data, onChange}: InputsParams<IBorder>) => (
 )
 
 export const Form = (params: Params) => {
-  const useBorders = useBorder({initFetch: false})
+  const useBorders = useBorder({ initFetch: false })
   return (
     <BaseForm {...params} Inputs={Inputs} dataFormatter={getData} hook={useBorders}/>
   )
 }
-

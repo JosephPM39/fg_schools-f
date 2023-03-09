@@ -1,4 +1,4 @@
-import { ReactNode } from "react"
+import { ReactNode } from 'react'
 import {
   GridToolbarContainer,
   GridToolbarDensitySelector,
@@ -6,12 +6,12 @@ import {
   GridToolbarFilterButton,
   GridToolbarExportContainer,
   GridCsvExportMenuItem,
-  GridPrintExportMenuItem,
-} from "@mui/x-data-grid"
-import { PDFExport } from "./exporters"
+  GridPrintExportMenuItem
+} from '@mui/x-data-grid'
+import { PDFExport } from './exporters'
 
 interface Params {
-  name: string,
+  name: string
   actions?: {
     other?: ReactNode
   }
@@ -34,11 +34,10 @@ export const Toolbar = (params: Params) => {
         <GridPrintExportMenuItem options={{
           hideFooter: true,
           fileName: name,
-          hideToolbar: true,
+          hideToolbar: true
         }}/>
       </GridToolbarExportContainer>
       {actions?.other}
     </GridToolbarContainer>
   )
 }
-

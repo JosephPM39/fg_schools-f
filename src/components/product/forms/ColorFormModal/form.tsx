@@ -1,20 +1,20 @@
-import { Checkbox, FormControlLabel, Grid, InputAdornment, TextField } from '@mui/material';
-import { IColor } from '../../../../api/models_school';
-import { getData } from './getData';
-import { useColor } from '../../../../hooks/api/products/useColor';
-import { BaseForm, InputsParams } from '../BaseFormModal';
+import { Checkbox, FormControlLabel, Grid, TextField } from '@mui/material'
+import { IColor } from '../../../../api/models_school'
+import { getData } from './getData'
+import { useColor } from '../../../../hooks/api/products/useColor'
+import { BaseForm, InputsParams } from '../BaseFormModal'
 
 interface Params {
-  idForUpdate?: IColor['id'],
+  idForUpdate?: IColor['id']
   onSuccess?: () => void
 }
 
-const Inputs = ({data, onChange}: InputsParams<IColor>) => (
+const Inputs = ({ data, onChange }: InputsParams<IColor>) => (
   <>
     <input
       name="color_id"
       type='text'
-      value={data?.['id'] || ''}
+      value={data?.id}
       onChange={() => {}}
       hidden
     />
@@ -22,7 +22,7 @@ const Inputs = ({data, onChange}: InputsParams<IColor>) => (
       <Grid item xs={12} sm={6}>
         <TextField
           fullWidth
-          value={data?.name || ''}
+          value={data?.name}
           onChange={(e) => onChange(e, 'name')}
           InputLabelProps={{
             shrink: !!data?.name
@@ -32,7 +32,7 @@ const Inputs = ({data, onChange}: InputsParams<IColor>) => (
           type='text'
           inputProps={{
             minLength: 1,
-            maxLength: 30,
+            maxLength: 30
           }}
           variant="outlined"
           required
@@ -41,14 +41,14 @@ const Inputs = ({data, onChange}: InputsParams<IColor>) => (
       <Grid item xs={12} sm={6}>
         <TextField
           fullWidth
-          value={data?.hex || ''}
+          value={data?.hex}
           onChange={(e) => onChange(e, 'hex')}
           name="hex"
           label="Hex"
           type='color'
           inputProps={{
             minLength: 7,
-            maxLength: 9,
+            maxLength: 9
           }}
           variant="outlined"
           required
@@ -68,7 +68,7 @@ const Inputs = ({data, onChange}: InputsParams<IColor>) => (
 )
 
 export const Form = (params: Params) => {
-  const useColors = useColor({initFetch: false})
+  const useColors = useColor({ initFetch: false })
   return (
     <BaseForm {...params} Inputs={Inputs} dataFormatter={getData} hook={useColors}/>
   )

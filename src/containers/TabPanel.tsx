@@ -1,10 +1,10 @@
-import { Box, Divider, Typography } from "@mui/material";
+import { Box, Divider } from '@mui/material'
 
 interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-  orientation: "vertical" | "horizontal"
+  children?: React.ReactNode
+  index: number
+  value: number
+  orientation: 'vertical' | 'horizontal'
   idPrefix: string
   contentPadding?: number | string
 }
@@ -18,7 +18,7 @@ export const TabPanel = (props: TabPanelProps) => {
     idPrefix,
     contentPadding = 3,
     ...other
-  } = props;
+  } = props
 
   return (
     <>
@@ -41,7 +41,5 @@ export const TabPanel = (props: TabPanelProps) => {
         )}
       </div>
     </>
-  );
+  )
 }
-
-

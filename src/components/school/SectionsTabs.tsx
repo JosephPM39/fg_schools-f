@@ -1,10 +1,10 @@
-import { Box, Typography } from '@mui/material';
-import { useState, useEffect, useContext } from 'react';
-import { ITitle, IGroup, ISectionProm } from '../../api/models_school';
-import { OrderType } from '../../api/models_school/store/order.model';
-import { Tabs } from '../../containers/Tabs';
-import { GroupContext, TitleContext } from '../../context/api/schools';
-import { Orders } from '../store/Orders';
+import { Box, Typography } from '@mui/material'
+import { useState, useEffect, useContext } from 'react'
+import { ITitle, IGroup, ISectionProm } from '../../api/models_school'
+import { OrderType } from '../../api/models_school/store/order.model'
+import { Tabs } from '../../containers/Tabs'
+import { GroupContext, TitleContext } from '../../context/api/schools'
+import { Orders } from '../store/Orders'
 
 interface Params {
   sectionProms: ISectionProm[]
@@ -17,8 +17,8 @@ interface Section {
 }
 
 export const SectionsTabs = (params: Params) => {
-  const [sections, setSections] = useState<Array<Section>>([])
-  const [list, setList] = useState<Array<{label: string, content: JSX.Element}>>([])
+  const [sections, setSections] = useState<Section[]>([])
+  const [list, setList] = useState<Array<{ label: string, content: JSX.Element }>>([])
   const useTitle = useContext(TitleContext)
   const useGroup = useContext(GroupContext)
 
@@ -28,8 +28,8 @@ export const SectionsTabs = (params: Params) => {
         params.sectionProms.map(
           async (prom) => ({
             sectionPromId: prom.id,
-            title: await useTitle?.findOne({id: prom.titleId}) ?? undefined,
-            group: await useGroup?.findOne({id: prom.groupId}) ?? undefined
+            title: await useTitle?.findOne({ id: prom.titleId }) ?? undefined,
+            group: await useGroup?.findOne({ id: prom.groupId }) ?? undefined
           })
         )
       )
@@ -37,7 +37,7 @@ export const SectionsTabs = (params: Params) => {
         setSections(sectionsBuilt)
       }
     }
-    getData()
+    void getData()
   }, [useGroup, useTitle, useGroup?.data?.length, useTitle?.data?.length, params.sectionProms])
 
   useEffect(() => {
@@ -73,4 +73,3 @@ export const SectionsTabs = (params: Params) => {
 
   return <Tabs data={list} orientation='horizontal' idPrefix='sections' />
 }
-

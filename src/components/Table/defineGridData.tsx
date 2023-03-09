@@ -1,12 +1,12 @@
-import { IconButton } from "@mui/material"
-import { GridColDef } from "@mui/x-data-grid"
-import { Delete, Edit } from "@mui/icons-material"
-import { IBaseModel } from "../../api/models_school/base.model"
-import { getOverflowCell } from "./renders"
+import { IconButton } from '@mui/material'
+import { GridColDef } from '@mui/x-data-grid'
+import { Delete, Edit } from '@mui/icons-material'
+import { IBaseModel } from '../../api/models_school/base.model'
+import { getOverflowCell } from './renders'
 
 type Params<T extends IBaseModel> = {
-  columns: Array<GridColDef>
-  rows: Array<T>
+  columns: GridColDef[]
+  rows: T[]
   disableNumberCol?: true
 } & ({
   disableDefaultActions: true
@@ -14,19 +14,19 @@ type Params<T extends IBaseModel> = {
   disableDefaultActions?: false
   deleteAction: (id: T['id']) => void
   editAction: (id: T['id']) => void
-  otherAction?: (p: {id: T['id']}) => JSX.Element
+  otherAction?: (p: { id: T['id'] }) => JSX.Element
 })
 
 export const defineGridData = <T extends IBaseModel>(params: Params<T>) => {
-  let columns: Array<GridColDef> = []
-  let rows: Array<object> = []
+  let columns: GridColDef[] = []
+  let rows: object[] = []
 
   if (!params.disableNumberCol) {
     const cols = params.columns.map((column) => {
       let col: GridColDef = {
         ...column
       }
-      if (!column?.renderCell && column?.type === 'string') {
+      if (((column?.renderCell) == null) && column?.type === 'string') {
         col = {
           ...col,
           renderCell: getOverflowCell({ valueGetter: col.valueGetter })
@@ -37,16 +37,16 @@ export const defineGridData = <T extends IBaseModel>(params: Params<T>) => {
     columns = [
       {
         field: 'number_index',
-        headerName: "#",
+        headerName: '#',
         type: 'number',
-        width: 50,
+        width: 50
       },
       ...cols
     ]
 
     rows = params.rows.map((row, index) => {
       return {
-        'number_index': index + 1,
+        number_index: index + 1,
         ...row
       }
     })

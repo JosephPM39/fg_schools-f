@@ -1,17 +1,16 @@
-import { IBaseModel } from "../models_school/base.model";
-import {validateDto, validateIdBy, validateQuery} from '../validations'
+import { IBaseModel } from '../models_school/base.model'
+import { validateDto, validateIdBy, validateQuery } from '../validations'
 import { EXPOSE_VERSIONS as EV, ModelClassType, QueryUsed } from '../types'
-import { ApiRequest, LocalRequest } from "./data";
-import { isSearchById, SearchBy, SearchById } from "./types";
-import { instanceToPlain } from "class-transformer";
+import { ApiRequest, LocalRequest } from './data'
 import {
+  isSearchById, SearchBy, SearchById,
   ReadParams,
   PostParams as CreateParams,
   PatchParams as UpdateParams,
   DeleteParams
 } from './types'
-import { ErrorCatched, promiseCatchError } from "../handlers/errors";
-
+import { instanceToPlain } from 'class-transformer'
+import { ErrorCatched, promiseCatchError } from '../handlers/errors'
 
 interface GoOfflineParams {
   limit: number | 'NONE'
@@ -25,7 +24,7 @@ export interface StorageRequestConfig<Model extends IBaseModel> {
 
 interface Crud<Model extends IBaseModel> {
   read: (p: ReadParams<Model>) => Promise<{
-    data: Model[] | null,
+    data: Model[] | null
     queryUsed: QueryUsed
   }>
   create: (p: CreateParams<Model>) => Promise<Model[]>
@@ -33,7 +32,7 @@ interface Crud<Model extends IBaseModel> {
   delete: (p: DeleteParams<Model>) => Promise<true>
 
   safeRead: (p: ReadParams<Model>) => Promise<{
-    data: Model[] | null,
+    data: Model[] | null
     queryUsed: QueryUsed
   } | ErrorCatched>
   safeCreate: (p: CreateParams<Model>) => Promise<Model[] | ErrorCatched>
@@ -48,15 +47,14 @@ interface ValidateParams<Model extends IBaseModel> {
 }
 
 export class StorageRequest<Model extends IBaseModel> implements Crud<Model> {
+  private readonly local = new LocalRequest<Model>(this.config.path)
+  private readonly api = new ApiRequest<Model>(this.config.path)
 
-  private local = new LocalRequest<Model>(this.config.path)
-  private api = new ApiRequest<Model>(this.config.path)
-
-  constructor(
-    private config: StorageRequestConfig<Model>
+  constructor (
+    private readonly config: StorageRequestConfig<Model>
   ) {}
 
-  validate = async ({data: dto, version = EV.CREATE}: ValidateParams<Model>) => {
+  validate = async ({ data: dto, version = EV.CREATE }: ValidateParams<Model>) => {
     const data = await validateDto<Model>({
       model: this.config.model,
       dto,
@@ -67,9 +65,9 @@ export class StorageRequest<Model extends IBaseModel> implements Crud<Model> {
 
   create = async (params: CreateParams<Model>) => {
     const { data: dto } = params
-    const {model, offline } = this.config
+    const { model, offline } = this.config
     const data = await validateDto<Model>({
-      dto: dto,
+      dto,
       model,
       version: EV.CREATE
     })
@@ -85,14 +83,14 @@ export class StorageRequest<Model extends IBaseModel> implements Crud<Model> {
   }
 
   // To go offline, fetch entity, the lenght of fetch will be pass as parameter (limit)
-  goOffline = async ({limit}: GoOfflineParams) => {
-    const {path} = this.config
+  goOffline = async ({ limit }: GoOfflineParams) => {
+    const { path } = this.config
     const res = await this.api.get({
       query: {
         limit: String(limit)
       }
     })
-    if (res && res.data) {
+    if (res?.data) {
       this.local.set(path, res.data)
     }
   }
@@ -103,32 +101,32 @@ export class StorageRequest<Model extends IBaseModel> implements Crud<Model> {
   }
 
   read = async (params: ReadParams<Model>) => {
-    const { query: dto, searchBy: sb} = params
-    const {model, offline } = this.config
+    const { query: dto, searchBy: sb } = params
+    const { model, offline } = this.config
     const query = dto ? await validateQuery(dto) : undefined
     const searchBy = instanceToPlain(
-      await validateIdBy({searchBy: sb, model, version: EV.GET }),
+      await validateIdBy({ searchBy: sb, model, version: EV.GET }),
       {
         exposeUnsetFields: false
       }
     ) as SearchById<Model> | SearchBy<Model>
 
-    if (offline) return this.local.read({searchBy,query})
+    if (offline) return await this.local.read({ searchBy, query })
 
     if (!searchBy || isSearchById(searchBy)) {
       return await this.api.get({ searchBy, query })
     }
-    return await this.api.getFiltered({searchBy, query})
+    return await this.api.getFiltered({ searchBy, query })
   }
 
-  isOfflineRegister = async ({id}:{id: Model['id']}) => {
-    const res = await this.local.read({searchBy: { id }})
+  isOfflineRegister = async ({ id }: { id: Model['id'] }) => {
+    const res = await this.local.read({ searchBy: { id } })
     return (!!res.data?.[0].offline)
   }
 
   update = async (params: UpdateParams<Model>) => {
-    const {data: dto, id } = params
-    const {model, offline } = this.config
+    const { data: dto, id } = params
+    const { model, offline } = this.config
     const data = await validateDto<Model>({
       dto,
       model,
@@ -138,7 +136,7 @@ export class StorageRequest<Model extends IBaseModel> implements Crud<Model> {
     const config = { id, data }
 
     if (offline) {
-      if (!this.isOfflineRegister({id})) {
+      if (!this.isOfflineRegister({ id })) {
         throw new Error('No se puede actualizar un registro Online')
       }
 
@@ -157,21 +155,21 @@ export class StorageRequest<Model extends IBaseModel> implements Crud<Model> {
     const { offline } = this.config
 
     if (offline) {
-      if (!this.isOfflineRegister({id})) {
+      if (!this.isOfflineRegister({ id })) {
         throw new Error('No se puede eliminar un registro Online')
       }
-      const res = await this.local.delete({id})
+      const res = await this.local.delete({ id })
       if (!res) { throw new Error('No se pudo eliminar') }
       return res
     }
 
-    const res = await this.api.delete({id})
+    const res = await this.api.delete({ id })
     if (!res) { throw new Error('No se pudo eliminar') }
     return res
   }
 
-  safeCreate = (p: CreateParams<Model>) => promiseCatchError(this.create, p)
-  safeUpdate = (p: UpdateParams<Model>) => promiseCatchError(this.update, p)
-  safeDelete = (p: DeleteParams<Model>) => promiseCatchError(this.delete, p)
-  safeRead = (p: ReadParams<Model>) => promiseCatchError(this.read, p)
+  safeCreate = async (p: CreateParams<Model>) => await promiseCatchError(this.create, p)
+  safeUpdate = async (p: UpdateParams<Model>) => await promiseCatchError(this.update, p)
+  safeDelete = async (p: DeleteParams<Model>) => await promiseCatchError(this.delete, p)
+  safeRead = async (p: ReadParams<Model>) => await promiseCatchError(this.read, p)
 }

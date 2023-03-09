@@ -1,15 +1,14 @@
-import { Box } from "@mui/material";
-import { Modal } from "../containers/Modal"
-import { Tabs } from "../containers/Tabs";
-import { BtnContainer, BtnPropsContainer } from '../containers/types';
-import { ProductsTabs } from "./product/ProductsTabs";
+import { Box } from '@mui/material'
+import { Modal } from '../containers/Modal'
+import { Tabs } from '../containers/Tabs'
+import { BtnContainer, BtnPropsContainer } from '../containers/types'
+import { ProductsTabs } from './product/ProductsTabs'
 
 interface Params {
-  btn?: React.ReactNode,
+  btn?: React.ReactNode
 }
 
-export const SettingsModal = ({btn}: Params) => {
-
+export const SettingsModal = ({ btn }: Params) => {
   const data = [
     {
       label: 'Artículos',
@@ -17,12 +16,12 @@ export const SettingsModal = ({btn}: Params) => {
     },
     {
       label: 'Combos',
-      content: <Box sx={{p:3}}>Put here combos components</Box>
+      content: <Box sx={{ p: 3 }}>Put here combos components</Box>
     }
   ]
 
   const mBtn = (): BtnContainer | BtnPropsContainer => {
-    if(btn) {
+    if (btn) {
       return {
         btn
       }
@@ -39,5 +38,5 @@ export const SettingsModal = ({btn}: Params) => {
     <Modal fullScreen {...mBtn()} title={'Ajustes'}>
       <Tabs data={data} orientation='horizontal' contentPadding={0} idPrefix="settings" />
     </Modal>
-  );
+  )
 }

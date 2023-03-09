@@ -1,15 +1,15 @@
 import { Modal } from '../../../../containers/Modal'
-import { Box } from '@mui/material';
+import { Box } from '@mui/material'
 import { Form } from './form'
-import { IModel } from '../../../../api/models_school';
+import { IModel } from '../../../../api/models_school'
 import {
   BtnContainer,
   BtnPropsContainer,
   isBtnContainer,
   isNoBtnContainer,
   NoBtnContainer
-} from '../../../../containers/types';
-import { Dispatch, SetStateAction } from 'react';
+} from '../../../../containers/types'
+import { Dispatch, SetStateAction } from 'react'
 export { Form as ModelForm }
 
 type Params = {

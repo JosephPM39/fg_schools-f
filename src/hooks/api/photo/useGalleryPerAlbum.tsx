@@ -1,4 +1,4 @@
-import { IGalleryAlbum, GalleryAlbum} from '../../../api/models_school'
+import { IGalleryAlbum, GalleryAlbum } from '../../../api/models_school'
 import { useBase } from '../useBase'
 import { DefaultApiHookParams as Params } from '../types'
 

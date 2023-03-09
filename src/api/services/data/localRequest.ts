@@ -6,7 +6,7 @@ import { debounce, filterBy, queryFilter, toPromise } from '../utils'
 
 interface Crud<Model extends IBaseModel> {
   read: (p: ReadParams<Model>) => Promise<{
-    data: Model[] | null,
+    data: Model[] | null
     queryUsed: QueryUsed
   }>
   create: (p: PostParams<Model>) => Promise<Model[] | false>
@@ -15,12 +15,11 @@ interface Crud<Model extends IBaseModel> {
 }
 
 export class LocalRequest<Model extends IBaseModel> implements Crud<Model> {
-
-  constructor(
-    private path: string
+  constructor (
+    private readonly path: string
   ) {}
 
-  read = ({searchBy,query}: ReadParams<Model>) => toPromise(() => {
+  read = async ({ searchBy, query }: ReadParams<Model>) => await toPromise(() => {
     const existent = this.get(this.path)
     if (!searchBy) {
       return queryFilter(existent ?? [], query)
@@ -29,16 +28,16 @@ export class LocalRequest<Model extends IBaseModel> implements Crud<Model> {
     return queryFilter(filteredBy, query)
   }, [])
 
-  create = ({ data }: PostParams<Model>) => debounce(() => {
+  create = async ({ data }: PostParams<Model>) => await debounce(() => {
     const existent = this.get(this.path)
 
     if (existent && Array.isArray(data)) {
-
-      const duplicates = data.filter(
-        (d) => filterBy<Model>(
-          existent, {id: d.id} as Partial<Model>
-        ).length > 0
-      )
+      const duplicates = data.filter((d) => {
+        const searchBy: object = {
+          id: d.id
+        }
+        return filterBy<Model>(existent, searchBy).length > 0
+      })
 
       if (duplicates.length > 0) {
         throw new ResponseError(Responses[400], 'El dato ya existe')
@@ -48,7 +47,10 @@ export class LocalRequest<Model extends IBaseModel> implements Crud<Model> {
     }
 
     if (existent && !Array.isArray(data)) {
-      const duplicates = filterBy(existent, {id: data.id} as Partial<Model>)
+      const searchBy: object = {
+        id: data.id
+      }
+      const duplicates = filterBy(existent, searchBy)
       if (duplicates.length > 0) {
         throw new ResponseError(Responses[400], 'El dato ya existe')
       }
@@ -63,7 +65,7 @@ export class LocalRequest<Model extends IBaseModel> implements Crud<Model> {
     return this.set(this.path, [data]) ? [data] : false
   }, [])
 
-  patch = ({ data, id }: PatchParams<Model>) => debounce(() => {
+  patch = async ({ data, id }: PatchParams<Model>) => await debounce(() => {
     const existent = this.get(this.path)
     if (!existent) throw new ResponseError(Responses[404], 'No existe la colección')
 
@@ -78,13 +80,14 @@ export class LocalRequest<Model extends IBaseModel> implements Crud<Model> {
     return this.set(this.path, existent)
   }, [])
 
-  delete = ({ id }: DeleteParams<Model>) => debounce(() => {
+  delete = async ({ id }: DeleteParams<Model>) => await debounce(() => {
     const existent = this.get(this.path)
     if (!existent) throw new ResponseError(Responses[404], 'No existe la colección')
 
     const index = existent.findIndex((e) => e.id === id)
     if (index === -1) throw new ResponseError(Responses[404])
 
+    // eslint-disable-next-line
     const res = delete existent[index]
     if (!res) return false
 

@@ -1,14 +1,14 @@
 import { Modal } from '../../../../containers/Modal'
-import { Box } from '@mui/material';
+import { Box } from '@mui/material'
 import {
   BtnContainer,
   BtnPropsContainer,
   isBtnContainer,
   isNoBtnContainer,
   NoBtnContainer
-} from '../../../../containers/types';
-import { Dispatch, SetStateAction } from 'react';
-import { IBaseModel } from '../../../../api/models_school/base.model';
+} from '../../../../containers/types'
+import { Dispatch, SetStateAction } from 'react'
+import { IBaseModel } from '../../../../api/models_school/base.model'
 
 interface Base<T extends IBaseModel> {
   idForUpdate?: T['id']

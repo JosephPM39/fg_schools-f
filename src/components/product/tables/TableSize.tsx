@@ -1,9 +1,7 @@
-import { GridColDef } from "@mui/x-data-grid"
-import { useSize } from "../../../hooks/api/products/useSize"
-import { SizeFormModal } from "../forms/SizeFormModal"
-import { BaseTable } from "./BaseTable"
-
-
+import { GridColDef } from '@mui/x-data-grid'
+import { useSize } from '../../../hooks/api/products/useSize'
+import { SizeFormModal } from '../forms/SizeFormModal'
+import { BaseTable } from './BaseTable'
 
 export const TableSize = () => {
   const useSizes = useSize()
@@ -11,7 +9,7 @@ export const TableSize = () => {
   const columns: GridColDef[] = [
     {
       field: 'id',
-      headerName: "ID",
+      headerName: 'ID',
       type: 'string',
       disableExport: true,
       flex: 1
@@ -19,22 +17,22 @@ export const TableSize = () => {
     {
       field: 'height',
       headerName: 'Alto',
-      type: 'number',
+      type: 'number'
     },
     {
       field: 'width',
       headerName: 'Ancho',
-      type: 'number',
+      type: 'number'
     },
     {
       field: 'ppp',
       headerName: 'PPP',
-      type: 'number',
+      type: 'number'
     },
     {
       field: 'available',
       headerName: 'Disponible',
-      type: 'boolean',
+      type: 'boolean'
     }
   ]
 

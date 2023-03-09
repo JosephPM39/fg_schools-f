@@ -1,11 +1,11 @@
-import { IPosition } from "../../../api/models_school"
-import { SelectFromList } from "../../inputs/SelectFromList"
+import { IPosition } from '../../../api/models_school'
+import { SelectFromList } from '../../inputs/SelectFromList'
 
 interface Params {
   onSelect: (select?: IPosition) => void
-  list: Array<IPosition>
+  list: IPosition[]
   defaultValue?: IPosition['id']
-  paginationNext: (p:{limit: number, offset:number}) => void
+  paginationNext: (p: { limit: number, offset: number }) => void
   count: number
 }
 

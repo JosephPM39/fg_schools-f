@@ -1,15 +1,15 @@
-import { GridColDef, GridRenderCellParams, GridValueGetterParams } from "@mui/x-data-grid"
-import { useEffect, useState } from "react"
-import { IProductCombo, IProductOrder } from "../../../api/models_school"
-import { useBorder } from "../../../hooks/api/products/useBorder"
-import { useColor } from "../../../hooks/api/products/useColor"
-import { useModel } from "../../../hooks/api/products/useModel"
-import { useSize } from "../../../hooks/api/products/useSize"
-import { useType } from "../../../hooks/api/products/useType"
-import { useTextWrap } from "../../../hooks/useTextWrap"
-import { Table } from "../../Table"
-import { getColorCell } from "../../Table/renders"
-import { ArrayElement, WithRequired } from "../../types"
+import { GridColDef, GridRenderCellParams, GridValueGetterParams } from '@mui/x-data-grid'
+import { useEffect, useState } from 'react'
+import { IProductCombo, IProductOrder } from '../../../api/models_school'
+import { useBorder } from '../../../hooks/api/products/useBorder'
+import { useColor } from '../../../hooks/api/products/useColor'
+import { useModel } from '../../../hooks/api/products/useModel'
+import { useSize } from '../../../hooks/api/products/useSize'
+import { useType } from '../../../hooks/api/products/useType'
+import { useTextWrap } from '../../../hooks/useTextWrap'
+import { Table } from '../../Table'
+import { getColorCell } from '../../Table/renders'
+import { ArrayElement, WithRequired } from '../../types'
 
 type List = Array<WithRequired<IProductCombo | IProductOrder, 'product'>>
 
@@ -19,11 +19,11 @@ interface Params {
 }
 
 export const TableProduct = (params: Params) => {
-  const useModels = useModel({initFetch: false})
-  const useTypes = useType({initFetch: false})
-  const useSizes = useSize({initFetch: false})
-  const useColors = useColor({initFetch: false})
-  const useBorders = useBorder({initFetch: false})
+  const useModels = useModel({ initFetch: false })
+  const useTypes = useType({ initFetch: false })
+  const useSizes = useSize({ initFetch: false })
+  const useColors = useColor({ initFetch: false })
+  const useBorders = useBorder({ initFetch: false })
   const { list } = params
   const [products, setProducts] = useState<List | null>([])
   const { formatTextWrap } = useTextWrap()
@@ -31,16 +31,16 @@ export const TableProduct = (params: Params) => {
   const [isLoading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!list) return
-    Promise.all(list.map(async (item) => ({
+    if (list == null) return
+    void Promise.all(list.map(async (item) => ({
       ...item,
       product: {
         ...item.product,
-        size: await useSizes.findOne({id: item.product.sizeId}) ?? undefined,
-        type: await useTypes.findOne({id: item.product.typeId}) ?? undefined,
-        color: await useColors.findOne({id: item.product.colorId}) ?? undefined,
-        border: await useBorders.findOne({id: item.product.borderId}) ?? undefined,
-        model: await useModels.findOne({id: item.product.modelId}) ?? undefined
+        size: await useSizes.findOne({ id: item.product.sizeId }) ?? undefined,
+        type: await useTypes.findOne({ id: item.product.typeId }) ?? undefined,
+        color: await useColors.findOne({ id: item.product.colorId }) ?? undefined,
+        border: await useBorders.findOne({ id: item.product.borderId }) ?? undefined,
+        model: await useModels.findOne({ id: item.product.modelId }) ?? undefined
       }
     }))).then((res) => {
       setProducts(res)
@@ -57,7 +57,7 @@ export const TableProduct = (params: Params) => {
   const columns: GridColDef[] = [
     {
       field: 'id',
-      headerName: "ID",
+      headerName: 'ID',
       type: 'string',
       disableExport: true,
       flex: 1
@@ -66,17 +66,17 @@ export const TableProduct = (params: Params) => {
       field: 'name',
       headerName: 'Nombre',
       type: 'string',
-      valueGetter: ({row}: GridValueGetterParams<any, ArrayElement<List>>) => {
+      valueGetter: ({ row }: GridValueGetterParams<any, ArrayElement<List>>) => {
         return `${row.product.name}`
       },
-      flex: 1,
+      flex: 1
     },
     {
       field: 'modelName',
       headerName: 'Modelo',
       flex: 1,
-      valueGetter: ({row}: GridValueGetterParams<any, ArrayElement<List>>) => {
-        return `${row.product.model?.name}`
+      valueGetter: ({ row }: GridValueGetterParams<any, ArrayElement<List>>) => {
+        return `${row.product.model?.name ?? 'Cargando...'}`
       },
       type: 'string'
     },
@@ -84,8 +84,8 @@ export const TableProduct = (params: Params) => {
       field: 'size',
       headerName: 'Tamaño',
       flex: 1,
-      valueGetter: ({row}: GridValueGetterParams<any, ArrayElement<List>>) => {
-        return `${row.product.size?.width}x${row.product.size?.height}`
+      valueGetter: ({ row }: GridValueGetterParams<any, ArrayElement<List>>) => {
+        return `${row.product.size?.width ?? 'Cargando...'}x${row.product.size?.height ?? 'Cargando...'}`
       },
       type: 'string'
     },
@@ -93,8 +93,8 @@ export const TableProduct = (params: Params) => {
       field: 'typeProduct',
       headerName: 'Tipo',
       flex: 1,
-      valueGetter: ({row}: GridValueGetterParams<any, ArrayElement<List>>) => {
-        return `${row.product?.type?.name ?? ''}`
+      valueGetter: ({ row }: GridValueGetterParams<any, ArrayElement<List>>) => {
+        return `${row.product?.type?.name ?? 'Cargando...'}`
       },
       type: 'string'
     },
@@ -102,8 +102,8 @@ export const TableProduct = (params: Params) => {
       field: 'border',
       headerName: 'Borde',
       flex: 1,
-      valueGetter: ({row}: GridValueGetterParams<any, ArrayElement<List>>) => {
-        return `${row.product.border?.name}`
+      valueGetter: ({ row }: GridValueGetterParams<any, ArrayElement<List>>) => {
+        return `${row.product.border?.name ?? 'Cargando...'}`
       },
       type: 'string'
     },
@@ -138,7 +138,7 @@ export const TableProduct = (params: Params) => {
       columns={columns}
       rows={products ?? []}
       isLoading={isLoading}
-      count={products?.length || 0}
+      count={products?.length ?? 0}
       name={`Detalles del combo de: ${studentName}`}
       hideFooterPagination
       disableDefaultActions

@@ -1,17 +1,16 @@
-import { useEffect, useState } from "react"
-import { ISectionProm } from "../../../api/models_school"
-import { useGroup } from "../../../hooks/api/schools/useGroup"
-import { useTitle } from "../../../hooks/api/schools/useTitle"
-import { SelectFromList } from "../../inputs/SelectFromList"
+import { useEffect, useState } from 'react'
+import { ISectionProm, ITitle, IGroup } from '../../../api/models_school'
+import { useGroup } from '../../../hooks/api/schools/useGroup'
+import { useTitle } from '../../../hooks/api/schools/useTitle'
+import { SelectFromList } from '../../inputs/SelectFromList'
 
 interface Params {
   onSelect: (select?: ISectionProm) => void
-  list: Array<ISectionProm>
+  list: ISectionProm[]
   defaultValue?: ISectionProm['id']
-  paginationNext: (p:{limit: number, offset:number}) => void
+  paginationNext: (p: { limit: number, offset: number }) => void
   count: number
 }
-
 
 export const SelectSectionProm = (params: Params) => {
   const {
@@ -21,26 +20,26 @@ export const SelectSectionProm = (params: Params) => {
     paginationNext,
     count
   } = params
-  const [list, setList] = useState<Array<ISectionProm>>([])
+  const [list, setList] = useState<ISectionProm[]>([])
   const useTitles = useTitle()
   const useGroups = useGroup()
 
   useEffect(() => {
     const getData = async () => {
-      const res = await Promise.all(defaultList.map(async (item) => {
+      const res = await Promise.all(defaultList.map(async (item): Promise<ISectionProm> => {
         if (item.title && item.group) return item
 
         const title = await useTitles.findOne({ id: item.titleId }) ?? {}
-        const group = await useGroups.findOne({ id: item.groupId}) ?? {}
+        const group = await useGroups.findOne({ id: item.groupId }) ?? {}
         return {
           ...item,
-          title,
-          group
-        } as ISectionProm
+          title: title as ITitle,
+          group: group as IGroup
+        }
       }))
       setList(res)
     }
-    getData()
+    void getData()
   }, [defaultList, useTitles.data, useGroups.data])
 
   const nameFormat = (section: ISectionProm) => {

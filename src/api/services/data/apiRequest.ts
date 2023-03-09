@@ -7,11 +7,11 @@ import { removeOfflineFlag, addOfflineFlag, throwApiResponseError, fetchOnce } f
 
 interface Crud<Model extends IBaseModel> {
   get: (p: GetNormalParams<Model>) => Promise<{
-    data: Model[] | null,
+    data: Model[] | null
     queryUsed: QueryUsed
   }>
   getFiltered: (p: GetFilteredParams<Model>) => Promise<{
-    data: Model[] | null,
+    data: Model[] | null
     queryUsed: QueryUsed
   }>
   post: (p: PostParams<Model>) => Promise<Model[] | false>
@@ -21,13 +21,13 @@ interface Crud<Model extends IBaseModel> {
 
 const getHeaders = () => {
   return {
-    'Content-Type': 'application/json',
+    'Content-Type': 'application/json'
   }
 }
 
 export class ApiRequest<Model extends IBaseModel> implements Crud<Model> {
-  constructor(
-    private path: string
+  constructor (
+    private readonly path: string
   ) {}
 
   post = async (params: PostParams<Model>) => {
@@ -49,11 +49,11 @@ export class ApiRequest<Model extends IBaseModel> implements Crud<Model> {
       exposeUnsetFields: false
     })
     const { id } = params.searchBy ?? { id: '' }
-    const searchParams = new URLSearchParams(query)
-    const path = `${CONFIG.schoolsApiUrl}/${this.path}/${id}?${searchParams}`
+    const searchParams = (new URLSearchParams(query)).toString()
+    const path = `${CONFIG.schoolsApiUrl}/${this.path}/${id ?? ''}?${searchParams}`
 
     const res = await fetchOnce(path, {
-      headers: getHeaders(),
+      headers: getHeaders()
     })
 
     if (res.status !== 200) throwApiResponseError(res.status)
@@ -73,7 +73,7 @@ export class ApiRequest<Model extends IBaseModel> implements Crud<Model> {
     const body = JSON.stringify(removeOfflineFlag({
       ...params.searchBy
     }))
-    const searchParams = new URLSearchParams(query)
+    const searchParams = (new URLSearchParams(query)).toString()
     const path = `${CONFIG.schoolsApiUrl}/${this.path}/get-filtered?${searchParams}`
 
     const res = await fetchOnce(path, {
@@ -93,7 +93,7 @@ export class ApiRequest<Model extends IBaseModel> implements Crud<Model> {
   }
 
   patch = async (params: PatchParams<Model>) => {
-    const path = `${CONFIG.schoolsApiUrl}/${this.path}/${params.id}`
+    const path = `${CONFIG.schoolsApiUrl}/${this.path}/${params.id ?? ''}`
     const res = await fetch(path, {
       method: 'PATCH',
       headers: getHeaders(),
@@ -106,10 +106,10 @@ export class ApiRequest<Model extends IBaseModel> implements Crud<Model> {
   }
 
   delete = async (params: DeleteParams<Model>) => {
-    const path = `${CONFIG.schoolsApiUrl}/${this.path}/${params.id}`
+    const path = `${CONFIG.schoolsApiUrl}/${this.path}/${params.id ?? ''}`
     const res = await fetch(path, {
       method: 'DELETE',
-      headers: getHeaders(),
+      headers: getHeaders()
     })
 
     if (res.status !== 200) throwApiResponseError(res.status)

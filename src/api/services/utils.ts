@@ -3,13 +3,13 @@ import { QueryUsed } from '../types'
 import { ByOperator, IQuery, Order } from '../validations/query'
 import { ResponseError, Responses, Status } from '../handlers/errors'
 
-const requests: Array<string> = []
+const requests: string[] = []
 let promises: {
   [key: string]: Promise<Response>
 } = {}
 
 export const fetchOnce = async (input: RequestInfo, init?: RequestInit) => {
-  const request = `${input.toString()}${JSON.stringify(init ?? '')}`
+  const request = `${JSON.stringify(input)}${JSON.stringify(init ?? '')}`
   if (requests.includes(request)) {
     const res = await promises[request]
     return res.clone()
@@ -24,26 +24,31 @@ export const fetchOnce = async (input: RequestInfo, init?: RequestInit) => {
   const response = await promises[request]
 
   const index = requests.findIndex((e) => e === request)
+
+  // eslint-disable-next-line
   delete requests[index]
+  // eslint-disable-next-line
   delete promises[request]
   return response
 }
 
-export const toPromise = <T extends (...any: any) => any>(
+export const toPromise = async <T extends (...any: any) => any>(
   cb: T,
   p: Parameters<T>
-) => new Promise<ReturnType<T>>((res, rej) => {
+) => await new Promise<ReturnType<T>>((resolve, reject) => {
   try {
     console.log('fetching')
-    setTimeout(() => res(cb(p)), 0)
-  } catch(e) {
-    rej(e)
+    setTimeout(() => resolve(cb(p)), 0)
+  } catch (e) {
+    reject(e)
   }
 })
 
 export const throwApiResponseError = (status: number) => {
   const st: Status = Object
-    .keys(Responses).includes(String(status)) ? status as Status : 999
+    .keys(Responses).includes(String(status))
+    ? status as Status
+    : 999
   throw new ResponseError(Responses[st])
 }
 
@@ -53,18 +58,17 @@ export const getFileExtension = (filename: string) => {
   return split.pop() ?? ''
 }
 
-export const debounce = <T extends (...any: any) => any>(
+export const debounce = async <T extends (...any: any) => any>(
   cb: T,
   p: Parameters<T>,
   time: number = 50
 ) => {
-  return new Promise<ReturnType<T>>((res, rej) => {
+  return await new Promise<ReturnType<T>>((resolve, reject) => {
     setTimeout(() => {
       try {
-        res(cb(p))
-      }
-      catch (e) {
-        rej(e)
+        resolve(cb(p))
+      } catch (e) {
+        reject(e)
       }
     }, time)
   })
@@ -120,7 +124,7 @@ export const searchByHandler = (sby?: string | object) => {
 }
 
 export const queryFilter = <Model extends IBaseModel>(json: Model[], query?: IQuery): {
-  data: Model[] | null,
+  data: Model[] | null
   queryUsed: QueryUsed
 } => {
   const filt: Required<IQuery> = {

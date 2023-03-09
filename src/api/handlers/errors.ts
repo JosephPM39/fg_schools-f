@@ -1,5 +1,5 @@
-import { ValidationError } from "class-validator"
-import { formatValidationError } from "../validations"
+import { ValidationError } from 'class-validator'
+import { formatValidationError } from '../validations'
 
 interface CustomResponse {
   state: States
@@ -14,15 +14,15 @@ export type Status = 102 | 201 | 200 | 401 | 404 | 400 | 500 | 999
 export enum States {
   processing = 'PROCESSING',
   created = 'CREATED',
-    ok = 'OK',
-    forbidden = 'FORBIDDEN',
-    notFound = 'NOT_FOUND',
-    badData = 'BAD_DATA',
-    serverError = 'SERVER_ERROR',
-    systemError = 'SYSTEM_ERROR',
+  ok = 'OK',
+  forbidden = 'FORBIDDEN',
+  notFound = 'NOT_FOUND',
+  badData = 'BAD_DATA',
+  serverError = 'SERVER_ERROR',
+  systemError = 'SYSTEM_ERROR',
 }
 
-export const Responses : {
+export const Responses: {
   [key in Status]: CustomResponse
 } = {
   102: {
@@ -82,21 +82,16 @@ export enum ErrorType {
   unknow = 'Error desconocido'
 }
 
-
-export function isCustomError(e: unknown): e is CustomError {
+export function isCustomError (e: unknown): e is CustomError {
   return (e as CustomError).type !== undefined
 }
 
-export function isResponseError(e: unknown): e is ResponseError {
+export function isResponseError (e: unknown): e is ResponseError {
   return (e as ResponseError).type === ErrorType.apiResponse
 }
 
-export function isInvalidDataError(e: unknown): e is InvalidDataError {
+export function isInvalidDataError (e: unknown): e is InvalidDataError {
   return (e as InvalidDataError).type === ErrorType.validation
-}
-
-function isError(e: unknown): e is Error {
-  return !!(e as Error).name && !(e as CustomError).type
 }
 
 export class CustomError extends Error {
@@ -152,6 +147,7 @@ export const functionHandleError = <T extends (...args: any) => any>(
   ...args: Parameters<T>
 ): ReturnType<T> | undefined => {
   try {
+    // eslint-disable-next-line
     const res = cb(...args)
     return res
   } catch (e: any) {
@@ -165,6 +161,7 @@ export const promiseHandleError = async <T extends (...args: any) => Promise<any
   ...args: Parameters<T>
 ): Promise<Awaited<ReturnType<T>> | undefined> => {
   try {
+    // eslint-disable-next-line
     const res = await cb(...args)
     return res
   } catch (e: any) {
@@ -174,6 +171,7 @@ export const promiseHandleError = async <T extends (...args: any) => Promise<any
 
 export const functionCatchError = <T extends (...args: any) => any>(cb: T, ...args: Parameters<T>): ReturnType<T> | ErrorCatched => {
   try {
+    // eslint-disable-next-line
     const res = cb(...args)
     return res
   } catch (e: any) {
@@ -185,6 +183,7 @@ export const promiseCatchError = async <
   T extends (...args: any) => Promise<any>
 >(cb: T, ...args: Parameters<T>): Promise<Awaited<ReturnType<T>> | ErrorCatched> => {
   try {
+    // eslint-disable-next-line
     const res = await cb(...args)
     return res
   } catch (e: any) {

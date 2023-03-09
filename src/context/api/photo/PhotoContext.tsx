@@ -1,9 +1,9 @@
-import { createContext } from "react"
-import { useAlbum } from "../../../hooks/api/photo/useAlbum"
-import { useGallery } from "../../../hooks/api/photo/useGallery"
-import { useGalleryPerAlbum } from "../../../hooks/api/photo/useGalleryPerAlbum"
-import { usePhotoPerProduct } from "../../../hooks/api/photo/usePhotoPerProduct"
-import { useQr } from "../../../hooks/api/photo/useQr"
+import { createContext } from 'react'
+import { useAlbum } from '../../../hooks/api/photo/useAlbum'
+import { useGallery } from '../../../hooks/api/photo/useGallery'
+import { useGalleryPerAlbum } from '../../../hooks/api/photo/useGalleryPerAlbum'
+import { usePhotoPerProduct } from '../../../hooks/api/photo/usePhotoPerProduct'
+import { useQr } from '../../../hooks/api/photo/useQr'
 
 type Ct<T extends () => object> = ReturnType<T> | undefined
 

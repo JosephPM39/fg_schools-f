@@ -50,27 +50,26 @@ export {
 } from './store'
 export type {
   IComboOrder,
-  ICombo ,
+  ICombo,
   IOrder,
-  IPayment ,
-  IProductCombo ,
-  IProductOrder ,
+  IPayment,
+  IProductCombo,
+  IProductOrder,
   IStudent
 } from './store'
-
 
 export {
   Qr,
   PhotoProduct,
-  Album ,
-  Gallery ,
+  Album,
+  Gallery,
   GalleryAlbum
 } from './photo'
 
 export type {
-  IQr ,
-  IPhotoProduct ,
-  IAlbum ,
-  IGallery ,
+  IQr,
+  IPhotoProduct,
+  IAlbum,
+  IGallery,
   IGalleryAlbum
 } from './photo'

@@ -1,10 +1,10 @@
-import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
-import { Button, Divider } from '@mui/material';
-import { IColor } from '../../../../api/models_school';
-import { Alert, AlertProps, AlertWithError } from '../../../Alert';
-import { InvalidDataError, promiseHandleError } from '../../../../api/handlers/errors';
-import { IBaseModel } from '../../../../api/models_school/base.model';
-import { useBase } from '../../../../hooks/api/useBase';
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react'
+import { Button, Divider } from '@mui/material'
+import { IColor } from '../../../../api/models_school'
+import { Alert, AlertProps, AlertWithError } from '../../../Alert'
+import { InvalidDataError, promiseHandleError } from '../../../../api/handlers/errors'
+import { IBaseModel } from '../../../../api/models_school/base.model'
+import { useBase } from '../../../../hooks/api/useBase'
 
 export interface InputsParams<T extends IBaseModel> {
   onChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, k: keyof T) => void
@@ -12,7 +12,7 @@ export interface InputsParams<T extends IBaseModel> {
 }
 
 export interface BaseFormParams<T extends IBaseModel> {
-  idForUpdate?: IColor['id'],
+  idForUpdate?: IColor['id']
   onSuccess?: () => void
   Inputs: (p: InputsParams<T>) => JSX.Element
   dataFormatter: (form: FormData) => T
@@ -36,25 +36,24 @@ export const BaseForm = <T extends IBaseModel>(params: BaseFormParams<T>) => {
   const [showNotify, setShowNofity] = useState(false)
 
   useEffect(() => {
-    if (notify) setShowNofity(true)
+    if (notify != null) setShowNofity(true)
   }, [notify])
 
   useEffect(() => {
     const getData = async () => {
-      if (!idForUpdate || !!data) return
-      const res = await hook?.findOne({id: idForUpdate})
-      if (!res) return
+      if (!idForUpdate || !(data == null)) return
+      const res = await hook?.findOne({ id: idForUpdate })
+      if (res == null) return
       return setData(res)
     }
-    getData()
+    void getData()
   }, [idForUpdate, hook?.data, hook?.data.length, data])
 
   const onChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, k: keyof T) => {
-    const d = {
-      ...data,
+    setData({
+      ...data as T,
       [k]: e.target.value
-    } as T
-    setData(d)
+    })
     e.preventDefault()
   }
 
@@ -65,8 +64,8 @@ export const BaseForm = <T extends IBaseModel>(params: BaseFormParams<T>) => {
     if (!idForUpdate) {
       await hook.create(data)
     } else {
-      const {id, ...rest} = data
-      await hook.update({id, data: rest})
+      const { id, ...rest } = data
+      await hook.update({ id, data: rest })
     }
     setSending(false)
     setNotify({
@@ -79,9 +78,9 @@ export const BaseForm = <T extends IBaseModel>(params: BaseFormParams<T>) => {
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    promiseHandleError((error) => {
+    void promiseHandleError((error) => {
       console.log((error as InvalidDataError).getErrors())
-      setNotify({error})
+      setNotify({ error })
       setSending(false)
     }, submit)
   }

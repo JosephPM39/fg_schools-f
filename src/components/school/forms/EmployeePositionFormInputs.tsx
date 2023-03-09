@@ -1,11 +1,10 @@
-import { TextField, Grid } from "@mui/material"
-import { ChangeEvent, useEffect, useState } from "react"
-import { IEmployee, IEmployeePosition, IPosition } from "../../../api/models_school"
-import { useEmployee } from "../../../hooks/api/schools/useEmployee"
-import { useEmployeePosition } from "../../../hooks/api/schools/useEmployeePosition"
-import { usePosition } from "../../../hooks/api/schools/usePosition"
-import { v4 as uuidV4 } from 'uuid'
-import { SelectPosition } from "./SelectPosition"
+import { TextField, Grid } from '@mui/material'
+import { ChangeEvent, useEffect, useState } from 'react'
+import { IEmployee, IEmployeePosition, IPosition } from '../../../api/models_school'
+import { useEmployee } from '../../../hooks/api/schools/useEmployee'
+import { useEmployeePosition } from '../../../hooks/api/schools/useEmployeePosition'
+import { usePosition } from '../../../hooks/api/schools/usePosition'
+import { SelectPosition } from './SelectPosition'
 
 interface EPFIParams {
   type?: IPosition['type']
@@ -21,11 +20,11 @@ export const EmployeePositionFormInputs = (params?: EPFIParams) => {
 
   useEffect(() => {
     const getData = async () => {
-      const ep = await useEmployeePositions.findOne({ id: params?.idForUpdate})
+      const ep = await useEmployeePositions.findOne({ id: params?.idForUpdate })
       const employee = await useEmployees.findOne({ id: ep?.employeeId })
       const position = await usePositions.findOne({ id: ep?.positionId })
       if (params?.type) {
-        await usePositions.findBy({type: params.type})
+        await usePositions.findBy({ type: params.type })
       }
       setObj({
         ...ep,
@@ -34,8 +33,8 @@ export const EmployeePositionFormInputs = (params?: EPFIParams) => {
       })
       setPositionId(position?.id)
     }
-    if (params && !obj) {
-      getData()
+    if ((params != null) && (obj == null)) {
+      void getData()
     }
   }, [params, useEmployees, usePositions, obj, useEmployeePositions])
 
@@ -45,12 +44,12 @@ export const EmployeePositionFormInputs = (params?: EPFIParams) => {
 
   const onTxtChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, nam: keyof IEmployee) => {
     const d = {
-      ...obj,
+      ...obj as IEmployeePosition,
       employee: {
-        ...obj?.employee,
+        ...obj?.employee as IEmployee,
         [nam]: e.target.value
       }
-    } as IEmployeePosition
+    }
     setObj(d)
   }
 
@@ -58,22 +57,20 @@ export const EmployeePositionFormInputs = (params?: EPFIParams) => {
     <input
       name="employee_position_id"
       type='text'
-      onChange={() => {}}
-      value={obj?.id || uuidV4()}
+      value={obj?.id}
       hidden
     />
     <input
       name="employee_id"
       type='text'
-      onChange={() => {}}
-      value={obj?.employeeId || ''}
+      value={obj?.employeeId}
       hidden
     />
     <Grid container spacing={2}>
       <Grid item xs={12} sm={6}>
         <TextField
           fullWidth
-          value={obj?.employee?.firstName || ''}
+          value={obj?.employee?.firstName}
           InputLabelProps={{
             shrink: !!obj?.employee?.firstName
           }}
@@ -83,7 +80,7 @@ export const EmployeePositionFormInputs = (params?: EPFIParams) => {
           onChange={(e) => onTxtChange(e, 'firstName')}
           inputProps={{
             minLength: 1,
-            maxLength: 40,
+            maxLength: 40
           }}
           variant="outlined"
           required
@@ -92,7 +89,7 @@ export const EmployeePositionFormInputs = (params?: EPFIParams) => {
       <Grid item xs={12} sm={6}>
         <TextField
           fullWidth
-          value={obj?.employee?.lastName || ''}
+          value={obj?.employee?.lastName}
           onChange={(e) => onTxtChange(e, 'lastName')}
           InputLabelProps={{
             shrink: !!obj?.employee?.lastName
@@ -102,7 +99,7 @@ export const EmployeePositionFormInputs = (params?: EPFIParams) => {
           type='text'
           inputProps={{
             minLength: 1,
-            maxLength: 40,
+            maxLength: 40
           }}
           variant="outlined"
           required
@@ -111,7 +108,7 @@ export const EmployeePositionFormInputs = (params?: EPFIParams) => {
       <Grid item xs={12} sm={6}>
         <TextField
           fullWidth
-          value={obj?.employee?.contact || ''}
+          value={obj?.employee?.contact}
           onChange={(e) => onTxtChange(e, 'contact')}
           InputLabelProps={{
             shrink: !!obj?.employee?.contact
@@ -121,7 +118,7 @@ export const EmployeePositionFormInputs = (params?: EPFIParams) => {
           type='text'
           inputProps={{
             minLength: 1,
-            maxLength: 55,
+            maxLength: 55
           }}
           variant="outlined"
           required
@@ -130,7 +127,7 @@ export const EmployeePositionFormInputs = (params?: EPFIParams) => {
       <Grid item xs={12} sm={6}>
         <TextField
           fullWidth
-          value={obj?.employee?.profesion || ''}
+          value={obj?.employee?.profesion}
           onChange={(e) => onTxtChange(e, 'profesion')}
           InputLabelProps={{
             shrink: !!obj?.employee?.profesion
@@ -140,7 +137,7 @@ export const EmployeePositionFormInputs = (params?: EPFIParams) => {
           type='text'
           inputProps={{
             minLength: 1,
-            maxLength: 10,
+            maxLength: 10
           }}
           variant="outlined"
           required

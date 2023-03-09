@@ -1,4 +1,4 @@
-import { IEmployee, IEmployeePosition, IPosition, ISchool } from "../../api/models_school"
+import { IEmployee, IEmployeePosition, IPosition, ISchool } from '../../api/models_school'
 
 export interface SchoolsCardData {
   school?: ISchool
@@ -10,7 +10,7 @@ export interface SchoolsCardData {
 }
 
 export type ArrayElement<ArrayType extends readonly unknown[]> =
-  ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
+  ArrayType extends ReadonlyArray<infer ElementType> ? ElementType : never
 
 export type WithRequired<T, K extends keyof T> = {
   [P in keyof T]?: T[P] | undefined

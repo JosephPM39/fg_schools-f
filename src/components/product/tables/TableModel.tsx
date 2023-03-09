@@ -1,22 +1,21 @@
-import { Add } from "@mui/icons-material"
-import { Button } from "@mui/material"
-import { GridColDef } from "@mui/x-data-grid"
-import { useEffect, useState } from "react"
-import { IModel } from "../../../api/models_school"
-import { useModel } from "../../../hooks/api/products/useModel"
-import { ModelFormModal } from "../forms/ModelFormModal"
-import { Table } from "../../Table"
-import { Alert, AlertProps, AlertWithError } from "../../Alert"
-import { promiseHandleError } from "../../../api/handlers/errors"
+import { Add } from '@mui/icons-material'
+import { Button } from '@mui/material'
+import { GridColDef } from '@mui/x-data-grid'
+import { useEffect, useState } from 'react'
+import { IModel } from '../../../api/models_school'
+import { useModel } from '../../../hooks/api/products/useModel'
+import { ModelFormModal } from '../forms/ModelFormModal'
+import { Table } from '../../Table'
+import { Alert, AlertProps, AlertWithError } from '../../Alert'
+import { promiseHandleError } from '../../../api/handlers/errors'
 
 export const TableModel = () => {
-
   const useModels = useModel()
 
   const columns: GridColDef[] = [
     {
       field: 'id',
-      headerName: "ID",
+      headerName: 'ID',
       type: 'string',
       disableExport: true,
       flex: 1
@@ -25,22 +24,22 @@ export const TableModel = () => {
       field: 'name',
       headerName: 'Nombre',
       type: 'string',
-      flex: 1,
+      flex: 1
     },
     {
       field: 'price',
       headerName: 'Precio normal',
-      type: 'string',
+      type: 'string'
     },
     {
       field: 'offer',
       headerName: 'Precio promoción',
-      type: 'string',
+      type: 'string'
     },
     {
       field: 'available',
       headerName: 'Disponible',
-      type: 'boolean',
+      type: 'boolean'
     }
   ]
 
@@ -49,7 +48,7 @@ export const TableModel = () => {
   const [showNotify, setShowNofity] = useState(false)
 
   useEffect(() => {
-    if (notify) setShowNofity(true)
+    if (notify != null) setShowNofity(true)
   }, [notify])
 
   const [idForUpdate, setIdForUpdate] = useState<IModel['id']>()
@@ -63,12 +62,12 @@ export const TableModel = () => {
 
   useEffect(() => {
     if (!idForDelete) return
-    promiseHandleError((error) => {
-      setNotify({error})
-    }, async () => await useModels.delete({id: idForDelete})).then(() => {
+    void promiseHandleError((error) => {
+      setNotify({ error })
+    }, async () => await useModels.delete({ id: idForDelete })).then(() => {
       setNotify({
         title: 'Éxito',
-        details: `Modelo eliminado`,
+        details: 'Modelo eliminado',
         type: 'success'
       })
       setIdForDelete(undefined)
@@ -88,7 +87,7 @@ export const TableModel = () => {
       columns={columns}
       rows={useModels.data}
       onPagination={(limit, offset) => {
-        useModels.launchNextFetch({limit, offset})
+        useModels.launchNextFetch({ limit, offset })
       }}
       isLoading={useModels.data.length < 1 || useModels.needFetchNext}
       count={useModels.metadata?.count ?? 0}

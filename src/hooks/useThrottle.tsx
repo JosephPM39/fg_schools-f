@@ -1,23 +1,23 @@
-import { useRef } from "react"
+import { useRef } from 'react'
 
 export const useThrottle = () => {
-  let timeout = useRef<number | undefined>(undefined)
+  const timeout = useRef<number | undefined>(undefined)
 
   const throttle = (cb: Function, time?: number) => {
-    if (timeout.current) return;
+    if (timeout.current) return
     timeout.current = window.setTimeout(() => {
       cb()
       window.clearTimeout(timeout.current)
     }, time ?? 500)
   }
 
-  function promiseHelper<T>(cb?: Promise<T>, time?: number) {
-    if (!cb) return
-    return new Promise<T>((res, rej) => throttle(() => {
+  async function promiseHelper<T> (cb?: Promise<T>, time?: number) {
+    if (cb == null) return
+    return await new Promise<T>((resolve, reject) => throttle(() => {
       cb.then(
-        (r) => res(r)
+        (r) => resolve(r)
       ).catch(
-        (e) => rej(e)
+        (e) => reject(e)
       )
     }, time))
   }

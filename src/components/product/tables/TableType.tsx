@@ -1,7 +1,7 @@
-import { GridColDef } from "@mui/x-data-grid"
-import { useType } from "../../../hooks/api/products/useType"
-import { TypeFormModal } from "../forms/TypeFormModal"
-import { BaseTable } from "./BaseTable"
+import { GridColDef } from '@mui/x-data-grid'
+import { useType } from '../../../hooks/api/products/useType'
+import { TypeFormModal } from '../forms/TypeFormModal'
+import { BaseTable } from './BaseTable'
 
 export const TableType = () => {
   const useTypes = useType()
@@ -9,7 +9,7 @@ export const TableType = () => {
   const columns: GridColDef[] = [
     {
       field: 'id',
-      headerName: "ID",
+      headerName: 'ID',
       type: 'string',
       disableExport: true,
       flex: 1
@@ -18,12 +18,12 @@ export const TableType = () => {
       field: 'name',
       headerName: 'Nombre',
       type: 'string',
-      flex: 1,
+      flex: 1
     },
     {
       field: 'available',
       headerName: 'Disponible',
-      type: 'boolean',
+      type: 'boolean'
     }
   ]
 

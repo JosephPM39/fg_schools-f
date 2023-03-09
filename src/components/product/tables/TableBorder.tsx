@@ -1,14 +1,14 @@
-import { GridColDef } from "@mui/x-data-grid"
-import { useBorder } from "../../../hooks/api/products/useBorder"
-import { BorderFormModal } from "../forms/BorderFormModal"
-import { BaseTable } from "./BaseTable"
+import { GridColDef } from '@mui/x-data-grid'
+import { useBorder } from '../../../hooks/api/products/useBorder'
+import { BorderFormModal } from '../forms/BorderFormModal'
+import { BaseTable } from './BaseTable'
 
 export const TableBorder = () => {
   const useBorders = useBorder()
   const columns: GridColDef[] = [
     {
       field: 'id',
-      headerName: "ID",
+      headerName: 'ID',
       type: 'string',
       disableExport: true,
       flex: 1
@@ -17,12 +17,12 @@ export const TableBorder = () => {
       field: 'name',
       headerName: 'Nombre',
       type: 'string',
-      flex: 1,
+      flex: 1
     },
     {
       field: 'available',
       headerName: 'Disponible',
-      type: 'boolean',
+      type: 'boolean'
     }
   ]
 

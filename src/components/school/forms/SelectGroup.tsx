@@ -1,11 +1,11 @@
-import { IGroup } from "../../../api/models_school"
-import { SelectFromList } from "../../inputs/SelectFromList"
+import { IGroup } from '../../../api/models_school'
+import { SelectFromList } from '../../inputs/SelectFromList'
 
 interface Params {
   onSelect: (select?: IGroup) => void
-  list: Array<IGroup>
+  list: IGroup[]
   defaultValue?: IGroup['id']
-  paginationNext: (p:{limit: number, offset:number}) => void
+  paginationNext: (p: { limit: number, offset: number }) => void
   count: number
 }
 

@@ -1,10 +1,10 @@
-import { createContext } from "react"
-import { useBorder } from "../../../hooks/api/products/useBorder"
-import { useColor } from "../../../hooks/api/products/useColor"
-import { useModel } from "../../../hooks/api/products/useModel"
-import { useProduct } from "../../../hooks/api/products/useProduct"
-import { useSize } from "../../../hooks/api/products/useSize"
-import { useType } from "../../../hooks/api/products/useType"
+import { createContext } from 'react'
+import { useBorder } from '../../../hooks/api/products/useBorder'
+import { useColor } from '../../../hooks/api/products/useColor'
+import { useModel } from '../../../hooks/api/products/useModel'
+import { useProduct } from '../../../hooks/api/products/useProduct'
+import { useSize } from '../../../hooks/api/products/useSize'
+import { useType } from '../../../hooks/api/products/useType'
 
 type Ct<T extends () => object> = ReturnType<T> | undefined
 

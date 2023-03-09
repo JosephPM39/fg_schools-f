@@ -23,7 +23,7 @@ export {
   QrContext
 } from './PhotoContext'
 
-export const PhotoProviders = ({children}:{children: ReactNode}) => {
+export const PhotoProviders = ({ children }: { children: ReactNode }) => {
   return <QrProvider>
     <GalleryProvider>
       <AlbumProvider>

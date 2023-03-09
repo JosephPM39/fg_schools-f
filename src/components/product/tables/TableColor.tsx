@@ -1,15 +1,15 @@
-import { GridColDef } from "@mui/x-data-grid"
-import { useColor } from "../../../hooks/api/products/useColor"
-import { getColorCell } from "../../Table/renders"
-import { ColorFormModal } from "../forms/ColorFormModal"
-import { BaseTable } from "./BaseTable"
+import { GridColDef } from '@mui/x-data-grid'
+import { useColor } from '../../../hooks/api/products/useColor'
+import { getColorCell } from '../../Table/renders'
+import { ColorFormModal } from '../forms/ColorFormModal'
+import { BaseTable } from './BaseTable'
 
 export const TableColor = () => {
   const useColors = useColor()
   const columns: GridColDef[] = [
     {
       field: 'id',
-      headerName: "ID",
+      headerName: 'ID',
       type: 'string',
       disableExport: true,
       flex: 1
@@ -18,7 +18,7 @@ export const TableColor = () => {
       field: 'name',
       headerName: 'Nombre',
       type: 'string',
-      flex: 1,
+      flex: 1
     },
     {
       field: 'hex',
@@ -29,7 +29,7 @@ export const TableColor = () => {
     {
       field: 'available',
       headerName: 'Disponible',
-      type: 'boolean',
+      type: 'boolean'
     }
   ]
 

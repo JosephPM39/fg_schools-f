@@ -1,14 +1,14 @@
-import { GridRenderCellParams } from "@mui/x-data-grid"
-import { useEffect, useState } from "react"
-import { IOrder } from "../../../api/models_school"
-import { OrderType } from "../../../api/models_school/store/order.model"
-import { Dialog } from "../../../containers/Dialog"
-import { TableOrder } from "./TableOrder"
-import { OnClickNestedParams } from "./TableOrder/types"
+import { GridRenderCellParams } from '@mui/x-data-grid'
+import { useEffect, useState } from 'react'
+import { IOrder } from '../../../api/models_school'
+import { OrderType } from '../../../api/models_school/store/order.model'
+import { Dialog } from '../../../containers/Dialog'
+import { TableOrder } from './TableOrder'
+import { OnClickNestedParams } from './TableOrder/types'
 import { TableOrderProducts } from './TableOrderProducts'
-import { useGetComboPerOrders } from "./TableOrder/useGetCombosPerOrder"
-import { useOrder } from "../../../hooks/api/store/useOrder"
-import { PaymentDialog } from "./PaymentDialog"
+import { useGetComboPerOrders } from './TableOrder/useGetCombosPerOrder'
+import { useOrder } from '../../../hooks/api/store/useOrder'
+import { PaymentDialog } from './PaymentDialog'
 
 type Params = {
   type: OrderType.STUDIO
@@ -29,9 +29,8 @@ const ComboDetails = (params: Partial<GridRenderCellParams<any, IOrder>>) => {
 }
 
 export const Orders = (params: Params) => {
-
-  const useOrders = useOrder({initFetch: false})
-  const [orders, setOrders] = useState<Array<IOrder> | null>([])
+  const useOrders = useOrder({ initFetch: false })
+  const [orders, setOrders] = useState<IOrder[] | null>([])
 
   const [isLoading, setIsLoading] = useState(true)
   const [openCombos, setOpenCombos] = useState<boolean>(false)
@@ -39,14 +38,14 @@ export const Orders = (params: Params) => {
   const [rowSelected, setRowSelected] = useState<GridRenderCellParams<any, IOrder>>()
 
   useEffect(() => {
-    useOrders.fetch({ searchBy: {...params} })
+    void useOrders.fetch({ searchBy: { ...params } })
       .then((res) => {
         setOrders(res.data)
       })
   }, [params])
 
   useEffect(() => {
-    if (!orders) return setIsLoading(false)
+    if (orders == null) return setIsLoading(false)
     const loading = orders.length < 1 || useOrders.needFetchNext
     setIsLoading(loading)
   }, [orders, useOrders.needFetchNext])
@@ -81,7 +80,7 @@ export const Orders = (params: Params) => {
     <PaymentDialog
       noButton
       state={[openPayments, setOpenPayments]}
-      title={`Pagos de: ${rowSelected?.row.student?.nickName}`}
+      title={`Pagos de: ${rowSelected?.row.student?.nickName ?? 'Cargando...'}`}
       orderId={rowSelected?.row.id}
     />
     <TableOrder
@@ -90,7 +89,7 @@ export const Orders = (params: Params) => {
       onClickNested={onClickNested}
       isLoading={isLoading}
       onPagination={(limit, offset) => {
-        useOrders.launchNextFetch({limit, offset})
+        useOrders.launchNextFetch({ limit, offset })
       }}
       count={useOrders.metadata?.count ?? 0}
     />

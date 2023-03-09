@@ -1,11 +1,11 @@
-import { ITitle } from "../../../api/models_school"
-import { SelectFromList } from "../../inputs/SelectFromList"
+import { ITitle } from '../../../api/models_school'
+import { SelectFromList } from '../../inputs/SelectFromList'
 
 interface Params {
   onSelect: (select?: ITitle) => void
-  list: Array<ITitle>
+  list: ITitle[]
   defaultValue?: ITitle['id']
-  paginationNext: (p:{limit: number, offset:number}) => void
+  paginationNext: (p: { limit: number, offset: number }) => void
   count: number
 }
 

@@ -1,5 +1,5 @@
-import { AlertTitle, Alert as AlertMUI, Snackbar, Slide } from "@mui/material"
-import { CustomError, isResponseError, isInvalidDataError, InvalidDataError, ResponseError } from "../api/handlers/errors"
+import { AlertTitle, Alert as AlertMUI, Snackbar, Slide } from '@mui/material'
+import { CustomError, isResponseError, isInvalidDataError, InvalidDataError, ResponseError } from '../api/handlers/errors'
 
 export interface AlertProps {
   title?: string
@@ -18,15 +18,15 @@ interface BaseParams {
 
 type AlertParams = BaseParams & (AlertProps | AlertWithError)
 
-export function isAlertWithError(p: AlertProps | AlertWithError): p is AlertWithError {
+export function isAlertWithError (p: AlertProps | AlertWithError): p is AlertWithError {
   return (p as AlertWithError).error !== undefined
 }
 
-function isWithError(params: AlertParams): params is (BaseParams & AlertWithError) {
+function isWithError (params: AlertParams): params is (BaseParams & AlertWithError) {
   return (params as (BaseParams & AlertWithError)).error !== undefined
 }
 
-function getNotifyMsg(e: CustomError | ResponseError | InvalidDataError): AlertProps {
+function getNotifyMsg (e: CustomError | ResponseError | InvalidDataError): AlertProps {
   if (isResponseError(e)) {
     return {
       title: e.message,
@@ -50,7 +50,7 @@ function getNotifyMsg(e: CustomError | ResponseError | InvalidDataError): AlertP
 
 export const Alert = (params: AlertParams) => {
   const finalParams = isWithError(params)
-    ? { ...params, ...getNotifyMsg(params.error)}
+    ? { ...params, ...getNotifyMsg(params.error) }
     : params
   const {
     title,

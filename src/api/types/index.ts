@@ -8,7 +8,7 @@ export enum EXPOSE_VERSIONS {
   CREATE = 2,
   FULL = 3,
   GET = 4,
-  GET_OPERATOR=5,
+  GET_OPERATOR = 5,
   CREATE_NESTED = 6,
   DELETE = 7
 }

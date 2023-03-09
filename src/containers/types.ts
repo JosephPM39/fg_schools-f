@@ -1,4 +1,4 @@
-import { ButtonTypeMap, ExtendButtonBase } from "@mui/material"
+import { ButtonTypeMap, ExtendButtonBase } from '@mui/material'
 
 type Button = ExtendButtonBase<ButtonTypeMap<{}, 'button'>>
 
@@ -8,10 +8,10 @@ export type NoBtnContainer = { noButton: true }
 
 type Params<T> = T & (BtnPropsContainer | BtnContainer | NoBtnContainer)
 
-export function isBtnContainer<T>(params: Params<T>): params is T & BtnContainer {
+export function isBtnContainer<T> (params: Params<T>): params is T & BtnContainer {
   return typeof (params as BtnContainer & T).btn !== 'undefined'
 }
 
-export function isNoBtnContainer<T>(params: Params<T>): params is T & NoBtnContainer {
+export function isNoBtnContainer<T> (params: Params<T>): params is T & NoBtnContainer {
   return typeof (params as NoBtnContainer & T).noButton !== 'undefined'
 }

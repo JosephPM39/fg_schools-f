@@ -1,5 +1,5 @@
-import { ReactNode } from "react";
-import { ComboPerOrderProvider, ComboProvider, OrderProvider, PaymentProvider, ProductPerComboProvider, ProductPerOrderProvider, StudentProvider } from "./StoreProviders";
+import { ReactNode } from 'react'
+import { ComboPerOrderProvider, ComboProvider, OrderProvider, PaymentProvider, ProductPerComboProvider, ProductPerOrderProvider, StudentProvider } from './StoreProviders'
 
 export {
   ComboPerOrderProvider,
@@ -9,7 +9,7 @@ export {
   ProductPerComboProvider,
   ProductPerOrderProvider,
   StudentProvider
-} from "./StoreProviders";
+} from './StoreProviders'
 
 export {
   ComboPerOrderContext,
@@ -19,10 +19,9 @@ export {
   ProductPerComboContext,
   ProductPerOrderContext,
   StudentContext
-} from "./StoreContext";
+} from './StoreContext'
 
-
-export const StoreProviders = ({children}: {children: ReactNode}) => {
+export const StoreProviders = ({ children }: { children: ReactNode }) => {
   return <ComboProvider>
     <OrderProvider>
       <ComboPerOrderProvider>

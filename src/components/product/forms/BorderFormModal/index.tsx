@@ -1,7 +1,7 @@
 import { Form } from './form'
-import { IBorder } from '../../../../api/models_school';
-import { BaseFormModal, BaseFormModalParams } from '../BaseFormModal';
-import { IBaseModel } from '../../../../api/models_school/base.model';
+import { IBorder } from '../../../../api/models_school'
+import { BaseFormModal, BaseFormModalParams } from '../BaseFormModal'
+import { IBaseModel } from '../../../../api/models_school/base.model'
 
 type Params<T extends IBaseModel> = Omit<BaseFormModalParams<T>, 'Form' | 'name'>
 

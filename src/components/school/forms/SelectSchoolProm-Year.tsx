@@ -1,17 +1,17 @@
-import { Grid } from "@mui/material"
-import { useContext, useEffect, useState } from "react"
-import { ISchoolProm } from "../../../api/models_school"
-import { SchoolPromContext } from "../../../context/api/schools"
-import { useSchoolProm } from "../../../hooks/api/schools/useSchoolProm"
-import { useSchool } from "../../../hooks/api/schools/useSchool"
-import { YearSelect } from "../../YearSelect"
-import { SelectSchoolProm } from "./SelectSchoolProm"
+import { Grid } from '@mui/material'
+import { useContext, useEffect, useState } from 'react'
+import { ISchoolProm } from '../../../api/models_school'
+import { SchoolPromContext } from '../../../context/api/schools'
+import { useSchoolProm } from '../../../hooks/api/schools/useSchoolProm'
+import { useSchool } from '../../../hooks/api/schools/useSchool'
+import { YearSelect } from '../../YearSelect'
+import { SelectSchoolProm } from './SelectSchoolProm'
 
 interface params {
   onSelect?: (selected?: ISchoolProm) => void
 }
 
-export const SelectSchoolPromYear = ({onSelect}: params) => {
+export const SelectSchoolPromYear = ({ onSelect }: params) => {
   const globalYear = useContext(SchoolPromContext)?.year
 
   const [list, setList] = useState<ISchoolProm[]>([])
@@ -21,7 +21,7 @@ export const SelectSchoolPromYear = ({onSelect}: params) => {
   const useSchools = useSchool()
 
   useEffect(() => {
-    proms.fetch({searchBy: { year }})
+    void proms.fetch({ searchBy: { year } })
   }, [year])
 
   useEffect(() => {
@@ -29,12 +29,12 @@ export const SelectSchoolPromYear = ({onSelect}: params) => {
       const res = await Promise.all(proms.data.map(async (p) => {
         return {
           ...p,
-          school: await useSchools.findOne({id: p.schoolId}) ?? undefined
+          school: await useSchools.findOne({ id: p.schoolId }) ?? undefined
         }
       }))
       setList(res)
     }
-    conf()
+    void conf()
   }, [proms.data, useSchools.data])
 
   return <>

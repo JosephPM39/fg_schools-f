@@ -1,18 +1,18 @@
-import { ISchoolProm } from "../../../api/models_school"
-import { SelectFromList } from "../../inputs/SelectFromList"
+import { ISchoolProm } from '../../../api/models_school'
+import { SelectFromList } from '../../inputs/SelectFromList'
 
 interface params {
   onSelect?: (selected?: ISchoolProm) => void
   list: ISchoolProm[]
-  paginationNext: (p:{limit: number, offset:number}) => void
+  paginationNext: (p: { limit: number, offset: number }) => void
   count: number
 }
 
 export const SelectSchoolProm = (params: params) => {
-  const { onSelect = () => {}, ...rest} = params
+  const { onSelect = () => {}, ...rest } = params
 
   const findSPName = (item: ISchoolProm) => {
-    return `${item.school?.name} (Código: ${item.school?.code})`
+    return `${item.school?.name ?? 'Cargando...'} (Código: ${item.school?.code ?? 'Cargando...'})`
   }
 
   return <SelectFromList

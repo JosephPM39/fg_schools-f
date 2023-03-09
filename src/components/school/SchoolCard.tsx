@@ -1,4 +1,4 @@
-import { Article, Delete, Edit, KeyboardArrowDown } from '@mui/icons-material';
+import { Article, Delete, Edit, KeyboardArrowDown } from '@mui/icons-material'
 import {
   Card,
   CardActions,
@@ -11,19 +11,19 @@ import {
   CircularProgress,
   Divider
 } from '@mui/material'
-import { Box } from '@mui/system';
-import { useContext, useEffect, useState } from 'react';
-import { IEmployee, IEmployeePosition, IPosition, ISchool, ISchoolProm } from '../../api/models_school';
-import { EmployeeContext, EmployeePositionContext, PositionContext, SchoolContext } from '../../context/api/schools';
-import { useDebounce } from '../../hooks/useDebouce';
-import { useNearScreen } from '../../hooks/useNearScreen';
-import { SectionsModal } from './SectionsModal';
+import { Box } from '@mui/system'
+import { useContext, useEffect, useState } from 'react'
+import { IEmployee, IEmployeePosition, IPosition, ISchool, ISchoolProm } from '../../api/models_school'
+import { EmployeeContext, EmployeePositionContext, PositionContext, SchoolContext } from '../../context/api/schools'
+import { useDebounce } from '../../hooks/useDebouce'
+import { useNearScreen } from '../../hooks/useNearScreen'
+import { SectionsModal } from './SectionsModal'
 import DefaultIcon from '../../assets/signature.png'
 import ImageError from '../../assets/image-error.png'
-import { SchoolPromFormModal } from './forms/SchoolPromFormModal';
-import { StorageFileContext } from '../../context/files/StorageFilesContext';
-import { SubDir } from '../../hooks/files/useStorageFile';
-import { ChangeIconDialog } from './forms/ChangeSchoolIconDialog';
+import { SchoolPromFormModal } from './forms/SchoolPromFormModal'
+import { StorageFileContext } from '../../context/files/StorageFilesContext'
+import { SubDir } from '../../hooks/files/useStorageFile'
+import { ChangeIconDialog } from './forms/ChangeSchoolIconDialog'
 
 interface Params {
   schoolProm?: ISchoolProm
@@ -47,8 +47,8 @@ export const SchoolCard = (params: Params) => {
   const useStorageFile = useContext(StorageFileContext)
   const useStorage = useStorageFile?.newStorage(SubDir.schoolIcons)
 
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const open = Boolean(anchorEl)
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
   }
@@ -57,149 +57,155 @@ export const SchoolCard = (params: Params) => {
   }
 
   useEffect(() => {
-    if(!show) return
-    if(params.schoolProm) return
-    if (!params.paginationNext) return
+    if (!show) return
+    if (params.schoolProm != null) return
+    if (params.paginationNext == null) return
     params.paginationNext()
   }, [show])
 
   useEffect(() => {
     const getData = async () => {
-      if (!school) return
+      if (school == null) return
       if (school.icon === 'default') return setIcon(DefaultIcon)
       const iconUrl = await useStorage?.getPreviewUrl(school.icon)
-      setIcon(iconUrl || ImageError)
+      setIcon(iconUrl ?? ImageError)
     }
-    getData()
+    void getData()
   }, [school])
 
   useEffect(() => {
     if (!show) return
     const get = async () => {
-      if (!params.schoolProm || !useSchool) return
+      if ((params.schoolProm == null) || (useSchool == null)) return
       const school = await useSchool.findOne({ id: params.schoolProm.schoolId })
-      if (!school) {
+      if (school == null) {
         const school = await promiseHelper(useSchool.findOne({ id: params.schoolProm.schoolId }), 5000)
 
         return setSchool(school)
       }
       setSchool(school)
     }
-    get()
+    void get()
   }, [show, params, useSchool?.data, useSchool?.data.length])
 
   useEffect(() => {
     if (!show) return
     const get = async () => {
-      if (!params.schoolProm || !useEmployeePosition) return
+      if ((params.schoolProm == null) || (useEmployeePosition == null)) return
       const principal = await useEmployeePosition.findOne({ id: params.schoolProm.principalId })
       setPrincipal(principal)
     }
-    get()
+    void get()
   }, [show, params, useEmployeePosition?.data])
 
   useEffect(() => {
-    if (!show || !useEmployee) return
+    if (!show || (useEmployee == null)) return
     const get = async () => {
       const employee = await useEmployee.findOne({ id: principal?.employeeId })
       setEmployee(employee)
     }
-    get()
+    void get()
   }, [show, params, useEmployee?.data, principal])
 
   useEffect(() => {
-    if (!show || !usePosition) return
+    if (!show || (usePosition == null)) return
     const get = async () => {
       const position = await usePosition.findOne({ id: principal?.positionId })
       setPosition(position)
     }
-    get()
+    void get()
   }, [show, params, usePosition?.data, principal])
 
   return (
     <Card ref={element} sx={{ maxWidth: 345 }}>
-      { icon ? <CardMedia
-        component="img"
-        alt={school?.name}
-        height="140"
-        image={icon}
-      /> : <Box height='140px' width='345px' display='flex' alignItems='center' justifyContent='center'>
-        <CircularProgress/>
-      </Box>
+      { icon
+        ? <CardMedia
+          component="img"
+          alt={school?.name}
+          height="140"
+          image={icon}
+        />
+        : <Box height='140px' width='345px' display='flex' alignItems='center' justifyContent='center'>
+          <CircularProgress/>
+        </Box>
       }
       <CardContent>
         <Typography gutterBottom variant="h5" component="div">
           {school?.name ?? 'Loading...'}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          { school && position && employee ? <>
+          { (school != null) && (position != null) && (employee != null)
+            ? <>
             Dirección: {school?.location}
-            <br/>
+              <br/>
             Código: {school?.code}
-            <br/>
-            {`${position?.name}: `}
-            {`${employee?.profesion} `}
-            {`${employee?.firstName} `}
-            {`${employee?.lastName} `}
-          </> : <>
+              <br/>
+              {`${position?.name}: `}
+              {`${employee?.profesion} `}
+              {`${employee?.firstName} `}
+              {`${employee?.lastName} `}
+            </>
+            : <>
               Loading...
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-          </> }
+              <br/>
+              <br/>
+              <br/>
+              <br/>
+            </> }
         </Typography>
       </CardContent>
-      {show && params.schoolProm ? <CardActions>
-        <SectionsModal
-          btnProps={{
-            children: 'Abrir',
-            startIcon: <Article/>,
-            variant: 'contained',
-            color: 'info',
-            size: 'small',
-            disabled: !params.schoolProm
-          }}
-          initOpen={false}
-          schoolPromId={params.schoolProm.id}
-          school={school}
-        />
-        <Button
-          id={`school-menu-button-${params.schoolProm.id}`}
-          aria-controls={open ? 'basic-menu' : undefined}
-          aria-haspopup="true"
-          aria-expanded={open ? 'true' : undefined}
-          onClick={handleClick}
-          variant='outlined'
-          size='small'
-          disabled={!params.schoolProm}
-          endIcon={<KeyboardArrowDown/>}
-        > Más opciones </Button>
-        <Menu
-          id={`school-menu-${params.schoolProm.id}`}
-          anchorEl={anchorEl}
-          open={open}
-          onClose={handleClose}
-        >
-          <SchoolPromFormModal
-            idForUpdate={params.schoolProm.id}
-            btn={
-              <MenuItem sx={{color: 'grey'}} ><Edit/>&#8288; Editar información</MenuItem>
-            }
+      {show && (params.schoolProm != null)
+        ? <CardActions>
+          <SectionsModal
+            btnProps={{
+              children: 'Abrir',
+              startIcon: <Article/>,
+              variant: 'contained',
+              color: 'info',
+              size: 'small',
+              disabled: !params.schoolProm
+            }}
+            initOpen={false}
+            schoolPromId={params.schoolProm.id}
+            school={school}
           />
-          <ChangeIconDialog school={school} btn={
-            <MenuItem sx={{color: 'grey'}} ><Edit/>&#8288; Cambiar Logo</MenuItem>
-          } />
-          <Divider/>
-          <MenuItem onClick={handleClose} sx={{color: 'red'}}><Delete/>&#8288; Eliminar</MenuItem>
-        </Menu>
+          <Button
+            id={`school-menu-button-${params.schoolProm.id ?? ''}`}
+            aria-controls={open ? 'basic-menu' : undefined}
+            aria-haspopup="true"
+            aria-expanded={open ? 'true' : undefined}
+            onClick={handleClick}
+            variant='outlined'
+            size='small'
+            disabled={!params.schoolProm}
+            endIcon={<KeyboardArrowDown/>}
+          > Más opciones </Button>
+          <Menu
+            id={`school-menu-${params.schoolProm.id ?? ''}`}
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleClose}
+          >
+            <SchoolPromFormModal
+              idForUpdate={params.schoolProm.id}
+              btn={
+                <MenuItem sx={{ color: 'grey' }} ><Edit/>&#8288; Editar información</MenuItem>
+              }
+            />
+            <ChangeIconDialog school={school} btn={
+              <MenuItem sx={{ color: 'grey' }} ><Edit/>&#8288; Cambiar Logo</MenuItem>
+            } />
+            <Divider/>
+            <MenuItem onClick={handleClose} sx={{ color: 'red' }}><Delete/>&#8288; Eliminar</MenuItem>
+          </Menu>
 
-      </CardActions> : <CardActions>
-        <br/>
+        </CardActions>
+        : <CardActions>
+          <br/>
           ...loading
-        <br/>
-      </CardActions>
+          <br/>
+        </CardActions>
       }
     </Card>
-  );
+  )
 }

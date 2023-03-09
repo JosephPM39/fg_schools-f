@@ -1,13 +1,13 @@
-import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from "@mui/material"
-import { isNumber } from "class-validator"
-import { useEffect, useState } from "react"
+import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material'
+import { isNumber } from 'class-validator'
+import { useEffect, useState } from 'react'
 
 interface params {
   onSelect: (select: number) => void
   defaultValue?: number
 }
 
-export const YearSelect = ({onSelect, defaultValue}: params) => {
+export const YearSelect = ({ onSelect, defaultValue }: params) => {
   const [year, setYear] = useState<number>(defaultValue ?? new Date().getFullYear())
 
   useEffect(() => {

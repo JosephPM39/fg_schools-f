@@ -1,4 +1,4 @@
-import { useRef } from "react"
+import { useRef } from 'react'
 
 export const useDebounce = () => {
   const timeout = useRef<number | undefined>()
@@ -10,12 +10,12 @@ export const useDebounce = () => {
     }, time ?? 500)
   }
 
-  function promiseHelper<T>(cb: Promise<T>, time?: number) {
-    return new Promise<T>((res, rej) => debounce(() => {
+  async function promiseHelper<T> (cb: Promise<T>, time?: number) {
+    return await new Promise<T>((resolve, reject) => debounce(() => {
       cb.then(
-        (r) => res(r)
+        (r) => resolve(r)
       ).catch(
-        (e) => rej(e)
+        (e) => reject(e)
       )
     }, time))
   }

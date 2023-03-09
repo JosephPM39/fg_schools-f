@@ -1,13 +1,13 @@
-import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
-import { Button, Checkbox, Divider, FormControlLabel, Grid, InputAdornment, TextField } from '@mui/material';
-import { IModel } from '../../../../api/models_school';
-import { Alert, AlertProps, AlertWithError } from '../../../Alert';
-import { useModel } from '../../../../hooks/api/products/useModel';
-import { getData } from './getData';
-import { InvalidDataError, promiseHandleError } from '../../../../api/handlers/errors';
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react'
+import { Button, Checkbox, Divider, FormControlLabel, Grid, InputAdornment, TextField } from '@mui/material'
+import { IModel } from '../../../../api/models_school'
+import { Alert, AlertProps, AlertWithError } from '../../../Alert'
+import { useModel } from '../../../../hooks/api/products/useModel'
+import { getData } from './getData'
+import { InvalidDataError, promiseHandleError } from '../../../../api/handlers/errors'
 
 interface Params {
-  idForUpdate?: IModel['id'],
+  idForUpdate?: IModel['id']
   onSuccess?: () => void
 }
 
@@ -24,24 +24,24 @@ export const Form = (params: Params) => {
   const [showNotify, setShowNofity] = useState(false)
 
   useEffect(() => {
-    if (notify) setShowNofity(true)
+    if (notify != null) setShowNofity(true)
   }, [notify])
 
   useEffect(() => {
     const getData = async () => {
-      if (!idForUpdate || !!data) return
-      const res = await useModels?.findOne({id: idForUpdate})
-      if (!res) return
+      if (!idForUpdate || !(data == null)) return
+      const res = await useModels?.findOne({ id: idForUpdate })
+      if (res == null) return
       return setData(res)
     }
-    getData()
+    void getData()
   }, [idForUpdate, useModels?.data, useModels?.data.length, data])
 
   const onChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, k: keyof IModel) => {
     const d = {
-      ...data,
+      ...data as IModel,
       [k]: e.target.value
-    } as IModel
+    }
     setData(d)
     e.preventDefault()
   }
@@ -53,8 +53,8 @@ export const Form = (params: Params) => {
     if (!idForUpdate) {
       await useModels.create(data)
     } else {
-      const {id, ...rest} = data
-      await useModels.update({id, data: rest})
+      const { id, ...rest } = data
+      await useModels.update({ id, data: rest })
     }
     setSending(false)
     setNotify({
@@ -67,9 +67,9 @@ export const Form = (params: Params) => {
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    promiseHandleError((error) => {
+    void promiseHandleError((error) => {
       console.log((error as InvalidDataError).getErrors())
-      setNotify({error})
+      setNotify({ error })
       setSending(false)
     }, submit)
   }
@@ -79,7 +79,7 @@ export const Form = (params: Params) => {
       <input
         name="model_id"
         type='text'
-        value={data?.['id'] || ''}
+        value={data?.id}
         onChange={() => {}}
         hidden
       />
@@ -87,7 +87,7 @@ export const Form = (params: Params) => {
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
-            value={data?.name || ''}
+            value={data?.name}
             onChange={(e) => onChange(e, 'name')}
             InputLabelProps={{
               shrink: !!data?.name
@@ -97,7 +97,7 @@ export const Form = (params: Params) => {
             type='text'
             inputProps={{
               minLength: 1,
-              maxLength: 40,
+              maxLength: 40
             }}
             variant="outlined"
             required
@@ -106,7 +106,7 @@ export const Form = (params: Params) => {
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
-            value={data?.price || ''}
+            value={data?.price}
             onChange={(e) => onChange(e, 'price')}
             name="price"
             label="Precio"
@@ -126,7 +126,7 @@ export const Form = (params: Params) => {
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
-            value={data?.offer || ''}
+            value={data?.offer}
             onChange={(e) => onChange(e, 'offer')}
             name="offer"
             label="Precio para promoción"

@@ -1,7 +1,7 @@
-import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from "@mui/material"
-import { useEffect, useState } from "react"
-import { IBaseModel } from "../../api/models_school/base.model"
-import { useNearScreen } from "../../hooks/useNearScreen"
+import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material'
+import { useEffect, useState } from 'react'
+import { IBaseModel } from '../../api/models_school/base.model'
+import { useNearScreen } from '../../hooks/useNearScreen'
 
 interface WithFormat<T extends IBaseModel> {
   itemNameFormat: (item: T) => string
@@ -17,22 +17,22 @@ interface BaseParams<T extends IBaseModel> {
   name: string
   omitCreateOption?: true
   onSelect: (select?: T) => void
-  list: Array<T>
+  list: T[]
   defaultValue?: T['id']
   valueBy?: keyof T
   size?: 'small' | 'medium'
-  paginationNext?: (params:{offset: number, limit: number}) => void
+  paginationNext?: (params: { offset: number, limit: number }) => void
   count: number
 }
 
 type Params<T extends IBaseModel> = BaseParams<T> & (WithFormat<T> | WithProp<T>)
 
-function isWithProp<T extends IBaseModel>(p: Params<T>): p is BaseParams<T> & WithProp<T> {
+function isWithProp<T extends IBaseModel> (p: Params<T>): p is BaseParams<T> & WithProp<T> {
   return typeof (p as BaseParams<T> & WithProp<T>).itemNameBy !== 'undefined'
 }
 
 interface ItemParams {
-  value?: string,
+  value?: string
   key?: string
   children?: string
   index: number
@@ -40,12 +40,12 @@ interface ItemParams {
 }
 
 const Item = (params: ItemParams) => {
-  const { value, key, children, onNeedFetch, index} = params
+  const { value, key, children, onNeedFetch, index } = params
   const { show, element } = useNearScreen()
 
   useEffect(() => {
     if (!show || value) return
-    if (!onNeedFetch) return
+    if (onNeedFetch == null) return
     onNeedFetch(index)
   }, [show, value])
 
@@ -53,7 +53,7 @@ const Item = (params: ItemParams) => {
     <MenuItem
       ref={element}
       value={value ?? ''}
-      key={`menu-item-${key}`}
+      key={`menu-item-${key ?? ''}`}
     >
       {children}
     </MenuItem>
@@ -75,7 +75,7 @@ export const SelectFromList = <T extends IBaseModel>(params: Params<T>) => {
     count
   } = params
   const [selected, setSelected] = useState<T>()
-  const [items, setItems] = useState<Array<JSX.Element>>([])
+  const [items, setItems] = useState<JSX.Element[]>([])
 
   const getItemName = (item: T) => {
     if (isWithProp(params)) {
@@ -86,7 +86,7 @@ export const SelectFromList = <T extends IBaseModel>(params: Params<T>) => {
 
   const onNeedFetch = (index: number) => {
     if (index < (list.length - 1)) return
-    if ((index%10) !== 0) return
+    if ((index % 10) !== 0) return
     paginationNext({
       offset: index,
       limit: 10
@@ -95,7 +95,7 @@ export const SelectFromList = <T extends IBaseModel>(params: Params<T>) => {
 
   useEffect(() => {
     if (list.length < 1) return
-    const itms: Array<JSX.Element> = []
+    const itms: JSX.Element[] = []
     for (let i = 0; i < count; i++) {
       const item = list.at(i)
       itms.push(
@@ -105,7 +105,7 @@ export const SelectFromList = <T extends IBaseModel>(params: Params<T>) => {
           index={i}
           onNeedFetch={onNeedFetch}
         >
-          {item ? getItemName(item) : 'Cargando...'}
+          {(item != null) ? getItemName(item) : 'Cargando...'}
         </Item>
       )
     }
@@ -127,10 +127,10 @@ export const SelectFromList = <T extends IBaseModel>(params: Params<T>) => {
   }
 
   const defaultId = <K extends typeof valueBy>(prop?: T[K]) => {
-    if (!prop) return
+    if (prop == null) return
     const item = find(prop)
-    if (item?.[valueBy]) return String(item[valueBy])
-    if (selected && !find(selected[valueBy as keyof T])) setSelected(undefined)
+    if ((item?.[valueBy]) != null) return String(item[valueBy])
+    if ((selected != null) && (find(selected[valueBy]) == null)) setSelected(undefined)
     return ''
   }
 
@@ -142,7 +142,7 @@ export const SelectFromList = <T extends IBaseModel>(params: Params<T>) => {
         labelId={`${id}-select-label`}
         id={`${id}-select`}
         name={name}
-        MenuProps={{ PaperProps: { sx: { maxHeight: 250 }} }}
+        MenuProps={{ PaperProps: { sx: { maxHeight: 250 } } }}
         defaultValue={defaultValue}
         value={defaultId(selected?.[valueBy]) ?? ''}
         label={`${title}`}

@@ -13,10 +13,10 @@ export const validateIdBy = async <Model extends {}>(params: ValidateIdOptions<M
     version,
     validatorOptions: {
       skipMissingProperties: true,
-      skipUndefinedProperties: true,
+      skipUndefinedProperties: true
     },
     transformOptions: {
-      exposeUnsetFields: false,
+      exposeUnsetFields: false
     }
   })
 

@@ -1,29 +1,28 @@
-import { useContext, useState} from 'react';
-import Button from '@mui/material/Button';
-import { Settings as SettingsIcon, Edit as EditIcon, Logout as LogoutIcon } from '@mui/icons-material'
-import MenuItem from '@mui/material/MenuItem';
-import Divider from '@mui/material/Divider';
+import { useContext, useState } from 'react'
+import Button from '@mui/material/Button'
+import { Settings as SettingsIcon, Edit as EditIcon, Logout as LogoutIcon, Menu as MenuIcon, SaveAlt as SaveAltIcon } from '@mui/icons-material'
+import MenuItem from '@mui/material/MenuItem'
+import Divider from '@mui/material/Divider'
 import { MenuStyled } from '../styles/MenuStyled'
-import { FormControlLabel, Switch } from '@mui/material';
-import { Menu as MenuIcon, SaveAlt as SaveAltIcon } from '@mui/icons-material'
-import { SchoolPromFormModal } from './school/forms/SchoolPromFormModal';
-import { SchoolPromContext } from '../context/api/schools';
-import { YearSelect } from './YearSelect';
-import { useNetStatus } from '../hooks/useNetStatus';
-import { SettingsModal } from './SettingsModal';
+import { FormControlLabel, Switch } from '@mui/material'
+import { SchoolPromFormModal } from './school/forms/SchoolPromFormModal'
+import { SchoolPromContext } from '../context/api/schools'
+import { YearSelect } from './YearSelect'
+import { useNetStatus } from '../hooks/useNetStatus'
+import { SettingsModal } from './SettingsModal'
 
 export const NavMenu = () => {
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const open = Boolean(anchorEl)
   const useSchoolProm = useContext(SchoolPromContext)
   const { isAppOffline, toggleOfflineMode } = useNetStatus()
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
+    setAnchorEl(event.currentTarget)
+  }
   const handleClose = () => {
-    setAnchorEl(null);
-  };
+    setAnchorEl(null)
+  }
 
   return (
     <div>
@@ -35,14 +34,14 @@ export const NavMenu = () => {
         variant="contained"
         disableElevation
         onClick={handleClick}
-        sx={{mx: 1}}
+        sx={{ mx: 1 }}
       >
         <MenuIcon/>
       </Button>
       <MenuStyled
         id="demo-customized-menu"
         MenuListProps={{
-          'aria-labelledby': 'demo-customized-button',
+          'aria-labelledby': 'demo-customized-button'
         }}
         anchorEl={anchorEl}
         open={open}
@@ -85,5 +84,5 @@ export const NavMenu = () => {
 
       </MenuStyled>
     </div>
-  );
+  )
 }

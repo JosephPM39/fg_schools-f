@@ -2,18 +2,17 @@ import { Principal } from './pages/Principal'
 import { ReactNode, useContext } from 'react'
 
 import {
-  SchoolComponentProviders,
+  SchoolComponentProviders
 } from './context/api/schools/'
-import { SessionContext, SessionProvider } from './context/SessionContext';
-import { Unauthorized } from './pages/Unauthorized';
-import { StorageFileProvider } from './context/files/StorageFilesContext';
-import { ProductsProviders } from './context/api/products';
-import { StoreProviders } from './context/api/store';
-import { PhotoProviders } from './context/api/photo';
+import { SessionContext, SessionProvider } from './context/SessionContext'
+import { Unauthorized } from './pages/Unauthorized'
+import { StorageFileProvider } from './context/files/StorageFilesContext'
+import { ProductsProviders } from './context/api/products'
+import { StoreProviders } from './context/api/store'
+import { PhotoProviders } from './context/api/photo'
 
-function App() {
-
-  const Root = ({children}:{children: ReactNode}) => {
+function App () {
+  const Root = ({ children }: { children: ReactNode }) => {
     const useSession = useContext(SessionContext)
 
     if (!useSession?.user.token) {
@@ -40,4 +39,4 @@ function App() {
   </SessionProvider>
 }
 
-export default App;
+export default App

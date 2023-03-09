@@ -46,7 +46,6 @@ export class SectionProm extends BaseModel {
   @ValidateIf(o => !o.schoolId)
   @ValidateNested()
     schoolProm: SchoolProm
-
 }
 
 export interface ISectionProm extends SectionProm {}

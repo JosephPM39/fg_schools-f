@@ -18,7 +18,7 @@ export {
   TypeProvider
 } from './ProductsProviders'
 
-export const ProductsProviders = ({children}:{children: ReactNode}) => {
+export const ProductsProviders = ({ children }: { children: ReactNode }) => {
   return <ModelProvider>
     <BorderProvider>
       <ColorProvider>

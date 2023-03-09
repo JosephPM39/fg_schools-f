@@ -1,11 +1,11 @@
 import { Modal } from '../../../../containers/Modal'
-import { Box } from '@mui/material';
+import { Box } from '@mui/material'
 import { Form } from './form'
-import { ISchool, ISchoolProm, ISectionProm } from '../../../../api/models_school';
-import { BtnContainer, BtnPropsContainer } from '../../../../containers/types';
+import { ISchool, ISectionProm } from '../../../../api/models_school'
+import { BtnContainer, BtnPropsContainer } from '../../../../containers/types'
 
 interface Params {
-  btn?: React.ReactNode,
+  btn?: React.ReactNode
   idForUpdate?: ISectionProm['id']
   schoolId: ISchool['id']
 }
@@ -13,7 +13,7 @@ interface Params {
 export const SectionPromFormModal = (params: Params) => {
   const { btn, idForUpdate, schoolId } = params
   const mBtn = (): BtnContainer | BtnPropsContainer => {
-    if(btn) {
+    if (btn) {
       return {
         btn
       }
@@ -35,5 +35,5 @@ export const SectionPromFormModal = (params: Params) => {
         <Form idForUpdate={idForUpdate} schoolId={schoolId}/>
       </Box>
     </Modal>
-  );
+  )
 }

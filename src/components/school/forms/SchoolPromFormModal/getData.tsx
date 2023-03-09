@@ -1,7 +1,7 @@
-import { IEmployeePosition, ISchool, ISchoolProm } from '../../../../api/models_school';
+import { IEmployeePosition, ISchool, ISchoolProm } from '../../../../api/models_school'
 import { v4 as uuidV4 } from 'uuid'
 
-function getFormValue<T>(form: FormData, name: string): T {
+function getFormValue<T> (form: FormData, name: string): T {
   return form.get(name) as T
 }
 
@@ -12,7 +12,7 @@ const getSchoolFormData = (form: FormData): {
   const icon = getFormValue<File | null>(form, 'school_icon')
   const data: ISchool = {
     id: getFormValue<string>(form, 'school_id') || uuidV4(),
-    icon: icon?.name || 'default',
+    icon: icon?.name ?? 'default',
     name: getFormValue<string>(form, 'school_name'),
     location: getFormValue<string>(form, 'school_location'),
     code: getFormValue<string>(form, 'school_code')
@@ -33,10 +33,10 @@ const getPrincipalFormData = (form: FormData): IEmployeePosition => {
       firstName: getFormValue<string>(form, 'employee_first_name'),
       lastName: getFormValue<string>(form, 'employee_last_name'),
       contact: getFormValue<string>(form, 'employee_contact'),
-      profesion: getFormValue<string>(form, 'employee_profesion'),
+      profesion: getFormValue<string>(form, 'employee_profesion')
     },
     employeeId,
-    positionId: getFormValue<string>(form, 'position_id'),
+    positionId: getFormValue<string>(form, 'position_id')
   }
 }
 
@@ -60,8 +60,8 @@ interface SubmitParams {
 }
 
 export interface SubmitData {
-  schoolProm: ISchoolProm,
-  principal?: IEmployeePosition,
+  schoolProm: ISchoolProm
+  principal?: IEmployeePosition
   school?: {
     data: ISchool
     file: File | null
@@ -77,12 +77,12 @@ export const getSubmitData = (params: SubmitParams): SubmitData | undefined => {
     schoolOrigin
   } = params
 
-  if (!form) return
+  if (form == null) return
   const formData = new FormData(form)
 
   if (!isNew(principalOrigin) && !isNew(schoolOrigin)) {
     return {
-      schoolProm: getSchoolPromData(formData),
+      schoolProm: getSchoolPromData(formData)
     }
   }
 

@@ -1,6 +1,5 @@
-import * as React from 'react';
-import { styled } from '@mui/material/styles';
-import InputBase from '@mui/material/InputBase';
+import { styled } from '@mui/material/styles'
+import InputBase from '@mui/material/InputBase'
 
 export const InputBaseStyled = styled(InputBase)(({ theme }) => ({
   color: 'inherit',
@@ -13,8 +12,8 @@ export const InputBaseStyled = styled(InputBase)(({ theme }) => ({
     [theme.breakpoints.up('sm')]: {
       width: '12ch',
       '&:focus': {
-        width: '20ch',
-      },
-    },
-  },
-}));
+        width: '20ch'
+      }
+    }
+  }
+}))

@@ -1,12 +1,12 @@
-import { IEmployeePosition } from "../../../api/models_school"
-import { PositionType } from "../../../api/models_school/schools/position.model"
-import { SelectFromList } from "../../inputs/SelectFromList"
+import { IEmployeePosition } from '../../../api/models_school'
+import { PositionType } from '../../../api/models_school/schools/position.model'
+import { SelectFromList } from '../../inputs/SelectFromList'
 
 interface params {
   onSelect?: (selected?: IEmployeePosition) => void
   list: IEmployeePosition[]
   type: PositionType
-  paginationNext: (p:{offset: number, limit: number}) => void
+  paginationNext: (p: { offset: number, limit: number }) => void
   count: number
 }
 
@@ -20,7 +20,11 @@ export const SelectEmployeePosition = (params: params) => {
   } = params
 
   const findEPName = (ep: IEmployeePosition) => {
-    return `${ep.employee?.profesion} ${ep.employee?.firstName} ${ep.employee?.lastName} (${ep?.position?.name})`
+    const profesion = ep.employee?.profesion ?? 'Cargando...'
+    const firstName = ep.employee?.firstName ?? 'Cargando...'
+    const lastName = ep.employee?.lastName ?? 'Cargando...'
+    const position = ep?.position?.name ?? 'Cargando...'
+    return `${profesion} ${firstName} ${lastName} (${position})`
   }
 
   const getLabel = () => {

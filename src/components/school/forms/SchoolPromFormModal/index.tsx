@@ -1,12 +1,12 @@
 import { Modal } from '../../../../containers/Modal'
-import { Box } from '@mui/material';
+import { Box } from '@mui/material'
 import { Form } from './form'
-import { ISchoolProm } from '../../../../api/models_school';
-import { BtnContainer, BtnPropsContainer } from '../../../../containers/types';
+import { ISchoolProm } from '../../../../api/models_school'
+import { BtnContainer, BtnPropsContainer } from '../../../../containers/types'
 
-export const SchoolPromFormModal = ({btn, idForUpdate}:{btn?: React.ReactNode, idForUpdate?: ISchoolProm['id']}) => {
+export const SchoolPromFormModal = ({ btn, idForUpdate }: { btn?: React.ReactNode, idForUpdate?: ISchoolProm['id'] }) => {
   const mBtn = (): BtnContainer | BtnPropsContainer => {
-    if(btn) {
+    if (btn) {
       return {
         btn
       }
@@ -28,5 +28,5 @@ export const SchoolPromFormModal = ({btn, idForUpdate}:{btn?: React.ReactNode, i
         <Form idForUpdate={idForUpdate}/>
       </Box>
     </Modal>
-  );
+  )
 }

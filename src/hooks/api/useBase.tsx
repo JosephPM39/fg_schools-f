@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { StorageRequest, ReadParams, DeleteParams,UpdateParams } from '../../api/services'
+import { StorageRequest, ReadParams, DeleteParams, UpdateParams } from '../../api/services'
 import { IBaseModel } from '../../api/models_school/base.model'
 import { ModelClassType, QueryUsed } from '../../api/types'
 import { filterBy } from '../../api/services/utils'
@@ -14,17 +14,17 @@ export interface BaseParams<Model extends IBaseModel> {
 }
 
 type FetchParams<Model extends IBaseModel> = {
-  mode?: 'clean' | 'merge',
+  mode?: 'clean' | 'merge'
 } & ReadParams<Model>
 
 interface FetchNextParams {
-  offset: number,
+  offset: number
   limit: number
 }
 
 type CreateParams<Model extends IBaseModel> = Model | Model[]
 
-const secureMerge = <T extends IBaseModel>(listOne: Array<T>, listTwo: Array<T>) => {
+const secureMerge = <T extends IBaseModel>(listOne: T[], listTwo: T[]) => {
   const list = [...listOne, ...listTwo]
   return list.filter((item, index) => {
     return list.findIndex((s) => s.id === item.id) === index
@@ -67,34 +67,34 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
     return data.find((e) => e.id === id)
   }
 
-  const findOne = async ({id}: {id?: Model['id']}) => {
+  const findOne = async ({ id }: { id?: Model['id'] }) => {
     if (!id) return null
 
     const local = findOneLocal(id)
-    if (local) return local
+    if (local != null) return local
 
     const remote = await storage.read({
-      searchBy: { id },
+      searchBy: { id }
     })
-    if (!remote?.data || remote?.data?.length < 1) return null
+    if (((remote?.data) == null) || remote?.data?.length < 1) return null
 
-    if (!findOneLocal(id)){
+    if (findOneLocal(id) == null) {
       data.push(...remote.data)
     }
     return remote.data[0]
   }
 
   const findBy = async (searchBy?: SearchBy<Model>) => {
-    if (!searchBy) return null
+    if (searchBy == null) return null
 
     const local = filterBy<Model>(data, searchBy as Partial<Model>)
     if (local.length > 0) return local
 
     const remote = await (storage.read({
-      searchBy,
+      searchBy
     }))
-    if (!remote?.data) return null
-    if(filterBy<Model>(data, searchBy as Partial<Model>).length < 1) {
+    if ((remote?.data) == null) return null
+    if (filterBy<Model>(data, searchBy as Partial<Model>).length < 1) {
       data.push(...remote.data)
     }
     setMetadata({
@@ -108,7 +108,7 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
     const { query, searchBy, mode = 'clean' } = params
     const res = await (storage.read({
       query,
-      searchBy,
+      searchBy
     }))
     if (mode === 'merge') {
       const merged = secureMerge(data, res.data ?? [])
@@ -128,24 +128,23 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
   const fetch = useCallback(fetchF, [storage, data])
 
   const fetchNext = useCallback(async () => {
-    try {
-      if (!metadata) return
-      const { limit, offset } = fetchNextParams
-      if (offset > metadata.count) return
-      const { searchByUsed, ...rest } = metadata
-      return await fetch({ mode: 'merge', query: {
+    if (metadata == null) return
+    const { limit, offset } = fetchNextParams
+    if (offset > metadata.count) return
+    const { searchByUsed, ...rest } = metadata
+    return await fetch({
+      mode: 'merge',
+      query: {
         ...rest,
         offset: String(offset),
         limit: String(limit)
-      }, searchBy: searchByUsed})
-    } catch (err) {
-      throw err
-    }
-
+      },
+      searchBy: searchByUsed
+    })
   }, [fetch, metadata, fetchNextParams])
 
   const launchNextFetch = (params?: Partial<{
-    limit?: FetchNextParams['limit'],
+    limit?: FetchNextParams['limit']
     offset?: FetchNextParams['offset'] | 'auto' | 'previous'
   }>) => {
     const { offset: previousOffset, limit: previousLimit } = fetchNextParams
@@ -167,7 +166,7 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
           offset: previousOffset
         }
       }
-      return {limit, offset: newOffset}
+      return { limit, offset: newOffset }
     }
     setFetchNextParams(makeParams())
     setNeedFetchNext(true)
@@ -179,26 +178,26 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
 
   const configInitFetching = () => {
     if (!isInit || !initFetch) return
-    fetch({})
+    void fetch({})
     return setIsInit(false)
   }
 
   const configAppMode = () => {
     if (isAppNetStatus(AppNetStatus.mountOffline)) {
-      debounce(() => storage.goOffline({
+      debounce(async () => await storage.goOffline({
         limit: 'NONE'
       }))
       setAppNetStatus(AppNetStatus.offline)
     }
     if (isAppNetStatus(AppNetStatus.unmountOffline)) {
-      storage.goOnline()
+      void storage.goOnline()
       setAppNetStatus(AppNetStatus.online)
     }
   }
 
   const configFetchNext = () => {
     if (!needFetchNext) return
-    fetchNext().then(() => {
+    void fetchNext().then(() => {
       setNeedFetchNext(false)
     })
   }
@@ -213,7 +212,7 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
 
   const create = async (dto: CreateParams<Model>) => {
     const res = await storage.create({
-      data: dto,
+      data: dto
     })
     if (res && Array.isArray(res)) {
       setData([...data, ...res])
@@ -230,7 +229,7 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
 
   const update = async (params: UpdateParams<Model>) => {
     const { id, data: newData } = params
-    const old = await findOne({id})
+    const old = await findOne({ id })
     const res = await storage.update(params)
     if (!res) return false
     const index = data.findIndex((e) => e.id === id)
@@ -249,7 +248,7 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
   const remove = async (params: DeleteParams<Model>) => {
     const res = await storage.delete(params)
     const index = data.findIndex((e) => e.id === params.id)
-    console.log(data.splice(index, (index+1)))
+    console.log(data.splice(index, (index + 1)))
     if (metadata?.count) {
       metadata.count = metadata.count - 1
     }

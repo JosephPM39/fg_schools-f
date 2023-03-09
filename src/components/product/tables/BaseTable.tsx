@@ -1,13 +1,13 @@
-import { Add } from "@mui/icons-material"
-import { Button } from "@mui/material"
-import { Alert, AlertProps, AlertWithError } from "../../Alert"
-import { GridColDef } from "@mui/x-data-grid"
-import { useEffect, useState } from "react"
-import { promiseHandleError } from "../../../api/handlers/errors"
-import { IBaseModel } from "../../../api/models_school/base.model"
-import { useBase } from "../../../hooks/api/useBase"
-import { Table } from "../../Table"
-import { BaseFormModalParams } from "../forms/BaseFormModal"
+import { Add } from '@mui/icons-material'
+import { Button } from '@mui/material'
+import { Alert, AlertProps, AlertWithError } from '../../Alert'
+import { GridColDef } from '@mui/x-data-grid'
+import { useEffect, useState } from 'react'
+import { promiseHandleError } from '../../../api/handlers/errors'
+import { IBaseModel } from '../../../api/models_school/base.model'
+import { useBase } from '../../../hooks/api/useBase'
+import { Table } from '../../Table'
+import { BaseFormModalParams } from '../forms/BaseFormModal'
 
 type FormModalParams<T extends IBaseModel> = Omit<BaseFormModalParams<T>, 'Form' | 'name'>
 
@@ -31,7 +31,7 @@ export const BaseTable = <T extends IBaseModel>(params: BaseTableParams<T>) => {
   const [showNotify, setShowNofity] = useState(false)
 
   useEffect(() => {
-    if (notify) setShowNofity(true)
+    if (notify != null) setShowNofity(true)
   }, [notify])
 
   const [idForUpdate, setIdForUpdate] = useState<T['id']>()
@@ -45,12 +45,12 @@ export const BaseTable = <T extends IBaseModel>(params: BaseTableParams<T>) => {
 
   useEffect(() => {
     if (!idForDelete) return
-    promiseHandleError((error) => {
-      setNotify({error})
-    }, async () => await hook.delete({id: idForDelete})).then(() => {
+    void promiseHandleError((error) => {
+      setNotify({ error })
+    }, async () => await hook.delete({ id: idForDelete })).then(() => {
       setNotify({
         title: 'Éxito',
-        details: `Registro eliminado`,
+        details: 'Registro eliminado',
         type: 'success'
       })
       setIdForDelete(undefined)
@@ -75,7 +75,7 @@ export const BaseTable = <T extends IBaseModel>(params: BaseTableParams<T>) => {
       columns={columns}
       rows={hook.data}
       onPagination={(limit, offset) => {
-        hook.launchNextFetch({limit, offset})
+        hook.launchNextFetch({ limit, offset })
       }}
       isLoading={hook.data.length < 1 || hook.needFetchNext}
       count={hook.metadata?.count ?? 0}

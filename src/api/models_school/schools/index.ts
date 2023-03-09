@@ -15,5 +15,3 @@ export type { ITitle } from './title.model'
 export type { ISchool } from './school.model'
 export type { ISectionProm } from './section-prom.model'
 export type { ISchoolProm } from './school-prom.model'
-
-

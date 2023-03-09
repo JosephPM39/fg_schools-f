@@ -1,11 +1,11 @@
-import { Grid } from "@mui/material"
-import { useEffect, useState } from "react"
-import { IGroup, ISectionProm, ITitle } from "../../../api/models_school"
-import { useGroup } from "../../../hooks/api/schools/useGroup"
-import { useSectionProm } from "../../../hooks/api/schools/useSectionProm"
-import { useTitle } from "../../../hooks/api/schools/useTitle"
-import { SelectGroup } from "./SelectGroup"
-import { SelectTitle } from "./SelectTitle"
+import { Grid } from '@mui/material'
+import { useEffect, useState } from 'react'
+import { IGroup, ISectionProm, ITitle } from '../../../api/models_school'
+import { useGroup } from '../../../hooks/api/schools/useGroup'
+import { useSectionProm } from '../../../hooks/api/schools/useSectionProm'
+import { useTitle } from '../../../hooks/api/schools/useTitle'
+import { SelectGroup } from './SelectGroup'
+import { SelectTitle } from './SelectTitle'
 
 interface Params {
   idForUpdate?: ISectionProm['id']
@@ -13,11 +13,11 @@ interface Params {
 }
 
 export const SectionInputs = (params: Params) => {
-  const {idForUpdate} = params
+  const { idForUpdate } = params
   // const [titleList, setTitleList] = useState<Array<ITitle>>([])
   // const [groupList, setGroupList] = useState<Array<IGroup>>([])
-  const [titleSelected, setTitleSelected] = useState<ITitle>()
-  const [groupSelected, setGroupSelected] = useState<IGroup>()
+  // const [titleSelected, setTitleSelected] = useState<ITitle>()
+  // const [groupSelected, setGroupSelected] = useState<IGroup>()
   const [sectionSelected, setSectionSelected] = useState<ISectionProm | null>(null)
 
   const useTitles = useTitle()
@@ -26,7 +26,7 @@ export const SectionInputs = (params: Params) => {
 
   useEffect(() => {
     if (idForUpdate) {
-      useSectionProms.findOne({ id: idForUpdate }).then((res) => {
+      void useSectionProms.findOne({ id: idForUpdate }).then((res) => {
         setSectionSelected(res)
       })
     }
@@ -50,8 +50,6 @@ export const SectionInputs = (params: Params) => {
         })
       })
 
-
-
       setGroupList(groups)
       setTitleList(titles)
     }
@@ -60,11 +58,11 @@ export const SectionInputs = (params: Params) => {
   */
 
   const onSelectTitle = (title?: ITitle) => {
-    setTitleSelected(title)
+    // setTitleSelected(title)
   }
 
   const onSelectGroup = (group?: IGroup) => {
-    setGroupSelected(group)
+    // setGroupSelected(group)
   }
 
   return <div>

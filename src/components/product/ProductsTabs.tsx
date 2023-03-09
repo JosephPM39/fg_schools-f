@@ -1,12 +1,11 @@
-import { Tabs } from "../../containers/Tabs";
-import { TableBorder } from "./tables/TableBorder";
-import { TableColor } from "./tables/TableColor";
-import { TableModel } from "./tables/TableModel";
-import { TableSize } from "./tables/TableSize";
-import { TableType } from "./tables/TableType";
+import { Tabs } from '../../containers/Tabs'
+import { TableBorder } from './tables/TableBorder'
+import { TableColor } from './tables/TableColor'
+import { TableModel } from './tables/TableModel'
+import { TableSize } from './tables/TableSize'
+import { TableType } from './tables/TableType'
 
 export const ProductsTabs = () => {
-
   const data = [
     {
       label: 'Productos',
@@ -36,5 +35,5 @@ export const ProductsTabs = () => {
 
   return (
     <Tabs data={data} height='75vh' orientation='vertical' contentPadding={1} idPrefix="settings" />
-  );
+  )
 }

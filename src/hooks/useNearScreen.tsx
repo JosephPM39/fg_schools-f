@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from 'react'
 
 export const useNearScreen = () => {
   const [show, setShow] = useState(false)
@@ -7,7 +7,7 @@ export const useNearScreen = () => {
   useEffect(() => {
     if (!element.current) return
     const observer = new window.IntersectionObserver((entries) => {
-      const {isIntersecting} = entries[0]
+      const { isIntersecting } = entries[0]
       if (isIntersecting) {
         setShow(true)
         observer.disconnect()

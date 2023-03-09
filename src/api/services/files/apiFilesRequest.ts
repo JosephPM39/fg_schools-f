@@ -4,17 +4,16 @@ import { fetchOnce, throwApiResponseError } from '../utils'
 
 const getHeaders = () => {
   return {
-    'Content-Type': 'application/json',
+    'Content-Type': 'application/json'
   }
 }
 
 export class ApiFilesRequest {
-  constructor(
-    private path: string
-  ){}
+  constructor (
+    private readonly path: string
+  ) {}
 
   upload = async <T extends UploadFileParams>(file: T): Promise<UploadFileReturn<T>> => {
-
     let basePath = `${CONFIG.schoolsFilesUrl}`
     const form = new FormData()
 
@@ -59,22 +58,22 @@ export class ApiFilesRequest {
   makePreviewUrl = (name: string) => `${CONFIG.schoolsFilesUrl}/${this.path}/${name}?imgwidth=300`
   makeDownloadUrl = (name: string) => `${CONFIG.schoolsFilesUrl}/${this.path}/download/${name}`
 
-  preDownloadAsUrl = (path: string, name: string) => new Promise<string | undefined>((res) => {
+  preDownloadAsUrl = async (path: string, name: string) => await new Promise<string | undefined>((resolve) => {
     this.getFile(path, name).then((file) => {
-      res(URL.createObjectURL(file))
+      resolve(URL.createObjectURL(file))
     }).catch(() => {
-      res(undefined)
+      resolve(undefined)
     })
   })
 
-  getPreviewUrl = (name: string) => {
+  getPreviewUrl = async (name: string) => {
     const path = this.makePreviewUrl(name)
-    return this.preDownloadAsUrl(path, name)
+    return await this.preDownloadAsUrl(path, name)
   }
 
-  getDownloadUrl = (name: string) => {
+  getDownloadUrl = async (name: string) => {
     const path = this.makeDownloadUrl(name)
-    return this.preDownloadAsUrl(path, name)
+    return await this.preDownloadAsUrl(path, name)
   }
 
   delete = async (name: string) => {
@@ -85,5 +84,4 @@ export class ApiFilesRequest {
     if (res.status !== 200) throwApiResponseError(res.status)
     return res.ok
   }
-
 }

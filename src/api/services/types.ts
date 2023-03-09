@@ -1,7 +1,7 @@
-import { IBaseModel } from "../models_school/base.model"
-import { IQuery } from "../validations/query"
+import { IBaseModel } from '../models_school/base.model'
+import { IQuery } from '../validations/query'
 
-export type SearchById<Model extends IBaseModel> = {id: Model['id']}
+export type SearchById<Model extends IBaseModel> = { id: Model['id'] }
 export type SearchBy<Model extends IBaseModel> = Partial<Omit<Model, 'id'>>
 
 export interface PostParams<Model> {
@@ -35,26 +35,26 @@ export const isSearchById = <Model extends IBaseModel>(search: SearchById<Model>
   return (search as SearchById<Model>).id !== undefined
 }
 
-export type UploadFileParams = File | Array<File>
+export type UploadFileParams = File | File[]
 
 export type FileList = Array<{
-  name: string,
-  urlPreview?: string,
+  name: string
+  urlPreview?: string
   url: string
 }>
 
 export type UploadSingleFileResponse = {
-  message: string,
+  message: string
   name: {
-    original: string,
+    original: string
     savedAs: string
   }
 }
 
 export type UploadManyFileResponse = {
-  message: string,
+  message: string
   names: Array<{
-    original: string,
+    original: string
     savedAs: string
   }>
 }
@@ -69,4 +69,4 @@ export interface DeleteFileParams {
 }
 
 export type UploadFileReturn<T extends UploadFileParams> = T extends File ?
-UploadSingleFileResponse : UploadManyFileResponse
+  UploadSingleFileResponse : UploadManyFileResponse

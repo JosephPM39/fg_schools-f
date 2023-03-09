@@ -1,24 +1,24 @@
-import { Button, IconButton, Tooltip } from '@mui/material';
-import { ChangeEvent, useContext, useEffect, useState } from 'react';
-import { ISchool } from '../../../api/models_school';
-import { Dialog } from '../../../containers/Dialog';
+import { Button, IconButton, Tooltip } from '@mui/material'
+import { ChangeEvent, useContext, useEffect, useState } from 'react'
+import { ISchool } from '../../../api/models_school'
+import { Dialog } from '../../../containers/Dialog'
 import DefaultPreview from '../../../assets/signature.png'
-import { StorageFileContext } from '../../../context/files/StorageFilesContext';
-import { BtnContainer, BtnPropsContainer } from '../../../containers/types';
-import { SubDir } from '../../../hooks/files/useStorageFile';
-import { CustomError, ErrorType } from '../../../api/handlers/errors';
+import { StorageFileContext } from '../../../context/files/StorageFilesContext'
+import { BtnContainer, BtnPropsContainer } from '../../../containers/types'
+import { SubDir } from '../../../hooks/files/useStorageFile'
+import { CustomError, ErrorType } from '../../../api/handlers/errors'
 import { v4 as uuidV4 } from 'uuid'
-import { getFileExtension } from '../../../api/services/utils';
-import { SchoolContext } from '../../../context/api/schools';
+import { getFileExtension } from '../../../api/services/utils'
+import { SchoolContext } from '../../../context/api/schools'
 
 type ChangeIconDialogParams = {
   school?: ISchool | null
 } & (BtnContainer | BtnPropsContainer)
 
-export const ChangeIconDialog = ({school, ...btns}: ChangeIconDialogParams) => {
+export const ChangeIconDialog = ({ school, ...btns }: ChangeIconDialogParams) => {
   const useStorage = useContext(StorageFileContext)
   const useSchool = useContext(SchoolContext)
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false)
   const [icon, setIcon] = useState<File | null>(null)
   const [uploading, setUploading] = useState(false)
   const [prevIcon, setPrevIcon] = useState<string>(DefaultPreview)
@@ -26,18 +26,20 @@ export const ChangeIconDialog = ({school, ...btns}: ChangeIconDialogParams) => {
 
   const onUpload = async () => {
     setUploading(true)
-    const finalIcon = icon ? new File([icon], `${uuidV4()}.${getFileExtension(icon.name)}`, {
-      type: icon.type
-    }) : null
-    if (finalIcon) {
-      if (!storage) throw new CustomError(ErrorType.unknow, 'Storage inssuses')
+    const finalIcon = (icon != null)
+      ? new File([icon], `${uuidV4()}.${getFileExtension(icon.name)}`, {
+        type: icon.type
+      })
+      : null
+    if (finalIcon != null) {
+      if (storage == null) throw new CustomError(ErrorType.unknow, 'Storage inssuses')
       await storage.save(finalIcon)
     }
     await useSchool?.update({
       id: school?.id,
       data: {
         ...school,
-        icon: finalIcon?.name || 'default'
+        icon: finalIcon?.name ?? 'default'
       }
     })
     setUploading(false)
@@ -45,14 +47,14 @@ export const ChangeIconDialog = ({school, ...btns}: ChangeIconDialogParams) => {
   }
 
   const onSelectIcon = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.[0]) {
+    if ((e.target.files?.[0]) != null) {
       return setIcon(e.target.files[0])
     }
   }
 
   useEffect(() => {
     const getData = async () => {
-      if (!!icon) {
+      if (icon != null) {
         return setPrevIcon(URL.createObjectURL(icon))
       }
       if (!school?.icon || school.icon === 'default') return
@@ -60,7 +62,7 @@ export const ChangeIconDialog = ({school, ...btns}: ChangeIconDialogParams) => {
       if (!url) return
       setPrevIcon(url)
     }
-    getData()
+    void getData()
   }, [school])
 
   const UploadBtn = () => <Button disabled={uploading} onClick={onUpload}>
@@ -94,5 +96,5 @@ export const ChangeIconDialog = ({school, ...btns}: ChangeIconDialogParams) => {
         </IconButton>
       </Tooltip>
     </Dialog>
-  );
+  )
 }

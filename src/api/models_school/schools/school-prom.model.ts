@@ -32,7 +32,6 @@ export class SchoolProm extends BaseModel {
   @ValidateIf(o => !o.schoolId)
   @ValidateNested()
     school?: School
-
 }
 
 export interface ISchoolProm extends SchoolProm {}

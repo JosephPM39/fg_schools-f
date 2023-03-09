@@ -1,18 +1,18 @@
-import { SchoolFormInputs } from '../SchoolFormInputs';
-import { ChangeEvent, FormEvent, ReactNode, useContext, useEffect, useRef, useState } from 'react';
-import { EmployeePositionFormInputs } from '../EmployeePositionFormInputs';
-import { PositionType } from '../../../../api/models_school/schools/position.model';
-import { Button, Divider, FormControlLabel, FormLabel, Radio, RadioGroup } from '@mui/material';
-import { ISchoolProm } from '../../../../api/models_school';
-import { SelectSchoolPromYear } from '../SelectSchoolProm-Year';
-import { SelectEmployeePositionPromYear } from '../SelectEmployeePosition-PromYear';
-import { useEmployee } from '../../../../hooks/api/schools/useEmployee';
-import { useEmployeePosition } from '../../../../hooks/api/schools/useEmployeePosition';
-import { SchoolPromContext } from '../../../../context/api/schools';
-import { useSchool } from '../../../../hooks/api/schools/useSchool';
+import { SchoolFormInputs } from '../SchoolFormInputs'
+import { ChangeEvent, FormEvent, ReactNode, useContext, useEffect, useRef, useState } from 'react'
+import { EmployeePositionFormInputs } from '../EmployeePositionFormInputs'
+import { PositionType } from '../../../../api/models_school/schools/position.model'
+import { Button, Divider, FormControlLabel, FormLabel, Radio, RadioGroup } from '@mui/material'
+import { ISchoolProm } from '../../../../api/models_school'
+import { SelectSchoolPromYear } from '../SelectSchoolProm-Year'
+import { SelectEmployeePositionPromYear } from '../SelectEmployeePosition-PromYear'
+import { useEmployee } from '../../../../hooks/api/schools/useEmployee'
+import { useEmployeePosition } from '../../../../hooks/api/schools/useEmployeePosition'
+import { SchoolPromContext } from '../../../../context/api/schools'
+import { useSchool } from '../../../../hooks/api/schools/useSchool'
 import { getSubmitData, SubmitData } from './getData'
-import { Alert, AlertProps, AlertWithError } from '../../../Alert';
-import { InvalidDataError, isInvalidDataError, promiseHandleError } from '../../../../api/handlers/errors';
+import { Alert, AlertProps, AlertWithError } from '../../../Alert'
+import { InvalidDataError, isInvalidDataError, promiseHandleError } from '../../../../api/handlers/errors'
 
 type SchoolOrigin = 'new' | 'previous'
 type PrincipalOrigin = 'new' | 'previous' | 'all'
@@ -40,24 +40,24 @@ export const Form = (params?: { idForUpdate?: ISchoolProm['id'] }) => {
   const [showNotify, setShowNofity] = useState(false)
 
   useEffect(() => {
-    if (notify) setShowNofity(true)
+    if (notify != null) setShowNofity(true)
   }, [notify])
 
   useEffect(() => {
     const getData = async () => {
-      if (!params?.idForUpdate || !!schoolPromForUpdate) return
-      const res = await useSchoolProms?.findOne({id: params.idForUpdate})
-      if (!res) return
+      if (!params?.idForUpdate || !(schoolPromForUpdate == null)) return
+      const res = await useSchoolProms?.findOne({ id: params.idForUpdate })
+      if (res == null) return
       return setSchoolPromForUpdate(res)
     }
-    getData()
+    void getData()
   }, [params, useSchoolProms?.data])
 
   useEffect(() => {
-    if (!schoolSelected && principalOrigin === 'previous') {
+    if ((schoolSelected == null) && principalOrigin === 'previous') {
       setPrincipalOrigin('new')
     }
-    if (schoolOrigin === 'new' && schoolSelected) {
+    if (schoolOrigin === 'new' && (schoolSelected != null)) {
       setSchoolSelected(undefined)
     }
   }, [schoolSelected, principalOrigin, schoolOrigin])
@@ -73,7 +73,7 @@ export const Form = (params?: { idForUpdate?: ISchoolProm['id'] }) => {
 
     const getSchoolProm = () => {
       if (principalOrigin !== 'previous') return {}
-      if (!schoolSelected) return {}
+      if (schoolSelected == null) return {}
       return {
         schoolProms: [schoolSelected],
         paginationNext: () => {},
@@ -122,12 +122,12 @@ export const Form = (params?: { idForUpdate?: ISchoolProm['id'] }) => {
       form: form.current
     })
 
-    if (!data || !useSchoolProms) return
+    if ((data == null) || (useSchoolProms == null)) return
 
     await promiseHandleError((error) => {
       console.log('Errors', error.message, (error as InvalidDataError).validationError)
       console.log(isInvalidDataError(error), 'invalid data')
-      setNotify({error})
+      setNotify({ error })
       setSending(false)
     }, async () => {
       await validateForm(data)
@@ -143,19 +143,19 @@ export const Form = (params?: { idForUpdate?: ISchoolProm['id'] }) => {
   }
 
   const validateForm = async (data: SubmitData) => {
-    if (data.school) {
+    if (data.school != null) {
       await useSchools.validate({
         data: data.school.data
       })
     }
-    if (data.principal?.employee) {
+    if ((data.principal?.employee) != null) {
       await useEmployees.validate({
         data: data.principal.employee
       })
     }
-    if (data.principal) {
+    if (data.principal != null) {
       const ep = {
-        ...data.principal,
+        ...data.principal
       }
       delete ep.employee
       await useEmployeePositions.validate({
@@ -165,18 +165,17 @@ export const Form = (params?: { idForUpdate?: ISchoolProm['id'] }) => {
   }
 
   const submitForm = async (data: SubmitData) => {
-
     // FOR CREATE MODE
 
-    if (data.school && !params?.idForUpdate) {
+    if ((data.school != null) && !params?.idForUpdate) {
       await useSchools.create(data.school.data)
     }
-    if (data.principal?.employee && !params?.idForUpdate) {
+    if (((data.principal?.employee) != null) && !params?.idForUpdate) {
       await useEmployees.create(data.principal.employee)
     }
-    if (data.principal && !params?.idForUpdate) {
+    if ((data.principal != null) && !params?.idForUpdate) {
       const ep = {
-        ...data.principal,
+        ...data.principal
       }
       delete ep.employee
       await useEmployeePositions.create(ep)
@@ -188,21 +187,21 @@ export const Form = (params?: { idForUpdate?: ISchoolProm['id'] }) => {
 
     // FOR UPDATE MODE
 
-    if (data.school && params?.idForUpdate) {
+    if ((data.school != null) && params?.idForUpdate) {
       await useSchools.update({
         data: data.school.data,
         id: data.school.data.id
       })
     }
-    if (data.principal?.employee && params?.idForUpdate) {
+    if (((data.principal?.employee) != null) && params?.idForUpdate) {
       await useEmployees.update({
         data: data.principal.employee,
         id: data.principal.employee.id
       })
     }
-    if (data.principal && params?.idForUpdate) {
+    if ((data.principal != null) && params?.idForUpdate) {
       const ep = {
-        ...data.principal,
+        ...data.principal
       }
       delete ep.employee
       await useEmployeePositions.update({
@@ -234,7 +233,7 @@ export const Form = (params?: { idForUpdate?: ISchoolProm['id'] }) => {
       <input
         name="school_prom_id"
         type='text'
-        value={schoolPromForUpdate?.['id'] || ''}
+        value={schoolPromForUpdate?.id ?? ''}
         onChange={() => {}}
         hidden
       />
@@ -242,7 +241,7 @@ export const Form = (params?: { idForUpdate?: ISchoolProm['id'] }) => {
         name="year"
         type='number'
         onChange={() => {}}
-        value={schoolPromForUpdate?.['year'] || ''}
+        value={schoolPromForUpdate?.year ?? ''}
         hidden
       />
       <FormLabel>Escuela: </FormLabel>
@@ -270,7 +269,7 @@ export const Form = (params?: { idForUpdate?: ISchoolProm['id'] }) => {
           label={params?.idForUpdate ? 'Editar' : 'Nuevo'}
         />
         {
-          (schoolOrigin === 'previous' && schoolSelected) &&
+          (schoolOrigin === 'previous' && (schoolSelected != null)) &&
           <FormControlLabel
             value='previous'
             control={<Radio/>}

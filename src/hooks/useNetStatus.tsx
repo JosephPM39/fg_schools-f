@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState } from 'react'
 
 export enum AppNetStatus {
   mountOffline = 'mount-offline',
@@ -22,17 +22,17 @@ const dispatch = (ev: string = 'storage') => {
   window.dispatchEvent(new Event(ev))
 }
 
-function getLS<T>(k: string): T | null {
+function getLS<T> (k: string): T | null {
   const res = window.localStorage.getItem(k)
   return res ? JSON.parse(res) as T : null
 }
 
-function setLS<T>(k: string, v: T) {
+function setLS<T> (k: string, v: T) {
   window.localStorage.setItem(k, JSON.stringify(v))
   dispatch()
 }
 
-function removeLS(k: string) {
+function removeLS (k: string) {
   window.localStorage.removeItem(k)
   dispatch()
 }
@@ -60,7 +60,6 @@ export const useNetStatus = () => {
     }
   }, [])
 
-
   useEffect(() => {
     const storageHandler = () => {
       const status = getLS<AppNetStatus>('app-net-status')
@@ -70,12 +69,12 @@ export const useNetStatus = () => {
 
       const errors = getLS<AppNetError[]>('app-net-status')
       const newErrors = () => {
-        if(appNetErrors && Array.isArray(errors)) {
+        if ((appNetErrors != null) && Array.isArray(errors)) {
           return errors.filter(
             (e, i) => e.title !== appNetErrors[i].title
           ).length > 0
         }
-        return (!appNetErrors && Array.isArray(errors))
+        return ((appNetErrors == null) && Array.isArray(errors))
       }
       if (newErrors()) {
         setAppNetErrors(errors)

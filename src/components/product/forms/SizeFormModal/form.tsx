@@ -1,20 +1,20 @@
-import { Checkbox, FormControlLabel, Grid, InputAdornment, TextField } from '@mui/material';
-import { ISize } from '../../../../api/models_school';
-import { getData } from './getData';
-import { useSize } from '../../../../hooks/api/products/useSize';
-import { BaseForm, InputsParams } from '../BaseFormModal';
+import { Checkbox, FormControlLabel, Grid, TextField } from '@mui/material'
+import { ISize } from '../../../../api/models_school'
+import { getData } from './getData'
+import { useSize } from '../../../../hooks/api/products/useSize'
+import { BaseForm, InputsParams } from '../BaseFormModal'
 
 interface Params {
-  idForUpdate?: ISize['id'],
+  idForUpdate?: ISize['id']
   onSuccess?: () => void
 }
 
-const Inputs = ({data, onChange}: InputsParams<ISize>) => (
+const Inputs = ({ data, onChange }: InputsParams<ISize>) => (
   <>
     <input
       name="size_id"
       type='text'
-      value={data?.['id'] || ''}
+      value={data?.id}
       onChange={() => {}}
       hidden
     />
@@ -22,7 +22,7 @@ const Inputs = ({data, onChange}: InputsParams<ISize>) => (
       <Grid item xs={12} sm={6}>
         <TextField
           fullWidth
-          value={data?.name || ''}
+          value={data?.name}
           onChange={(e) => onChange(e, 'name')}
           InputLabelProps={{
             shrink: !!data?.name
@@ -32,7 +32,7 @@ const Inputs = ({data, onChange}: InputsParams<ISize>) => (
           type='text'
           inputProps={{
             minLength: 1,
-            maxLength: 30,
+            maxLength: 30
           }}
           variant="outlined"
           required
@@ -41,7 +41,7 @@ const Inputs = ({data, onChange}: InputsParams<ISize>) => (
       <Grid item xs={12} sm={6}>
         <TextField
           fullWidth
-          value={data?.width || ''}
+          value={data?.width}
           onChange={(e) => onChange(e, 'width')}
           name="width"
           label="Ancho"
@@ -58,7 +58,7 @@ const Inputs = ({data, onChange}: InputsParams<ISize>) => (
       <Grid item xs={12} sm={6}>
         <TextField
           fullWidth
-          value={data?.height || ''}
+          value={data?.height}
           onChange={(e) => onChange(e, 'height')}
           name="height"
           label="Alto"
@@ -75,7 +75,7 @@ const Inputs = ({data, onChange}: InputsParams<ISize>) => (
       <Grid item xs={12} sm={6}>
         <TextField
           fullWidth
-          value={data?.ppp || ''}
+          value={data?.ppp}
           onChange={(e) => onChange(e, 'ppp')}
           name="ppp"
           label="Píxeles por PULG"
@@ -103,7 +103,7 @@ const Inputs = ({data, onChange}: InputsParams<ISize>) => (
 )
 
 export const Form = (params: Params) => {
-  const useSizes = useSize({initFetch: false})
+  const useSizes = useSize({ initFetch: false })
   return (
     <BaseForm {...params} Inputs={Inputs} dataFormatter={getData} hook={useSizes}/>
   )

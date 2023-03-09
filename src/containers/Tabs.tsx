@@ -1,8 +1,8 @@
-import * as React from 'react';
-import {default as TabsM } from '@mui/material/Tabs';
-import {Tab} from './Tab'
-import Box from '@mui/material/Box';
-import { TabPanel } from './TabPanel';
+import * as React from 'react'
+import TabsM from '@mui/material/Tabs'
+import { Tab } from './Tab'
+import Box from '@mui/material/Box'
+import { TabPanel } from './TabPanel'
 
 type TabsProps = {
   data: Array<{
@@ -12,19 +12,19 @@ type TabsProps = {
   idPrefix: string
   contentPadding?: number | string
 } & ({
-  orientation: "horizontal"
+  orientation: 'horizontal'
 } | {
-  orientation: "vertical"
+  orientation: 'vertical'
   height?: string
 })
 
 export const Tabs = (props: TabsProps) => {
-  const [value, setValue] = React.useState(0);
-  const {orientation, idPrefix, data} = props
+  const [value, setValue] = React.useState(0)
+  const { orientation, idPrefix, data } = props
 
   const handleChange = (_: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue);
-  };
+    setValue(newValue)
+  }
 
   const TabsPanels = () => {
     return <> { data.map(
@@ -68,9 +68,9 @@ export const Tabs = (props: TabsProps) => {
             )
           }
         </TabsM>
-        {orientation==='vertical' && <TabsPanels/>}
+        {orientation === 'vertical' && <TabsPanels/>}
       </Box>
-      {orientation==='horizontal' && <TabsPanels/>}
+      {orientation === 'horizontal' && <TabsPanels/>}
     </Box>
-  );
+  )
 }

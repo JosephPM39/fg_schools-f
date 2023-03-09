@@ -10,10 +10,10 @@ import { PickDirDialog } from '../components/PickDirDialog'
 export const Principal = () => {
   const schoolProms = useContext(SchoolPromContext)
 
-  const [cards, setCards] = useState<Array<JSX.Element>>([])
+  const [cards, setCards] = useState<JSX.Element[]>([])
 
   useEffect(() => {
-    const cardsFinded: Array<JSX.Element> = []
+    const cardsFinded: JSX.Element[] = []
     const count = schoolProms?.metadata?.count ?? 0
     for (let i = 0; i < count; i++) {
       const prom = schoolProms?.data.at(i)
