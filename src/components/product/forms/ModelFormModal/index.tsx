@@ -1,49 +1,13 @@
-import { Modal } from '../../../../containers/Modal'
-import { Box } from '@mui/material'
 import { Form } from './form'
 import { IModel } from '../../../../api/models_school'
-import {
-  BtnContainer,
-  BtnPropsContainer,
-  isBtnContainer,
-  isNoBtnContainer,
-  NoBtnContainer
-} from '../../../../containers/types'
-import { Dispatch, SetStateAction } from 'react'
+import { BaseFormModal, BaseFormModalParams } from '../../../BaseDataTable/BaseFormModal'
+import { IBaseModel } from '../../../../api/models_school/base.model'
 export { Form as ModelForm }
 
-type Params = {
-  idForUpdate?: IModel['id']
-  state?: [boolean, Dispatch<SetStateAction<boolean>>]
-  onSuccess?: () => void
-} & ((BtnContainer | BtnPropsContainer | NoBtnContainer) | undefined)
+type Params<T extends IBaseModel> = Omit<BaseFormModalParams<T>, 'Form' | 'name'>
 
-export const ModelFormModal = (params: Params) => {
-  const { idForUpdate, onSuccess } = params
-  const mBtn = (): BtnContainer | BtnPropsContainer | NoBtnContainer => {
-    if (isNoBtnContainer(params)) {
-      return params
-    }
-    if (isBtnContainer(params)) {
-      return params
-    }
-    if (params.btnProps) {
-      return params
-    }
-    return {
-      btnProps: {
-        children: `${idForUpdate ? 'Editar' : 'Agregar'} modelo`,
-        variant: 'outlined'
-      }
-    }
-  }
-
-  return <Modal {...mBtn()} title={`${idForUpdate ? 'Editar' : 'Agregar'} modelo`} state={params.state}>
-    <Box
-      marginY={4}
-      marginX={4}
-    >
-      <Form onSuccess={onSuccess} idForUpdate={idForUpdate}/>
-    </Box>
-  </Modal>
+export const ModelFormModal = (params: Params<IModel>) => {
+  return (
+    <BaseFormModal {...params as any} Form={Form} name='Modelo'/>
+  )
 }

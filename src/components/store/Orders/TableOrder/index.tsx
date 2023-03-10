@@ -55,6 +55,24 @@ export const TableOrder = (params: Params) => {
     })
   }, [orders])
 
+  const PaymentsButton = (p: GridRenderCellParams<any, IOrder>) => {
+    const onClick = () => {
+      onClickNested({ renderParams: p, field: 'payment' })
+    }
+    return <IconButton onClick={onClick} color='primary'>
+      <AttachMoney/>
+    </IconButton>
+  }
+
+  const PhotosButton = (p: GridRenderCellParams<any, IOrder>) => {
+    const onClick = () => {
+      onClickNested({ renderParams: p, field: 'photo' })
+    }
+    return <IconButton onClick={onClick} color='primary'>
+      <Photo/>
+    </IconButton>
+  }
+
   /* useEffect(() => {
     if (idForUpdate) {
       setOpen(true)
@@ -140,14 +158,7 @@ export const TableOrder = (params: Params) => {
       headerName: 'Pagos',
       type: 'actions',
       disableExport: true,
-      renderCell: (p: GridRenderCellParams<any, IOrder>) => {
-        const onClick = () => {
-          onClickNested({ renderParams: p, field: 'payment' })
-        }
-        return <IconButton onClick={onClick} color='primary'>
-          <AttachMoney/>
-        </IconButton>
-      },
+      renderCell: (p: GridRenderCellParams<any, IOrder>) => <PaymentsButton {...p}/>,
       width: 65
     },
     {
@@ -155,14 +166,7 @@ export const TableOrder = (params: Params) => {
       headerName: 'Fotos',
       type: 'actions',
       disableExport: true,
-      renderCell: (p: GridRenderCellParams<any, IOrder>) => {
-        const onClick = () => {
-          onClickNested({ renderParams: p, field: 'photo' })
-        }
-        return <IconButton onClick={onClick} color='primary'>
-          <Photo/>
-        </IconButton>
-      },
+      renderCell: (p: GridRenderCellParams<any, IOrder>) => <PhotosButton {...p}/>,
       width: 65
     },
     {

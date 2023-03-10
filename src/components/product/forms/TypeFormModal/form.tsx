@@ -1,4 +1,5 @@
-import { Checkbox, FormControlLabel, Grid, TextField } from '@mui/material'
+import { Grid, TextField } from '@mui/material'
+import { ControlledCheckbox } from '../../../inputs/ControlledCheckbox'
 import { IType } from '../../../../api/models_school'
 import { getData } from './getData'
 import { BaseForm, InputsParams } from '../../../BaseDataTable/BaseFormModal'
@@ -14,7 +15,7 @@ const Inputs = ({ data, onChange }: InputsParams<IType>) => (
     <input
       name="type_id"
       type='text'
-      value={data?.id}
+      value={data?.id ?? ''}
       onChange={() => {}}
       hidden
     />
@@ -22,7 +23,7 @@ const Inputs = ({ data, onChange }: InputsParams<IType>) => (
       <Grid item xs={12} sm={6}>
         <TextField
           fullWidth
-          value={data?.name}
+          value={data?.name ?? ''}
           onChange={(e) => onChange(e, 'name')}
           InputLabelProps={{
             shrink: !!data?.name
@@ -39,12 +40,10 @@ const Inputs = ({ data, onChange }: InputsParams<IType>) => (
         />
       </Grid>
       <Grid item xs={12} sm={6}>
-        <FormControlLabel
+        <ControlledCheckbox
           label='Disponible'
-          control={<Checkbox
-            defaultChecked={data?.available}
-            name='available'
-          />}
+          initState={data?.available ?? false}
+          name='available'
         />
       </Grid>
     </Grid>

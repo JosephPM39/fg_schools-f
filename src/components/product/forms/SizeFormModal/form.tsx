@@ -1,4 +1,5 @@
-import { Checkbox, FormControlLabel, Grid, TextField } from '@mui/material'
+import { Grid, TextField } from '@mui/material'
+import { ControlledCheckbox } from '../../../inputs/ControlledCheckbox'
 import { ISize } from '../../../../api/models_school'
 import { getData } from './getData'
 import { useSize } from '../../../../hooks/api/products/useSize'
@@ -14,7 +15,7 @@ const Inputs = ({ data, onChange }: InputsParams<ISize>) => (
     <input
       name="size_id"
       type='text'
-      value={data?.id}
+      value={data?.id ?? ''}
       onChange={() => {}}
       hidden
     />
@@ -22,7 +23,7 @@ const Inputs = ({ data, onChange }: InputsParams<ISize>) => (
       <Grid item xs={12} sm={6}>
         <TextField
           fullWidth
-          value={data?.name}
+          value={data?.name ?? ''}
           onChange={(e) => onChange(e, 'name')}
           InputLabelProps={{
             shrink: !!data?.name
@@ -41,8 +42,11 @@ const Inputs = ({ data, onChange }: InputsParams<ISize>) => (
       <Grid item xs={12} sm={6}>
         <TextField
           fullWidth
-          value={data?.width}
+          value={data?.width ?? ''}
           onChange={(e) => onChange(e, 'width')}
+          InputLabelProps={{
+            shrink: !!data?.width
+          }}
           name="width"
           label="Ancho"
           type='number'
@@ -58,9 +62,11 @@ const Inputs = ({ data, onChange }: InputsParams<ISize>) => (
       <Grid item xs={12} sm={6}>
         <TextField
           fullWidth
-          value={data?.height}
+          value={data?.height ?? ''}
           onChange={(e) => onChange(e, 'height')}
-          name="height"
+          InputLabelProps={{
+            shrink: !!data?.height
+          }}name="height"
           label="Alto"
           type='number'
           inputProps={{
@@ -75,9 +81,11 @@ const Inputs = ({ data, onChange }: InputsParams<ISize>) => (
       <Grid item xs={12} sm={6}>
         <TextField
           fullWidth
-          value={data?.ppp}
+          value={data?.ppp ?? ''}
           onChange={(e) => onChange(e, 'ppp')}
-          name="ppp"
+          InputLabelProps={{
+            shrink: !!data?.ppp
+          }}name="ppp"
           label="Píxeles por PULG"
           type='number'
           inputProps={{
@@ -90,12 +98,10 @@ const Inputs = ({ data, onChange }: InputsParams<ISize>) => (
         />
       </Grid>
       <Grid item xs={12} sm={6}>
-        <FormControlLabel
+        <ControlledCheckbox
           label='Disponible'
-          control={<Checkbox
-            defaultChecked={data?.available}
-            name='available'
-          />}
+          initState={data?.available ?? false}
+          name='available'
         />
       </Grid>
     </Grid>

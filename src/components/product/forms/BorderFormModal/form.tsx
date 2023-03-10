@@ -1,8 +1,9 @@
-import { Checkbox, FormControlLabel, Grid, TextField } from '@mui/material'
+import { Grid, TextField } from '@mui/material'
 import { IBorder } from '../../../../api/models_school'
 import { getData } from './getData'
 import { BaseForm, InputsParams } from '../../../BaseDataTable/BaseFormModal'
 import { useBorder } from '../../../../hooks/api/products/useBorder'
+import { ControlledCheckbox } from '../../../inputs/ControlledCheckbox'
 
 interface Params {
   idForUpdate?: IBorder['id']
@@ -39,12 +40,10 @@ const Inputs = ({ data, onChange }: InputsParams<IBorder>) => (
         />
       </Grid>
       <Grid item xs={12} sm={6}>
-        <FormControlLabel
+        <ControlledCheckbox
           label='Disponible'
-          control={<Checkbox
-            defaultChecked={data?.available}
-            name='available'
-          />}
+          initState={data?.available ?? false}
+          name='available'
         />
       </Grid>
     </Grid>

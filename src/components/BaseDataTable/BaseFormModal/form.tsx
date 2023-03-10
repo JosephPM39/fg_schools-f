@@ -6,7 +6,7 @@ import { IBaseModel } from '../../../api/models_school/base.model'
 import { useBase } from '../../../hooks/api/useBase'
 
 export interface InputsParams<T extends IBaseModel> {
-  onChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, k: keyof T) => void
+  onChange: (e: InputCE, k: keyof T, t?: VALUE_TYPE) => void
   data?: Partial<T>
 }
 
@@ -17,6 +17,37 @@ export interface BaseFormParams<T extends IBaseModel> {
   Inputs: (p: InputsParams<T>) => JSX.Element
   dataFormatter: (form: FormData) => T
   hook: ReturnType<typeof useBase<T>>
+}
+
+export enum VALUE_TYPE {
+  int = 'int',
+  float = 'float',
+  str = 'string',
+  bool = 'boolean',
+  date = 'date'
+}
+
+type InputCE = ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+type InputElementCE = ChangeEvent<HTMLInputElement>
+
+function isInputElement (e: InputCE): e is InputElementCE {
+  return typeof (e as InputElementCE).target.checked !== 'undefined'
+}
+
+const inferSafeType = (e: InputCE, type: VALUE_TYPE = VALUE_TYPE.str) => {
+  const value = e.target.value
+  if (type === VALUE_TYPE.int) return parseInt(value)
+  if (type === VALUE_TYPE.float) return parseFloat(value)
+  if (type === VALUE_TYPE.date) return new Date(value)
+  if (type === VALUE_TYPE.bool && isInputElement(e)) {
+    console.log('infering')
+    return e.target.checked
+  }
+  if (type === VALUE_TYPE.bool) {
+    return !!value ?? false
+  }
+  if (type === VALUE_TYPE.str) return String(value)
+  return String(value)
 }
 
 export const BaseForm = <T extends IBaseModel>(params: BaseFormParams<T>) => {
@@ -43,10 +74,11 @@ export const BaseForm = <T extends IBaseModel>(params: BaseFormParams<T>) => {
     void getData()
   }, [idForUpdate, hook?.data, hook?.data.length, data])
 
-  const onChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, k: keyof T) => {
+  const onChange = (e: InputCE, k: keyof T, type?: VALUE_TYPE) => {
+    const value = inferSafeType(e, type)
     setData({
       ...data as T,
-      [k]: e.target.value
+      [k]: value
     })
     e.preventDefault()
   }

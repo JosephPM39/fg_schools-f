@@ -1,11 +1,6 @@
 import { IModel } from '../../../../api/models_school'
 import { v4 as uuidV4 } from 'uuid'
-
-function getFormValue<T> (form: FormData, name: string): T | null {
-  const value = form.get(name)
-  if (!value) return null
-  return form.get(name) as T
-}
+import { getFormValue } from '../../../BaseDataTable/BaseFormModal/getData'
 
 export const getData = (form: FormData): IModel => {
   return {

@@ -44,14 +44,12 @@ export const TablePayment = (params: Params) => {
 
   const dateFormat = (value: string) => {
     const date = new Date(value)
-    console.log(date)
     const formated = date.toLocaleString('es-GB', {
       hourCycle: 'h12',
       dateStyle: 'full',
       timeStyle: 'short',
       timeZone: 'America/El_Salvador'
     })
-    console.log(formated)
     return formated
   }
 

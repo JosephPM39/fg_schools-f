@@ -24,75 +24,81 @@ const toDateTimeLocal = (date: Date) => {
   return `${fullDate}T${fullTime}`
 }
 
-export const Inputs = ({ data, onChange }: InputsParams<IPayment>) => (
-  <>
-    <input
-      name="payment_id"
-      type='text'
-      value={data?.id}
-      hidden
-    />
-    <input
-      name="order_id"
-      type='text'
-      value={data?.orderId}
-      hidden
-    />
-    <Grid container spacing={2}>
-      <Grid item xs={12} sm={6}>
-        <TextField
-          fullWidth
-          value={data?.total}
-          onChange={(e) => onChange(e, 'total')}
-          InputLabelProps={{
-            shrink: !!data?.total
-          }}
-          name="total"
-          label="Cantidad"
-          type='number'
-          inputProps={{
-            max: 9999.99,
-            min: 0.01,
-            step: 0.01
-          }}
-          variant="outlined"
-          required
-        />
+export const Inputs = ({ data, onChange }: InputsParams<IPayment>) => {
+  const date = data?.date ? new Date(data.date) : new Date()
+
+  return (
+    <>
+      <input
+        name="payment_id"
+        type='text'
+        value={data?.id ?? ''}
+        onChange={() => {}}
+        hidden
+      />
+      <input
+        name="order_id"
+        type='text'
+        value={data?.orderId ?? ''}
+        onChange={() => {}}
+        hidden
+      />
+      <Grid container spacing={2}>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            value={data?.total ?? ''}
+            onChange={(e) => onChange(e, 'total')}
+            InputLabelProps={{
+              shrink: !!data?.total
+            }}
+            name="total"
+            label="Cantidad"
+            type='number'
+            inputProps={{
+              max: 9999.99,
+              min: 0.01,
+              step: 0.01
+            }}
+            variant="outlined"
+            required
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            value={data?.details ?? ''}
+            onChange={(e) => onChange(e, 'details')}
+            InputLabelProps={{
+              shrink: !!data?.details
+            }}
+            name="details"
+            label="Concepto"
+            type='text'
+            inputProps={{
+              minLength: 1,
+              maxLength: 254
+            }}
+            variant="outlined"
+            required
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            fullWidth
+            value={toDateTimeLocal(date) ?? ''}
+            onChange={(e) => onChange(e, 'date')}
+            name="date"
+            label="Fecha"
+            type='datetime-local'
+            variant="outlined"
+            required
+          />
+        </Grid>
       </Grid>
-      <Grid item xs={12} sm={6}>
-        <TextField
-          fullWidth
-          value={data?.details}
-          onChange={(e) => onChange(e, 'details')}
-          InputLabelProps={{
-            shrink: !!data?.details
-          }}
-          name="details"
-          label="Concepto"
-          type='text'
-          inputProps={{
-            minLength: 1,
-            maxLength: 254
-          }}
-          variant="outlined"
-          required
-        />
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <TextField
-          fullWidth
-          value={data?.date ?? toDateTimeLocal(new Date())}
-          onChange={(e) => onChange(e, 'date')}
-          name="date"
-          label="Fecha"
-          type='datetime-local'
-          variant="outlined"
-          required
-        />
-      </Grid>
-    </Grid>
-  </>
-)
+    </>
+  )
+}
 
 export const Form = (params: FormParams) => {
   const usePayments = usePayment({ initFetch: false })
