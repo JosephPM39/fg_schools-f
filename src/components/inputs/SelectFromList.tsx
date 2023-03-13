@@ -36,16 +36,17 @@ interface ItemParams {
   key?: string
   children?: string
   index: number
+  onClick: () => void
   onNeedFetch?: (index: number) => void
 }
 
 const Item = (params: ItemParams) => {
-  const { value, key, children, onNeedFetch, index } = params
+  const { value, onClick, key, children, onNeedFetch, index } = params
   const { show, element } = useNearScreen()
 
   useEffect(() => {
     if (!show || value) return
-    if (onNeedFetch == null) return
+    if (!onNeedFetch) return
     onNeedFetch(index)
   }, [show, value])
 
@@ -53,6 +54,7 @@ const Item = (params: ItemParams) => {
     <MenuItem
       ref={element}
       value={value ?? ''}
+      onClick={onClick}
       key={`menu-item-${key ?? ''}`}
     >
       {children}
@@ -103,14 +105,15 @@ export const SelectFromList = <T extends IBaseModel>(params: Params<T>) => {
           value={String(item?.[valueBy])}
           key={`${id}-${i}`}
           index={i}
+          onClick={() => setSelected(list.at(i))}
           onNeedFetch={onNeedFetch}
         >
-          {(item != null) ? getItemName(item) : 'Cargando...'}
+          {(item) ? getItemName(item) : 'Cargando...'}
         </Item>
       )
     }
     setItems(itms)
-  }, [list, count])
+  }, [list, count, valueBy])
 
   useEffect(() => {
     onSelect(selected)
@@ -127,10 +130,10 @@ export const SelectFromList = <T extends IBaseModel>(params: Params<T>) => {
   }
 
   const defaultId = <K extends typeof valueBy>(prop?: T[K]) => {
-    if (prop == null) return
+    if (!prop) return
     const item = find(prop)
-    if ((item?.[valueBy]) != null) return String(item[valueBy])
-    if ((selected != null) && (find(selected[valueBy]) == null)) setSelected(undefined)
+    if (item?.[valueBy]) return String(item[valueBy])
+    if (selected && !find(selected[valueBy])) setSelected(undefined)
     return ''
   }
 
