@@ -15,6 +15,12 @@ export const TableSize = () => {
       flex: 1
     },
     {
+      field: 'name',
+      headerName: 'Nombre',
+      type: 'string',
+      flex: 1
+    },
+    {
       field: 'height',
       headerName: 'Alto',
       type: 'number'

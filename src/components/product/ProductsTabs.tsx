@@ -2,6 +2,7 @@ import { Tabs } from '../../containers/Tabs'
 import { TableBorder } from './tables/TableBorder'
 import { TableColor } from './tables/TableColor'
 import { TableModel } from './tables/TableModel'
+import { TableProduct } from './tables/TableProduct'
 import { TableSize } from './tables/TableSize'
 import { TableType } from './tables/TableType'
 
@@ -9,7 +10,7 @@ export const ProductsTabs = () => {
   const data = [
     {
       label: 'Productos',
-      content: <>Put here Products Table</>
+      content: <TableProduct/>
     },
     {
       label: 'Modelos',

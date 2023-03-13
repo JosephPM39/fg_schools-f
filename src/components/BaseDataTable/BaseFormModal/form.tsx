@@ -1,6 +1,5 @@
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react'
 import { Button, Divider } from '@mui/material'
-import { IColor } from '../../../api/models_school'
 import { ErrorCatched, promiseHandleError } from '../../../api/handlers/errors'
 import { IBaseModel } from '../../../api/models_school/base.model'
 import { useBase } from '../../../hooks/api/useBase'
@@ -11,7 +10,7 @@ export interface InputsParams<T extends IBaseModel> {
 }
 
 export interface BaseFormParams<T extends IBaseModel> {
-  idForUpdate?: IColor['id']
+  idForUpdate?: T['id']
   onSuccess?: () => void
   onFail?: (error: ErrorCatched) => void
   Inputs: (p: InputsParams<T>) => JSX.Element

@@ -36,7 +36,7 @@ interface ItemParams {
   key?: string
   children?: string
   index: number
-  onClick: () => void
+  onClick?: () => void
   onNeedFetch?: (index: number) => void
 }
 
@@ -105,7 +105,6 @@ export const SelectFromList = <T extends IBaseModel>(params: Params<T>) => {
           value={String(item?.[valueBy])}
           key={`${id}-${i}`}
           index={i}
-          onClick={() => setSelected(list.at(i))}
           onNeedFetch={onNeedFetch}
         >
           {(item) ? getItemName(item) : 'Cargando...'}
@@ -145,8 +144,8 @@ export const SelectFromList = <T extends IBaseModel>(params: Params<T>) => {
         labelId={`${id}-select-label`}
         id={`${id}-select`}
         name={name}
-        MenuProps={{ PaperProps: { sx: { maxHeight: 250 } } }}
         defaultValue={defaultValue}
+        MenuProps={{ PaperProps: { sx: { maxHeight: 250 } } }}
         value={defaultId(selected?.[valueBy]) ?? ''}
         label={`${title}`}
         onChange={handleChange}
