@@ -8,11 +8,16 @@ export const ComboBox = <
   KV extends keyof T = 'id',
   O extends Option<T> | LazyOption<T, KV> = Option<T>
 >(params: Params<T, KV, O>) => {
-  const { options, id, label, size, onToggleOpen = () => {} } = params
-  const { onChange: extOnChange, onSearch, searchMaxLength } = params
+  const { options, id, label, size, name, onToggleOpen = () => {} } = params
+  const { onChange: extOnChange, onSearch, searchMaxLength, defaultValue, renderOption } = params
   const [open, setOpen] = useState(false)
   const [value, setValue] = useState<O | null>(null)
   const [searchValue, setSearchValue] = useState<string>('')
+
+  useEffect(() => {
+    if (!defaultValue) return
+    setValue(defaultValue)
+  }, [defaultValue])
 
   useEffect(() => {
     onToggleOpen(open)
@@ -34,28 +39,38 @@ export const ComboBox = <
     setSearchValue(newSearch)
   }
 
-  return <Autocomplete
-    value={value}
-    onChange={onChange}
-    inputValue={searchValue}
-    onInputChange={onSearchValueChange}
-    isOptionEqualToValue={(o, v) => o.label === v.label}
-    disablePortal
-    open={open}
-    onOpen={() => setOpen(true)}
-    onClose={() => setOpen(false)}
-    options={options}
-    size={size}
-    id={`combobox-${id}`}
-    renderInput={(p) => (
-      <TextField
-        {...p}
-        label={label}
-        inputProps={{
-          ...p.inputProps,
-          maxLength: searchMaxLength ?? 254
-        }}
-      />
-    )}
-  />
+  return <>
+    <input
+      name={name}
+      type='text'
+      value={String(value?.value ?? '')}
+      onChange={() => {}}
+      hidden
+    />
+    <Autocomplete
+      value={value}
+      onChange={onChange}
+      inputValue={searchValue}
+      onInputChange={onSearchValueChange}
+      isOptionEqualToValue={(o, v) => o.label === v.label}
+      renderOption={renderOption}
+      disablePortal
+      open={open}
+      onOpen={() => setOpen(true)}
+      onClose={() => setOpen(false)}
+      options={options}
+      size={size}
+      id={`combobox-${id}`}
+      renderInput={(p) => (
+        <TextField
+          {...p}
+          label={label}
+          inputProps={{
+            ...p.inputProps,
+            maxLength: searchMaxLength ?? 254
+          }}
+        />
+      )}
+    />
+  </>
 }

@@ -1,3 +1,4 @@
+import { HTMLAttributes, ReactNode } from 'react'
 import { IBaseModel } from '../../../api/models_school/base.model'
 import { useBase } from '../../../hooks/api/useBase'
 
@@ -8,16 +9,16 @@ export interface Option<T extends IBaseModel> {
 
 export interface LazyOption<T extends IBaseModel, KV extends keyof T = 'id'> {
   label: string
-  id: T[KV] | 'new' | 'load'
+  value: T[KV] | 'new' | 'unloaded'
   index: number
 }
 
 export interface LazyParams<T extends IBaseModel, KV extends keyof T = 'id'>
-  extends Omit<Params<T>, 'options' | 'onToggleOpen' | 'onChange' | 'onSearch'> {
+  extends Omit<Params<T>, 'options' | 'onToggleOpen' | 'onChange' | 'onSearch' | 'defaultValue' | 'renderOption'> {
   itemLabelBy: keyof T
   itemValueBy: KV
   onChange: (item?: T[KV]) => void
-  defaultValue: T[KV]
+  defaultValue?: T['id']
   omitCreateOption?: true
   hook: ReturnType<typeof useBase<T>>
 }
@@ -30,9 +31,12 @@ export interface Params<
   id: string
   label: string
   options: O[]
+  name?: string
+  renderOption?: (p: HTMLAttributes<HTMLLIElement>, v: O) => ReactNode
   size?: 'small' | 'medium'
   onToggleOpen?: (open: boolean) => void
   onChange: (op: O | null) => void
   onSearch: (s: string) => void
   searchMaxLength?: number
+  defaultValue?: O
 }
