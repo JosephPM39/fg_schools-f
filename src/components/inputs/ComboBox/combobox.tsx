@@ -8,7 +8,7 @@ export const ComboBox = <
   KV extends keyof T = 'id',
   O extends Option<T> | LazyOption<T, KV> = Option<T>
 >(params: Params<T, KV, O>) => {
-  const { options, id, label, size, name, onToggleOpen = () => {} } = params
+  const { options, id, label, size, name, onToggleOpen = () => {}, isLoading } = params
   const { onChange: extOnChange, onSearch, searchMaxLength, defaultValue, renderOption } = params
   const [open, setOpen] = useState(false)
   const [value, setValue] = useState<O | null>(null)
@@ -54,6 +54,11 @@ export const ComboBox = <
       onInputChange={onSearchValueChange}
       isOptionEqualToValue={(o, v) => o.label === v.label}
       renderOption={renderOption}
+      loading={isLoading}
+      loadingText='Cargando...'
+      ListboxProps={{
+        role: 'list-box'
+      }}
       disablePortal
       open={open}
       onOpen={() => setOpen(true)}

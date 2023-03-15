@@ -9,12 +9,15 @@ export interface Option<T extends IBaseModel> {
 
 export interface LazyOption<T extends IBaseModel, KV extends keyof T = 'id'> {
   label: string
-  value: T[KV] | 'new' | 'unloaded'
+  value: T[KV] | 'new' | 'loader'
   index: number
 }
 
+type LazyParamsOmit = 'isLoading' | 'options' | 'onToggleOpen' |
+'onChange' | 'onSearch' | 'defaultValue' | 'renderOption'
+
 export interface LazyParams<T extends IBaseModel, KV extends keyof T = 'id'>
-  extends Omit<Params<T>, 'options' | 'onToggleOpen' | 'onChange' | 'onSearch' | 'defaultValue' | 'renderOption'> {
+  extends Omit<Params<T>, LazyParamsOmit> {
   itemLabelBy: keyof T
   itemValueBy: KV
   onChange: (item?: T[KV]) => void
@@ -32,6 +35,7 @@ export interface Params<
   label: string
   options: O[]
   name?: string
+  isLoading?: boolean
   renderOption?: (p: HTMLAttributes<HTMLLIElement>, v: O) => ReactNode
   size?: 'small' | 'medium'
   onToggleOpen?: (open: boolean) => void
