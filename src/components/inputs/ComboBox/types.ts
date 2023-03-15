@@ -38,6 +38,7 @@ export interface Params<
   isLoading?: boolean
   renderOption?: (p: HTMLAttributes<HTMLLIElement>, v: O) => ReactNode
   size?: 'small' | 'medium'
+  required?: boolean
   onToggleOpen?: (open: boolean) => void
   onChange: (op: O | null) => void
   onSearch: (s: string) => void

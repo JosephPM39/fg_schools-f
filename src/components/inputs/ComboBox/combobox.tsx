@@ -8,7 +8,7 @@ export const ComboBox = <
   KV extends keyof T = 'id',
   O extends Option<T> | LazyOption<T, KV> = Option<T>
 >(params: Params<T, KV, O>) => {
-  const { options, id, label, size, name, onToggleOpen = () => {}, isLoading } = params
+  const { options, id, label, size, name, onToggleOpen = () => {}, isLoading, required } = params
   const { onChange: extOnChange, onSearch, searchMaxLength, defaultValue, renderOption } = params
   const [open, setOpen] = useState(false)
   const [value, setValue] = useState<O | null>(null)
@@ -70,6 +70,7 @@ export const ComboBox = <
         <TextField
           {...p}
           label={label}
+          required={required}
           inputProps={{
             ...p.inputProps,
             maxLength: searchMaxLength ?? 254

@@ -21,14 +21,6 @@ export const ComboBoxLazy = <
   const [defaultValue, setDefaulValue] = useState<LazyOption<T, KV>>()
   const [searchValue, setSearchValue] = useState<string>('')
   const [items, setItems] = useState<T[]>([])
-  const [needNextPag, setNeedNextPag] = useState(false)
-
-  useEffect(() => {
-    if (!needNextPag) return
-    hook.launchNextFetch()
-    setNeedNextPag(false)
-  }, [needNextPag])
-
   const { debounce } = useDebounce()
 
   const RenderOption = ({ params, value }: { params: HTMLAttributes<HTMLLIElement>, value: LazyOption<T, KV> }) => {
@@ -37,8 +29,7 @@ export const ComboBoxLazy = <
     useEffect(() => {
       if (!show) return
       if (value.value !== 'loader') return
-      console.log('unloaded')
-      hook.launchNextFetch()
+      debounce(() => hook.launchNextFetch(), 100)
     }, [show, value])
 
     const onClick = (e: MouseEvent<HTMLLIElement>) => {
@@ -50,6 +41,7 @@ export const ComboBoxLazy = <
       }
       if (params.onClick) return params?.onClick(e)
     }
+
     return <li ref={element} {...params} onClick={onClick}>
       {value.label}
     </li>
@@ -109,8 +101,6 @@ export const ComboBoxLazy = <
       }
     })
     const rest = ((hook.metadata?.count ?? 0) - op.length)
-    const frest = rest > 0 ? rest : 0
-    console.log(frest, 'frest', op.length, 'op length', rest, 'rest', hook.data.length, 'hook')
     const fill: LazyOption<T, KV> = ({
       label: 'Cargando...',
       value: 'loader',
@@ -129,7 +119,7 @@ export const ComboBoxLazy = <
   useEffect(() => {
     if (dvId && !defaultValue) return
     setItems(hook.data)
-  }, [hook.data])
+  }, [hook.data, dvId, defaultValue])
 
   useEffect(() => {
     if (optionSelected?.value === 'new') return
@@ -152,7 +142,6 @@ export const ComboBoxLazy = <
   return <ComboBox<T, KV, LazyOption<T, KV>>
     onChange={onChangeCB}
     onSearch={onSearch}
-    isLoading={hook.isFetching}
     renderOption={(p, v) => {
       return <RenderOption key={v.index} params={p} value={v}/>
     }}
