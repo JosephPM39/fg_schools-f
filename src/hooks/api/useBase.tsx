@@ -72,7 +72,7 @@ const findFNStatus = <
 
 export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => {
   // ========== DATA HOOKS ==========
-  const [metadata, setMetadata] = useState<(QueryUsed & {
+  const [metadata, setMetadata] = useState<(QueryUsed<Model> & {
     searchByUsed?: SearchBy<Model> | SearchById<Model>
   }) | undefined>(undefined)
   const [data, setData] = useState<Model[]>([])

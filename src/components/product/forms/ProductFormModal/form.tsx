@@ -4,13 +4,13 @@ import { Grid, TextField } from '@mui/material'
 import { IProduct } from '../../../../api/models_school'
 import { useProduct } from '../../../../hooks/api/products/useProduct'
 import { getData } from './getData'
-import { SelectFromList } from '../../../inputs/SelectFromList'
 import { useType } from '../../../../hooks/api/products/useType'
 import { useModel } from '../../../../hooks/api/products/useModel'
 import { useSize } from '../../../../hooks/api/products/useSize'
 import { useColor } from '../../../../hooks/api/products/useColor'
 import { useBorder } from '../../../../hooks/api/products/useBorder'
 import { useEffect } from 'react'
+import { ComboBoxLazy } from '../../../inputs/ComboBox'
 
 interface Params {
   idForUpdate?: IProduct['id']
@@ -66,78 +66,67 @@ const Inputs = ({ data, onChange }: InputsParams<IProduct>) => {
         />
       </Grid>
       <Grid item xs={12} sm={6}>
-        <SelectFromList
-          id="model"
-          list={useModels.data}
-          count={useModels.metadata?.count ?? 0}
-          itemNameBy='name'
+        <ComboBoxLazy
+          itemLabelBy='name'
+          label='Modelo'
+          name='model_id'
+          searchMaxLength={50}
           defaultValue={data?.modelId}
-          paginationNext={(p) => {
-            useModels.launchNextFetch(p)
-          }}
-          onSelect={() => {}}
-          name="model_id"
-          title="Modelo"
+          id='model'
+          required
+          hook={useModels}
           omitCreateOption
         />
       </Grid>
       <Grid item xs={12} sm={6}>
-        <SelectFromList
-          id="size"
-          list={useSizes.data}
-          count={useSizes.metadata?.count ?? 0}
-          itemNameBy='name'
-          paginationNext={(p) => {
-            useSizes.launchNextFetch(p)
-          }}
-          onSelect={() => {}}
-          name="size_id"
-          title="Tamaño"
+        <ComboBoxLazy
+          itemLabelBy='name'
+          label='Tamaño'
+          name='size_id'
+          searchMaxLength={50}
+          // defaultValue={data?.sizeId}
+          id='size'
+          required
+          hook={useSizes}
           omitCreateOption
         />
       </Grid>
       <Grid item xs={12} sm={6}>
-        <SelectFromList
-          id="type"
-          list={useTypes.data}
-          count={useTypes.metadata?.count ?? 0}
-          itemNameBy='name'
-          paginationNext={(p) => {
-            useTypes.launchNextFetch(p)
-          }}
-          onSelect={() => {}}
-          name="type_id"
-          title="Tipo"
+        <ComboBoxLazy
+          itemLabelBy='name'
+          label='Tipo'
+          name='type_id'
+          searchMaxLength={50}
+          // defaultValue={data?.typeId}
+          id='type'
+          required
+          hook={useTypes}
           omitCreateOption
         />
       </Grid>
       <Grid item xs={12} sm={6}>
-        <SelectFromList
-          id="color"
-          list={useColors.data}
-          count={useColors.metadata?.count ?? 0}
-          itemNameBy='name'
-          paginationNext={(p) => {
-            useColors.launchNextFetch(p)
-          }}
-          onSelect={() => {}}
-          name="color_id"
-          title="Color"
+        <ComboBoxLazy
+          itemLabelBy='name'
+          label='Color'
+          name='color_id'
+          searchMaxLength={30}
+          // defaultValue={data?.colorId}
+          id='color'
+          required
+          hook={useColors}
           omitCreateOption
         />
       </Grid>
       <Grid item xs={12} sm={6}>
-        <SelectFromList
-          id="border"
-          list={useBorders.data}
-          count={useBorders.metadata?.count ?? 0}
-          itemNameBy='name'
-          paginationNext={(p) => {
-            useBorders.launchNextFetch(p)
-          }}
-          onSelect={() => {}}
-          name="border_id"
-          title="Borde"
+        <ComboBoxLazy
+          itemLabelBy='name'
+          label='Borde'
+          name='border_id'
+          searchMaxLength={30}
+          // defaultValue={data?.borderId}
+          id='border'
+          required
+          hook={useBorders}
           omitCreateOption
         />
       </Grid>
