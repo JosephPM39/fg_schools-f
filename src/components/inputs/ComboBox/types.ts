@@ -19,11 +19,19 @@ type LazyParamsOmit = 'isLoading' | 'options' | 'onToggleOpen' |
 export interface LazyParams<T extends IBaseModel, KV extends keyof T = 'id'>
   extends Omit<Params<T>, LazyParamsOmit> {
   itemLabelBy: keyof T
-  itemValueBy: KV
-  onChange: (item?: T[KV]) => void
+  itemValueBy?: KV
+  onChange?: (item?: T[KV]) => void
+  onCreacte?: () => void
   defaultValue?: T['id']
   omitCreateOption?: true
   hook: ReturnType<typeof useBase<T>>
+}
+
+export function isLazyOption<
+  T extends IBaseModel,
+  KV extends keyof T = 'id'
+> (option: Option<T> | LazyOption<T, KV>): option is LazyOption<T, KV> {
+  return typeof (option as LazyOption<T, KV>).index !== 'undefined'
 }
 
 export interface Params<
@@ -40,7 +48,7 @@ export interface Params<
   size?: 'small' | 'medium'
   required?: boolean
   onToggleOpen?: (open: boolean) => void
-  onChange: (op: O | null) => void
+  onChange?: (op: O | null) => void
   onSearch: (s: string) => void
   searchMaxLength?: number
   defaultValue?: O

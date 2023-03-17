@@ -1,7 +1,7 @@
 import { Autocomplete, TextField } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { IBaseModel } from '../../../api/models_school/base.model'
-import { LazyOption, Option, Params } from './types'
+import { isLazyOption, LazyOption, Option, Params } from './types'
 
 export const ComboBox = <
   T extends IBaseModel = IBaseModel,
@@ -24,6 +24,7 @@ export const ComboBox = <
   }, [open])
 
   useEffect(() => {
+    if (!extOnChange) return
     extOnChange(value)
   }, [value])
 
@@ -39,6 +40,26 @@ export const ComboBox = <
     setSearchValue(newSearch)
   }
 
+  const isOptionEqualToValue = (option: O, value: O) => {
+    const label = option.label === value.label
+    const dataValue = option.value === value.value
+    console.log('O: ', option, ' V: ', value)
+    if (isLazyOption<T, KV>(option) && isLazyOption<T, KV>(value)) {
+      const index = option.index === value.index
+      console.log({
+        label,
+        dataValue,
+        index
+      })
+      return label && index && dataValue
+    }
+    console.log({
+      label,
+      dataValue
+    })
+    return label && dataValue
+  }
+
   return <>
     <input
       name={name}
@@ -52,14 +73,14 @@ export const ComboBox = <
       onChange={onChange}
       inputValue={searchValue}
       onInputChange={onSearchValueChange}
-      isOptionEqualToValue={(o, v) => o.label === v.label}
+      defaultValue={defaultValue}
+      isOptionEqualToValue={isOptionEqualToValue}
       renderOption={renderOption}
       loading={isLoading}
       loadingText='Cargando...'
       ListboxProps={{
         role: 'list-box'
       }}
-      disablePortal
       open={open}
       onOpen={() => setOpen(true)}
       onClose={() => setOpen(false)}

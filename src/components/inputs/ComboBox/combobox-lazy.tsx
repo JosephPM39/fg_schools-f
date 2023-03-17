@@ -11,9 +11,9 @@ export const ComboBoxLazy = <
   KV extends keyof T = 'id'
 >(params: LazyParams<T, KV>) => {
   const {
-    itemLabelBy, itemValueBy,
+    itemLabelBy, itemValueBy = 'id' as KV,
     omitCreateOption, onChange: extOnChange,
-    hook, searchMaxLength,
+    hook, searchMaxLength, onCreacte,
     id, defaultValue: dvId, ...rest
   } = params
   const [options, setOptions] = useState<Array<LazyOption<T, KV>>>([])
@@ -34,7 +34,8 @@ export const ComboBoxLazy = <
 
     const onClick = (e: MouseEvent<HTMLLIElement>) => {
       if (value.value === 'new') {
-        return newOption()
+        if (!onCreacte) return
+        return onCreacte()
       }
       if (value.value === 'loader') {
         return
@@ -55,6 +56,9 @@ export const ComboBoxLazy = <
 
   useEffect(() => {
     const getData = async () => {
+      if (searchValue === optionSelected?.label) return
+      if (searchValue === newOp.label) return
+
       if (dvId && !defaultValue) {
         console.log(dvId, 'default value')
         const res = await hook.findOne({ id: dvId })
@@ -65,21 +69,21 @@ export const ComboBoxLazy = <
           value: res[itemValueBy],
           index: 0
         }
-        setOptionSelected(value)
-        return setDefaulValue(value)
+        setDefaulValue(value)
+        setOptions([...options, value])
+        return setOptionSelected(value)
       }
 
-      if (searchValue === optionSelected?.label) return
-      if (searchValue === newOp.label) return
+      console.log(searchValue.length, 'length', searchValue)
 
       const searchBy: T = {
         [itemLabelBy]: `%${searchValue}%`
       } as unknown as T
 
-      const isWithSearch = Object.keys(searchBy).length > 0
+      const isWithSearch = searchValue.length > 0
 
-      if (!isWithSearch || searchValue === '') {
-        await hook.fetch({})
+      if (!isWithSearch) {
+        return await hook.fetch({})
       }
 
       const conf = {
@@ -124,18 +128,16 @@ export const ComboBoxLazy = <
   useEffect(() => {
     if (optionSelected?.value === 'new') return
     if (optionSelected?.value === 'loader') return
+    if (!extOnChange) return
     extOnChange(optionSelected?.value)
   }, [optionSelected])
-
-  const newOption = () => {
-    console.log('nuevo')
-  }
 
   const onChangeCB = (op: LazyOption<T, KV> | null) => {
     setOptionSelected(op)
   }
 
   const onSearch = (search: string) => {
+    if (search === searchValue) return
     debounce(() => setSearchValue(search), 500)
   }
 
