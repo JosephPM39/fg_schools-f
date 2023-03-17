@@ -123,9 +123,50 @@ export const searchByHandler = (sby?: string | object) => {
   }
 }
 
+interface MakeGetFilteredParams<Model extends IBaseModel> {
+  json: Model[]
+  query?: IQuery
+  searchBy: Partial<Model>
+}
+
+interface MakeGetFilteredReturn<Model extends IBaseModel> {
+  data: Model[] | null
+  queryUsed: QueryUsed<Model>
+}
+
+export const makeGetFiltered = <
+  Model extends IBaseModel
+>(params: MakeGetFilteredParams<Model>): MakeGetFilteredReturn<Model> => {
+  const { query, searchBy, json: data } = params
+
+  const finalQuery: Required<IQuery> = {
+    limit: query?.limit ?? '10',
+    offset: query?.offset ?? '0',
+    byoperator: query?.byoperator ?? ByOperator.equal,
+    order: query?.order ?? Order.desc
+  }
+
+  const json = filterBy(data, searchBy, finalQuery.byoperator)
+
+  const queryUsed = {
+    ...finalQuery,
+    count: json.length
+  }
+  if (finalQuery.limit === 'NONE') {
+    return {
+      data: json.slice(parseInt(finalQuery.offset)),
+      queryUsed
+    }
+  }
+  return {
+    data: json.slice(parseInt(finalQuery.offset), (parseInt(finalQuery.limit) + parseInt(finalQuery.offset))),
+    queryUsed
+  }
+}
+
 export const queryFilter = <Model extends IBaseModel>(json: Model[], query?: IQuery): {
   data: Model[] | null
-  queryUsed: QueryUsed
+  queryUsed: QueryUsed<Model>
 } => {
   const filt: Required<IQuery> = {
     limit: query?.limit ?? '10',
@@ -149,12 +190,63 @@ export const queryFilter = <Model extends IBaseModel>(json: Model[], query?: IQu
   }
 }
 
-export const filterBy = <Model extends IBaseModel>(json: Model[], searchBy: Partial<Model>) => {
+export const escapeRegExp = (string: string) => {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // $& means the whole matched string
+}
+
+export const addslashes = (str: string) => {
+  //  discuss at: https://locutus.io/php/addslashes/
+  // original by: Kevin van Zonneveld (https://kvz.io)
+  // improved by: Ates Goral (https://magnetiq.com)
+  // improved by: marrtins
+  // improved by: Nate
+  // improved by: Onno Marsman (https://twitter.com/onnomarsman)
+  // improved by: Brett Zamir (https://brett-zamir.me)
+  // improved by: Oskar Larsson Högfeldt (https://oskar-lh.name/)
+  //    input by: Denny Wardhana
+  //   example 1: addslashes("kevin's birthday")
+  //   returns 1: "kevin\\'s birthday"
+  return (str + '')
+    .replace(/[\\"']/g, '\\$&')
+    .replace(/\u0000/g, '\\0')
+}
+
+const likeToReg = (likeExp: string) => {
+  const regExp = addslashes(likeExp).replace('%', '.*').replace('_', '.')
+  const regExpEscaped = escapeRegExp(`^${regExp}$`)
+  console.log('reg: ')
+  return regExpEscaped
+}
+
+export const filterBy = <Model extends IBaseModel>(json: Model[], searchBy: Partial<Model>, byoperator?: ByOperator) => {
+  const equal = (value: any, searchValue: any) => value === searchValue
+  const moreThan = (value: number, searchValue: number) => value > searchValue
+  const lessThan = (value: number, searchValue: number) => value < searchValue
+  const notEqual = (value: any, searchValue: any) => !equal(value, searchValue)
+  const like = (value: string, searchValue: string) => {
+    const res = new RegExp(likeToReg(searchValue)).test(value)
+    console.log(value, ' M ', searchValue, ' = ', res)
+    return res
+  }
+  const ilike = (value: string, searchValue: string) => (
+    like(value.toUpperCase(), searchValue.toUpperCase())
+  )
+
+  const operator = (value: any, searchValue: any) => {
+    if (byoperator === ByOperator.like) return like(value, searchValue)
+    if (byoperator === ByOperator.iLike) return ilike(value, searchValue)
+    if (byoperator === ByOperator.equal) return equal(value, searchValue)
+    if (byoperator === ByOperator.notEqual) return notEqual(value, searchValue)
+    if (byoperator === ByOperator.moreThan) return moreThan(value, searchValue)
+    if (byoperator === ByOperator.lessThan) return lessThan(value, searchValue)
+    return equal(value, searchValue)
+  }
+
   return json.filter((obj) => {
     const keys = Object.keys(searchBy)
     const res = keys.filter(
       (key) => {
-        return obj[key as keyof typeof obj] === searchBy[key as keyof typeof searchBy]
+        return operator(obj[key as keyof typeof obj], searchBy[key as keyof typeof searchBy])
       }
     )
     return res.length === keys.length

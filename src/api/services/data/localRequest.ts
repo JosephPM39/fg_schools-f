@@ -1,13 +1,14 @@
 import { ResponseError, Responses } from '../../handlers/errors'
 import { IBaseModel } from '../../models_school/base.model'
 import { QueryUsed } from '../../types'
+import { ByOperator } from '../../validations/query'
 import { PostParams, DeleteParams, PatchParams, ReadParams } from '../types'
-import { debounce, filterBy, queryFilter, toPromise } from '../utils'
+import { debounce, filterBy, makeGetFiltered, queryFilter, toPromise } from '../utils'
 
 interface Crud<Model extends IBaseModel> {
   read: (p: ReadParams<Model>) => Promise<{
     data: Model[] | null
-    queryUsed: QueryUsed
+    queryUsed: QueryUsed<Model>
   }>
   create: (p: PostParams<Model>) => Promise<Model[] | false>
   patch: (p: PatchParams<Model>) => Promise<boolean>
@@ -22,10 +23,13 @@ export class LocalRequest<Model extends IBaseModel> implements Crud<Model> {
   read = async ({ searchBy, query }: ReadParams<Model>) => await toPromise(() => {
     const existent = this.get(this.path)
     if (!searchBy) {
-      return queryFilter(existent ?? [], query)
+      const res = queryFilter(existent ?? [], query)
+      if (query?.byoperator === ByOperator.like) console.log('res without searchBy', res)
+      return res
     }
-    const filteredBy = filterBy<Model>(existent ?? [], searchBy as Partial<Model>)
-    return queryFilter(filteredBy, query)
+    const res = makeGetFiltered<Model>({ json: existent ?? [], searchBy: searchBy as Partial<Model>, query })
+    if (query?.byoperator === ByOperator.like) console.log('res with searchBy', res)
+    return res
   }, [])
 
   create = async ({ data }: PostParams<Model>) => await debounce(() => {

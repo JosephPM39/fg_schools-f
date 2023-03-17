@@ -32,7 +32,10 @@ export interface DeleteParams<Model extends IBaseModel> {
   softDelete?: boolean
 }
 
-export type QueryUsed = Partial<IQuery> & { count: number }
+export type QueryUsed<Model extends IBaseModel> = Partial<IQuery> & {
+  count: number
+  payload?: Partial<Model>
+}
 
 /* export interface IController<Model extends IBaseModel> {
   create: (params: CreateParams) => Promise<boolean | Model[]>

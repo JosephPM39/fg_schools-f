@@ -25,7 +25,7 @@ export interface StorageRequestConfig<Model extends IBaseModel> {
 interface Crud<Model extends IBaseModel> {
   read: (p: ReadParams<Model>) => Promise<{
     data: Model[] | null
-    queryUsed: QueryUsed
+    queryUsed: QueryUsed<Model>
   }>
   create: (p: CreateParams<Model>) => Promise<Model[]>
   update: (p: UpdateParams<Model>) => Promise<true>
@@ -33,7 +33,7 @@ interface Crud<Model extends IBaseModel> {
 
   safeRead: (p: ReadParams<Model>) => Promise<{
     data: Model[] | null
-    queryUsed: QueryUsed
+    queryUsed: QueryUsed<Model>
   } | ErrorCatched>
   safeCreate: (p: CreateParams<Model>) => Promise<Model[] | ErrorCatched>
   safeUpdate: (p: UpdateParams<Model>) => Promise<true | ErrorCatched>

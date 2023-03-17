@@ -8,11 +8,11 @@ import { removeOfflineFlag, addOfflineFlag, throwApiResponseError, fetchOnce } f
 interface Crud<Model extends IBaseModel> {
   get: (p: GetNormalParams<Model>) => Promise<{
     data: Model[] | null
-    queryUsed: QueryUsed
+    queryUsed: QueryUsed<Model>
   }>
   getFiltered: (p: GetFilteredParams<Model>) => Promise<{
     data: Model[] | null
-    queryUsed: QueryUsed
+    queryUsed: QueryUsed<Model>
   }>
   post: (p: PostParams<Model>) => Promise<Model[] | false>
   patch: (p: PatchParams<Model>) => Promise<boolean>
@@ -62,7 +62,7 @@ export class ApiRequest<Model extends IBaseModel> implements Crud<Model> {
 
     return {
       data: addOfflineFlag<Model>(json.data) ?? null,
-      queryUsed: json.queryUsed as QueryUsed
+      queryUsed: json.queryUsed as QueryUsed<Model>
     }
   }
 
@@ -88,7 +88,7 @@ export class ApiRequest<Model extends IBaseModel> implements Crud<Model> {
 
     return {
       data: addOfflineFlag<Model>(json.data) ?? null,
-      queryUsed: json.queryUsed as QueryUsed
+      queryUsed: json.queryUsed as QueryUsed<Model>
     }
   }
 
