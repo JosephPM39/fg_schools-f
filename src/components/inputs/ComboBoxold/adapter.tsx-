@@ -1,0 +1,116 @@
+import * as React from 'react'
+import useMediaQuery from '@mui/material/useMediaQuery'
+import { useTheme } from '@mui/material/styles'
+import { VariableSizeList } from 'react-window'
+import { renderRow, LISTBOX_PADDING } from './renderRow'
+import InfiniteLoader from 'react-window-infinite-loader'
+
+const OuterElementContext = React.createContext({})
+
+const OuterElementType = React.forwardRef<HTMLDivElement>((props, ref) => {
+  const outerProps = React.useContext(OuterElementContext)
+  return <div ref={ref} {...props} {...outerProps} />
+})
+
+function useResetCache (data: any) {
+  const ref = React.useRef<InfiniteLoader>(null)
+  React.useEffect(() => {
+    if (ref.current != null) {
+      ref.current.resetloadMoreItemsCache()
+    }
+  }, [data])
+  return ref
+}
+
+// Adapter for react-window
+
+interface Params {
+  isNextPageLoading: boolean
+  loadNextPage: () => void
+  hasNextPage: boolean
+}
+
+export const MakeListbox = (params: Params) => {
+  const { isNextPageLoading, loadNextPage, hasNextPage } = params
+
+  const ListboxComponent = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLElement>
+  >(function ListboxComponent (props, cref) {
+    const { children, ...other } = props
+    const itemData: React.ReactElement[] = [];
+
+    (children as React.ReactElement[]).forEach(
+      (item: React.ReactElement & { children?: React.ReactElement[] }) => {
+        itemData.push(item)
+        itemData.push(...(item.children ?? []))
+      }
+    )
+
+    const theme = useTheme()
+    const smUp = useMediaQuery(theme.breakpoints.up('sm'), {
+      noSsr: true
+    })
+    const itemCount = itemData.length
+    const itemSize = smUp ? 36 : 48
+
+    const getChildSize = (child: React.ReactElement) => {
+      if (child.hasOwnProperty('group')) {
+        return 48
+      }
+
+      return itemSize
+    }
+
+    const getHeight = () => {
+      if (itemCount > 8) {
+        return 8 * itemSize
+      }
+      return itemData.map(getChildSize).reduce((a, b) => a + b, 0)
+    }
+
+    const gridRef = useResetCache(itemCount)
+
+    // Only load 1 page of items at a time.
+    // Pass an empty callback to InfiniteLoader in case it asks us to load more than once.
+    const loadMoreItems = isNextPageLoading ? () => {} : loadNextPage
+
+    // Every row is loaded except for our loading indicator row.
+    const isItemLoaded = (index: number) => !hasNextPage || index < itemData.length
+    const itemC = hasNextPage ? (itemData.length + 1) : itemData.length
+
+    return (
+      <div ref={cref}>
+        <OuterElementContext.Provider value={other}>
+          <InfiniteLoader
+            ref={gridRef}
+            isItemLoaded={isItemLoaded}
+            loadMoreItems={loadMoreItems}
+            itemCount={itemC}
+          >
+            {({ onItemsRendered, ref }) => (
+
+              <VariableSizeList
+                itemData={itemData}
+                height={getHeight() + 2 * LISTBOX_PADDING}
+                width="100%"
+                onItemsRendered={onItemsRendered}
+                ref={ref}
+                outerElementType={OuterElementType}
+                innerElementType="ul"
+                itemSize={(index) => getChildSize(itemData[index])}
+                overscanCount={5}
+                itemCount={itemCount}
+              >
+                {renderRow}
+              </VariableSizeList>
+            )}
+          </InfiniteLoader>
+
+        </OuterElementContext.Provider>
+      </div>
+    )
+  })
+
+  return ListboxComponent
+}

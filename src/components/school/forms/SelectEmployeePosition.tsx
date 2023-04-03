@@ -6,7 +6,7 @@ interface params {
   onSelect?: (selected?: IEmployeePosition) => void
   list: IEmployeePosition[]
   type: PositionType
-  paginationNext: (p: { offset: number, limit: number }) => void
+  paginationNext: (p?: { offset?: number, limit?: number }) => void
   count: number
 }
 

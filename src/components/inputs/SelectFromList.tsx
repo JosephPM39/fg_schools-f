@@ -1,6 +1,7 @@
 import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { IBaseModel } from '../../api/models_school/base.model'
+import { useDebounce } from '../../hooks/useDebouce'
 import { useNearScreen } from '../../hooks/useNearScreen'
 
 interface WithFormat<T extends IBaseModel> {
@@ -21,7 +22,7 @@ interface BaseParams<T extends IBaseModel> {
   defaultValue?: T['id']
   valueBy?: keyof T
   size?: 'small' | 'medium'
-  paginationNext?: (params: { offset: number, limit: number }) => void
+  paginationNext?: (params?: { offset?: number, limit?: number }) => void
   count: number
 }
 
@@ -32,34 +33,10 @@ function isWithProp<T extends IBaseModel> (p: Params<T>): p is BaseParams<T> & W
 }
 
 interface ItemParams {
-  value?: string
+  valueId: string | 'loader' | 'new'
   key?: string
   children?: string
   index: number
-  onClick?: () => void
-  onNeedFetch?: (index: number) => void
-}
-
-const Item = (params: ItemParams) => {
-  const { value, onClick, key, children, onNeedFetch, index } = params
-  const { show, element } = useNearScreen()
-
-  useEffect(() => {
-    if (!show || value) return
-    if (!onNeedFetch) return
-    onNeedFetch(index)
-  }, [show, value])
-
-  return (
-    <MenuItem
-      ref={element}
-      value={value ?? ''}
-      onClick={onClick}
-      key={`menu-item-${key ?? ''}`}
-    >
-      {children}
-    </MenuItem>
-  )
 }
 
 export const SelectFromList = <T extends IBaseModel>(params: Params<T>) => {
@@ -78,6 +55,45 @@ export const SelectFromList = <T extends IBaseModel>(params: Params<T>) => {
   } = params
   const [selected, setSelected] = useState<T>()
   const [items, setItems] = useState<JSX.Element[]>([])
+  const { debounce } = useDebounce()
+
+  const loadMore = (index: number) => {
+    console.log('inited loadMore')
+    if (index < (list.length - 1)) return
+    paginationNext({
+      offset: index,
+      limit: 10
+    })
+  }
+
+  const create = () => {
+
+  }
+
+  const Item = (params: ItemParams) => {
+    const { valueId, key, children, index } = params
+    const { show, element } = useNearScreen()
+
+    useEffect(() => {
+      console.log('value', valueId)
+      if (!show) return
+      if (valueId === 'loader') {
+        console.log('loader')
+        return debounce(() => loadMore(index), 500)
+      }
+      if (valueId === 'new') return create()
+    }, [show, valueId, index])
+
+    return (
+      <MenuItem
+        ref={element}
+        value={valueId}
+        key={`menu-item-${key ?? ''}`}
+      >
+        {children}
+      </MenuItem>
+    )
+  }
 
   const getItemName = (item: T) => {
     if (isWithProp(params)) {
@@ -86,31 +102,33 @@ export const SelectFromList = <T extends IBaseModel>(params: Params<T>) => {
     return params.itemNameFormat(item)
   }
 
-  const onNeedFetch = (index: number) => {
-    if (index < (list.length - 1)) return
-    if ((index % 10) !== 0) return
-    paginationNext({
-      offset: index,
-      limit: 10
-    })
-  }
-
   useEffect(() => {
     if (list.length < 1) return
     const itms: JSX.Element[] = []
-    for (let i = 0; i < count; i++) {
+    for (let i = 0; i < list.length; i++) {
       const item = list.at(i)
       itms.push(
         <Item
-          value={String(item?.[valueBy])}
+          valueId={String(item?.[valueBy])}
           key={`${id}-${i}`}
           index={i}
-          onNeedFetch={onNeedFetch}
         >
           {(item) ? getItemName(item) : 'Cargando...'}
         </Item>
       )
     }
+    if (list.length < count) {
+      itms.push(
+        <Item
+          valueId={'loader'}
+          key={`${id}-loader`}
+          index={list.length}
+        >
+          {'Cargando...'}
+        </Item>
+      )
+    }
+
     setItems(itms)
   }, [list, count, valueBy])
 
@@ -151,13 +169,13 @@ export const SelectFromList = <T extends IBaseModel>(params: Params<T>) => {
         onChange={handleChange}
         required
       >
+        {!omitCreateOption && <MenuItem value='new' key={`menu-item-${id}-new`}>
+          Nuevo
+        </MenuItem>}
         <MenuItem value={''} key={`menu-item-${id}-null`}>
           {list.length < 1 ? 'No hay registros' : 'Sin seleccionar'}
         </MenuItem>
         {items}
-        {!omitCreateOption && <MenuItem value='new' key={`menu-item-${id}-new`}>
-          Nuevo
-        </MenuItem>}
       </Select>
     </FormControl>
   )

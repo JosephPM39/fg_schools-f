@@ -11,7 +11,7 @@ import { SelectEmployeePosition } from './SelectEmployeePosition'
 import { YearSelect } from '../../YearSelect'
 
 interface Pagination {
-  paginationNext: (p: { limit: number, offset: number }) => void
+  paginationNext: (p?: { limit?: number, offset?: number }) => void
   count: number
 }
 

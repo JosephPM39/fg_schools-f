@@ -8,7 +8,7 @@ interface Params {
   onSelect: (select?: ISectionProm) => void
   list: ISectionProm[]
   defaultValue?: ISectionProm['id']
-  paginationNext: (p: { limit: number, offset: number }) => void
+  paginationNext: (p?: { limit?: number, offset?: number }) => void
   count: number
 }
 

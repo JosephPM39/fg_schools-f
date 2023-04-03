@@ -208,6 +208,7 @@ export const addslashes = (str: string) => {
   //   returns 1: "kevin\\'s birthday"
   return (str + '')
     .replace(/[\\"']/g, '\\$&')
+  // eslint-disable-next-line
     .replace(/\u0000/g, '\\0')
 }
 
