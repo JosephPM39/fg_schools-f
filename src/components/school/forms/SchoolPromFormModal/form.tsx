@@ -102,7 +102,7 @@ export const Form = (params?: { idForUpdate?: ISchoolProm['id'] }) => {
       />)
     }
     if (schoolOrigin === 'previous') {
-      return setSchoolInput(<SelectSchoolPromYear onSelect={(p) => setSchoolSelected(p)}/>)
+      return setSchoolInput(<SelectSchoolPromYear onChange={(p) => setSchoolSelected(p)}/>)
     }
   }, [schoolOrigin, schoolPromForUpdate])
 

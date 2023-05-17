@@ -1,28 +1,34 @@
 import { ISchoolProm } from '../../../api/models_school'
-import { SelectFromList } from '../../inputs/SelectFromList'
+import { useSchool } from '../../../hooks/api/schools/useSchool'
+import { useSchoolProm } from '../../../hooks/api/schools/useSchoolProm'
+import { SelectLazy } from '../../inputs/Select'
 
 interface params {
-  onSelect?: (selected?: ISchoolProm) => void
-  list: ISchoolProm[]
-  paginationNext: (p?: { limit?: number, offset?: number }) => void
-  count: number
+  onChange?: (id?: ISchoolProm['id']) => void
+  hook: ReturnType<typeof useSchoolProm>
+  defaultValue?: ISchoolProm['id']
 }
 
 export const SelectSchoolProm = (params: params) => {
-  const { onSelect = () => {}, ...rest } = params
+  const { onChange = () => { }, defaultValue } = params
+  const useSchoolProms = useSchoolProm()
+  const useSchools = useSchool()
+  const hook = params.hook ?? useSchoolProms
 
-  const findSPName = (item: ISchoolProm) => {
-    return `${item.school?.name ?? 'Cargando...'} (Código: ${item.school?.code ?? 'Cargando...'})`
+  const findSPName = async (item: ISchoolProm) => {
+    const school = await useSchools.findOne({ id: item.schoolId })
+    return `${school?.name ?? 'Cargando...'} (Código: ${school?.code ?? 'Cargando...'})`
   }
 
-  return <SelectFromList
+  return <SelectLazy
     id="school-prom"
     name="school_id"
-    title="Escuela"
-    valueBy="schoolId"
+    label="Escuela"
+    itemLabelBy={findSPName}
+    hook={hook}
+    defaultValue={defaultValue}
+    itemValueBy="schoolId"
     omitCreateOption
-    itemNameFormat={findSPName}
-    onSelect={onSelect}
-    {...rest}
+    onChange={onChange}
   />
 }

@@ -24,7 +24,7 @@ export const EmployeePositionFormInputs = (params?: EPFIParams) => {
       const employee = await useEmployees.findOne({ id: ep?.employeeId })
       const position = await usePositions.findOne({ id: ep?.positionId })
       if (params?.type) {
-        await usePositions.findBy({ type: params.type })
+        await usePositions.fetch({ searchBy: { type: params.type } })
       }
       setObj({
         ...ep,
@@ -38,8 +38,8 @@ export const EmployeePositionFormInputs = (params?: EPFIParams) => {
     }
   }, [params, useEmployees, usePositions, obj, useEmployeePositions])
 
-  const handleChange = (p?: IPosition) => {
-    setPositionId(p?.id)
+  const handleChange = (p?: IPosition['id']) => {
+    setPositionId(p)
   }
 
   const onTxtChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, nam: keyof IEmployee) => {
@@ -146,10 +146,8 @@ export const EmployeePositionFormInputs = (params?: EPFIParams) => {
       <Grid item xs={12} sm={12}>
         <SelectPosition
           defaultValue={positionId}
-          list={usePositions.data}
-          onSelect={handleChange}
-          count={usePositions.metadata?.count ?? 0}
-          paginationNext={usePositions.launchNextFetch}
+          hook={usePositions}
+          onChange={handleChange}
         />
       </Grid>
     </Grid>

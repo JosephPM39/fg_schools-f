@@ -1,20 +1,22 @@
 import { IPosition } from '../../../api/models_school'
-import { SelectFromList } from '../../inputs/SelectFromList'
+import { usePosition } from '../../../hooks/api/schools/usePosition'
+import { SelectLazy } from '../../inputs/Select'
 
 interface Params {
-  onSelect: (select?: IPosition) => void
-  list: IPosition[]
+  onChange: (item?: IPosition['id']) => void
   defaultValue?: IPosition['id']
-  paginationNext: (p?: { limit?: number, offset?: number }) => void
-  count: number
+  hook?: ReturnType<typeof usePosition>
 }
 
 export const SelectPosition = (params: Params) => {
-  return <SelectFromList
+  const usePositions = usePosition()
+  const hook = params.hook ?? usePositions
+  return <SelectLazy
     id="position"
     name="position_id"
-    title="Cargo"
-    itemNameBy="name"
+    label="Cargo"
+    itemLabelBy="name"
     {...params}
+    hook={hook}
   />
 }

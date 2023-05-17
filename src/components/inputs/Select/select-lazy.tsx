@@ -9,7 +9,7 @@ import { MenuItem, MenuItemProps } from '@mui/material'
 function isFunctionItemLabel<
   T extends IBaseModel,
   KV extends keyof T
-> (item: SelectLazyParams<T, KV>['itemLabelBy']): item is ((item: T) => string) {
+> (item: SelectLazyParams<T, KV>['itemLabelBy']): item is ((item: T) => string | Promise<string>) {
   return !!(typeof item === 'function')
 }
 
@@ -43,7 +43,7 @@ export const SelectLazy = <
       if (!res) return
       console.log('setting')
       const value: LazyOption<T, KV> = {
-        label: getLabel(res, itemLabelBy),
+        label: await getLabel(res, itemLabelBy),
         value: res[itemValueBy] as T[KV],
         index: 0
       }
@@ -55,27 +55,30 @@ export const SelectLazy = <
   }, [options, defaultValue])
 
   useEffect(() => {
-    const op = items.map((item, index): LazyOption<T, KV> => {
-      return {
-        label: getLabel(item, itemLabelBy),
-        value: item[itemValueBy] as T[KV],
-        index
+    const getData = async () => {
+      const op: Array<LazyOption<T, KV>> = await Promise.all(items.map(async (item, index) => {
+        return {
+          label: await getLabel(item, itemLabelBy),
+          value: item[itemValueBy] as T[KV],
+          index
+        }
+      }))
+      const rest = ((hook.metadata?.count ?? 0) - op.length)
+      const fill: LazyOption<T, KV> = ({
+        label: 'Cargando...',
+        value: 'loader',
+        index: (op.length + 1)
+      })
+      if (omitCreateOption && rest < 1) {
+        return setOptions(op)
       }
-    })
-    const rest = ((hook.metadata?.count ?? 0) - op.length)
-    const fill: LazyOption<T, KV> = ({
-      label: 'Cargando...',
-      value: 'loader',
-      index: (op.length + 1)
-    })
-    if (omitCreateOption && rest < 1) {
-      return setOptions(op)
+      if (omitCreateOption) {
+        return setOptions([...op, fill])
+      }
+      if (rest < 1) return setOptions([newOp, ...op])
+      return setOptions([newOp, ...op, fill])
     }
-    if (omitCreateOption) {
-      return setOptions([...op, fill])
-    }
-    if (rest < 1) return setOptions([newOp, ...op])
-    return setOptions([newOp, ...op, fill])
+    void getData()
   }, [items])
 
   useEffect(() => {
@@ -90,9 +93,9 @@ export const SelectLazy = <
     extOnChange(optionSelected?.value)
   }, [optionSelected])
 
-  const getLabel = (item: T, itemLabelBy: SelectLazyParams<T, KV>['itemLabelBy']): string => {
+  const getLabel = async (item: T, itemLabelBy: SelectLazyParams<T, KV>['itemLabelBy']): Promise<string> => {
     if (isFunctionItemLabel(itemLabelBy)) {
-      return itemLabelBy(item)
+      return await itemLabelBy(item)
     }
     return String(item[itemLabelBy])
   }
@@ -126,7 +129,7 @@ export const SelectLazy = <
         props.onClick(e)
       }
     }
-    return <MenuItem {...props} ref={element} onClick={onClick}/>
+    return <MenuItem {...props} ref={element} onClick={onClick} />
   }
 
   return <Select<T, KV, LazyOption<T, KV>>

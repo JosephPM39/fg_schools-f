@@ -3,48 +3,33 @@ import { useContext, useEffect, useState } from 'react'
 import { ISchoolProm } from '../../../api/models_school'
 import { SchoolPromContext } from '../../../context/api/schools'
 import { useSchoolProm } from '../../../hooks/api/schools/useSchoolProm'
-import { useSchool } from '../../../hooks/api/schools/useSchool'
 import { YearSelect } from '../../YearSelect'
 import { SelectSchoolProm } from './SelectSchoolProm'
 
 interface params {
-  onSelect?: (selected?: ISchoolProm) => void
+  onChange?: (p: ISchoolProm) => void
 }
 
-export const SelectSchoolPromYear = ({ onSelect }: params) => {
+export const SelectSchoolPromYear = ({ onChange }: params) => {
   const globalYear = useContext(SchoolPromContext)?.year
-
-  const [list, setList] = useState<ISchoolProm[]>([])
   const initYear = (globalYear ?? new Date().getFullYear()) - 1
   const [year, setYear] = useState<number>(initYear)
   const proms = useSchoolProm({ year })
-  const useSchools = useSchool()
 
   useEffect(() => {
     void proms.fetch({ searchBy: { year } })
   }, [year])
 
-  useEffect(() => {
-    const conf = async () => {
-      const res = await Promise.all(proms.data.map(async (p) => {
-        return {
-          ...p,
-          school: await useSchools.findOne({ id: p.schoolId }) ?? undefined
-        }
-      }))
-      setList(res)
-    }
-    void conf()
-  }, [proms.data, useSchools.data])
-
   return <>
     <Grid container spacing={2}>
       <Grid item xs={12} sm={6}>
         <SelectSchoolProm
-          list={list}
-          onSelect={onSelect}
-          count={proms.metadata?.count ?? 0}
-          paginationNext={proms.launchNextFetch}
+          hook={proms}
+          onChange={async (id: ISchoolProm['id']) => {
+            const prom = await proms.findOne({ id })
+            if (!prom || !onChange) return
+            onChange(prom)
+          }}
         />
       </Grid>
       <Grid item xs={12} sm={6}>

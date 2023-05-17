@@ -23,7 +23,7 @@ export type SelectLazyParams<
   T extends IBaseModel,
   KV extends keyof T = 'id',
 > = Omit<SelectParams<T, KV, LazyOption<T, KV>>, OmitParamsSelect> & {
-  itemLabelBy: keyof T | ((item: T) => string)
+  itemLabelBy: keyof T | ((item: T) => string | Promise<string>)
   itemValueBy?: KV
   onChange?: (item?: T[KV]) => void
   onCreate?: () => void
