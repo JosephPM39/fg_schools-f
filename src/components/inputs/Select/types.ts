@@ -25,6 +25,7 @@ export type SelectLazyParams<
 > = Omit<SelectParams<T, KV, LazyOption<T, KV>>, OmitParamsSelect> & {
   itemLabelBy: keyof T | ((item: T) => string | Promise<string>)
   itemValueBy?: KV
+  paginate?: () => void
   onChange?: (item?: T[KV]) => void
   onCreate?: () => void
   defaultValue?: T['id']

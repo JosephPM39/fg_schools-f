@@ -273,6 +273,11 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
     void fetchNext(makeParams())
   }, [fetchNext, fetchNextStatus])
 
+  const clearRequests = () => {
+    setData([])
+    setMetadata(undefined)
+  }
+
   // ========================================
   // ============= UPDATE HOOKS =============
   // ========================================
@@ -382,6 +387,7 @@ export const useBase = <Model extends IBaseModel>(params: BaseParams<Model>) => 
     fetch,
     launchNextFetch,
     needFetchNext: isFetching,
+    clearRequests,
     isFetching,
     create,
     update,

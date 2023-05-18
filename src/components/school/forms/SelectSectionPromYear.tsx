@@ -6,49 +6,50 @@ import { useSectionProm } from '../../../hooks/api/schools/useSectionProm'
 import { YearSelect } from '../../YearSelect'
 import { SelectSectionProm } from './SelectSectionProm'
 import { useSchoolProm } from '../../../hooks/api/schools/useSchoolProm'
-import { CustomError, ErrorType } from '../../../api/handlers/errors'
 
 interface params {
-  onSelect: (selected?: ISectionProm) => void
+  onChange: (item?: ISectionProm) => void
   schoolId: ISchool['id']
 }
 
-export const SelectSectionPromYear = ({ onSelect, schoolId }: params) => {
+export const SelectSectionPromYear = ({ onChange, schoolId }: params) => {
   const globalYear = useContext(SchoolPromContext)?.year
-
-  const [list, setList] = useState<ISectionProm[]>([])
   const [year, setYear] = useState<number>((globalYear ?? new Date().getFullYear()) - 1)
   const useSchoolProms = useSchoolProm({ initFetch: false })
   const useSectionProms = useSectionProm({ initFetch: false })
 
   useEffect(() => {
     useSchoolProms.fetch({ searchBy: { year, schoolId } })
-      .then((res) => res).catch((err) => console.log(err.cause))
+      .then((res) => {
+        console.log(res, 'school proms fetch res')
+      }).catch((err) => console.log(err.cause))
+    console.log('proms fetched')
   }, [year])
 
   useEffect(() => {
     const conf = async () => {
-      const res = await Promise.all(useSchoolProms.data.map(async (p) => {
-        const section = await useSectionProms.findBy({ schoolPromId: p.id })
-        if (section == null) {
-          console.log(p)
-          throw new CustomError(ErrorType.apiResponse, 'Api problems')
-        }
-        return section
+      useSectionProms.clearRequests()
+      await Promise.all(useSchoolProms.data.map(async (p) => {
+        await useSectionProms.fetch({
+          mode: 'merge',
+          searchBy: { schoolPromId: p.id }
+        })
       }))
-      setList(res.flat())
     }
     void conf()
-  }, [useSectionProms.data, useSchoolProms.data])
+  }, [useSchoolProms.data])
 
   return <>
     <Grid container spacing={2}>
       <Grid item xs={12} sm={6}>
         <SelectSectionProm
-          list={list}
-          onSelect={onSelect}
-          count={useSchoolProms.metadata?.count ?? 0}
-          paginationNext={useSchoolProms.launchNextFetch}
+          hook={useSectionProms}
+          onChange={async (id: ISectionProm['id']) => {
+            const section = await useSectionProms.findOne({ id })
+            if (!section || !onChange) return
+            onChange(section)
+          }}
+          paginate={() => useSchoolProms.launchNextFetch()}
         />
       </Grid>
       <Grid item xs={12} sm={6}>

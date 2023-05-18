@@ -19,6 +19,7 @@ export const SelectLazy = <
 >(params: SelectLazyParams<T, KV>) => {
   const {
     hook,
+    paginate,
     onChange: extOnChange,
     defaultValue: dvId,
     omitCreateOption,
@@ -112,7 +113,10 @@ export const SelectLazy = <
     useEffect(() => {
       if (!show) return
       if (option.value !== 'loader') return
-      debounce(() => hook.launchNextFetch(), 100)
+      debounce(() => {
+        if (paginate) return paginate()
+        return hook.launchNextFetch()
+      }, 100)
     }, [show])
 
     const onClick = (e: MouseEvent<HTMLLIElement>) => {

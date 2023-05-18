@@ -1,20 +1,22 @@
 import { ITitle } from '../../../api/models_school'
-import { SelectFromList } from '../../inputs/SelectFromList'
+import { SelectLazy } from '../../inputs/Select'
 
 interface Params {
-  onSelect: (select?: ITitle) => void
-  list: ITitle[]
+  onChange?: (id?: ITitle['id']) => void
   defaultValue?: ITitle['id']
-  paginationNext: (p?: { limit?: number, offset?: number }) => void
-  count: number
 }
 
 export const SelectTitle = (params: Params) => {
-  return <SelectFromList
+  const {
+    onChange,
+    defaultValue
+  } = params
+  return <SelectLazy
     id="title"
     name="title_id"
-    title="Título"
-    itemNameBy="name"
-    {...params}
+    label="Título"
+    onChange={onChange}
+    defaultValue={defaultValue}
+    itemLabelBy="name"
   />
 }

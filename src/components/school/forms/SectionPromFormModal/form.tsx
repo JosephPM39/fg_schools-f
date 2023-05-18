@@ -98,7 +98,7 @@ export const Form = (params: Params) => {
     }
     if (sectionOrigin === 'previous') {
       return setSectionInput(<SelectSectionPromYear
-        onSelect={(p) => setSectionSelected(p)}
+        onChange={(p) => setSectionSelected(p)}
         schoolId={schoolId}
       />)
     }

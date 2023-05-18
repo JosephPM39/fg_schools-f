@@ -1,60 +1,41 @@
-import { useEffect, useState } from 'react'
-import { ISectionProm, ITitle, IGroup } from '../../../api/models_school'
+import { ISectionProm } from '../../../api/models_school'
 import { useGroup } from '../../../hooks/api/schools/useGroup'
 import { useTitle } from '../../../hooks/api/schools/useTitle'
-import { SelectFromList } from '../../inputs/SelectFromList'
+import { SelectLazy } from '../../inputs/Select'
+import { useSectionProm } from '../../../hooks/api/schools/useSectionProm'
 
 interface Params {
-  onSelect: (select?: ISectionProm) => void
-  list: ISectionProm[]
+  onChange: (item?: ISectionProm['id']) => void
+  hook?: ReturnType<typeof useSectionProm>
   defaultValue?: ISectionProm['id']
-  paginationNext: (p?: { limit?: number, offset?: number }) => void
-  count: number
+  paginate?: () => void
 }
 
 export const SelectSectionProm = (params: Params) => {
   const {
-    onSelect,
+    onChange,
     defaultValue,
-    list: defaultList,
-    paginationNext,
-    count
+    paginate
   } = params
-  const [list, setList] = useState<ISectionProm[]>([])
   const useTitles = useTitle()
   const useGroups = useGroup()
+  const useSectionProms = useSectionProm()
+  const hook = params.hook ?? useSectionProms
 
-  useEffect(() => {
-    const getData = async () => {
-      const res = await Promise.all(defaultList.map(async (item): Promise<ISectionProm> => {
-        if (item.title && item.group) return item
-
-        const title = await useTitles.findOne({ id: item.titleId }) ?? {}
-        const group = await useGroups.findOne({ id: item.groupId }) ?? {}
-        return {
-          ...item,
-          title: title as ITitle,
-          group: group as IGroup
-        }
-      }))
-      setList(res)
-    }
-    void getData()
-  }, [defaultList, useTitles.data, useGroups.data])
-
-  const nameFormat = (section: ISectionProm) => {
-    return `${section.title.name} - ${section.group.name}`
+  const nameFormat = async (section: ISectionProm) => {
+    const title = await useTitles.findOne({ id: section.titleId })
+    const group = await useGroups.findOne({ id: section.groupId })
+    return `${title?.name ?? 'Cargando...'} - ${group?.name ?? 'Cargando...'}`
   }
 
-  return <SelectFromList
+  return <SelectLazy
     id="section-prom"
     name="section_prom_id"
-    title="Sección"
-    itemNameFormat={nameFormat}
-    paginationNext={paginationNext}
-    count={count}
-    list={list}
+    label="Sección"
+    hook={hook}
+    itemLabelBy={nameFormat}
     defaultValue={defaultValue}
-    onSelect={onSelect}
+    onChange={onChange}
+    paginate={paginate}
   />
 }
