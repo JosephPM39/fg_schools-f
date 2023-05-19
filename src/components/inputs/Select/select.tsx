@@ -8,7 +8,15 @@ export const Select = <
   KV extends keyof T = 'id',
   O extends Option<T> | LazyOption<T, KV> = Option<T>
 >(params: SelectParams<T, KV, O>) => {
-  const { id, name, label, defaultValue, onChange: onChangeExt, options } = params
+  const {
+    id,
+    name,
+    label,
+    defaultValue,
+    onChange: onChangeExt,
+    options,
+    required
+  } = params
   const [value, setValue] = useState<O | null>(null)
 
   const Render = (props: { option: O } & MenuItemProps) => {
@@ -42,6 +50,7 @@ export const Select = <
         value={String(value?.value ?? '')}
         name={name}
         label={label}
+        required={required}
         onChange={onChange}
       >
         <MenuItem key='asdf' value="test">Test</MenuItem>

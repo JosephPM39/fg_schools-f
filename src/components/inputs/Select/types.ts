@@ -15,6 +15,7 @@ export type SelectParams<
   O extends LazyOption<T, KV> | Option<T> = Option<T>
 > = Omit<Params<T, KV, O>, OmitParamsComboBox> & {
   renderOption?: (props: { option: O } & MenuItemProps) => JSX.Element
+  required?: boolean
 }
 
 type OmitParamsSelect = 'renderOption' | 'onChange' | 'defaultValue' | 'options'
@@ -26,7 +27,7 @@ export type SelectLazyParams<
   itemLabelBy: keyof T | ((item: T) => string | Promise<string>)
   itemValueBy?: KV
   paginate?: () => void
-  onChange?: (item?: T[KV]) => void
+  onChange?: (item?: T) => void
   onCreate?: () => void
   defaultValue?: T['id']
   omitCreateOption?: true

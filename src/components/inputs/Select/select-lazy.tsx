@@ -90,8 +90,13 @@ export const SelectLazy = <
   useEffect(() => {
     if (optionSelected?.value === 'new') return
     if (optionSelected?.value === 'loader') return
+    if (!optionSelected?.value) return
     if (!extOnChange) return
-    extOnChange(optionSelected?.value)
+    const ext = async () => {
+      const item = await hook.findOne({ [itemValueBy]: optionSelected.value })
+      extOnChange(item ?? undefined)
+    }
+    void ext()
   }, [optionSelected])
 
   const getLabel = async (item: T, itemLabelBy: SelectLazyParams<T, KV>['itemLabelBy']): Promise<string> => {
