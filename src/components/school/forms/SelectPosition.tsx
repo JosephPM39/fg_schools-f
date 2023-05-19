@@ -3,9 +3,10 @@ import { usePosition } from '../../../hooks/api/schools/usePosition'
 import { SelectLazy } from '../../inputs/Select'
 
 interface Params {
-  onChange: (item?: IPosition['id']) => void
+  onChange: (item?: IPosition) => void
   defaultValue?: IPosition['id']
   hook?: ReturnType<typeof usePosition>
+  required?: boolean
 }
 
 export const SelectPosition = (params: Params) => {

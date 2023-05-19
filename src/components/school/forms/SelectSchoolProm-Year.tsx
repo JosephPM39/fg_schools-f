@@ -7,10 +7,11 @@ import { YearSelect } from '../../YearSelect'
 import { SelectSchoolProm } from './SelectSchoolProm'
 
 interface params {
-  onChange?: (p: ISchoolProm) => void
+  onChange?: (item?: ISchoolProm) => void
+  required?: boolean
 }
 
-export const SelectSchoolPromYear = ({ onChange }: params) => {
+export const SelectSchoolPromYear = ({ onChange, required }: params) => {
   const globalYear = useContext(SchoolPromContext)?.year
   const initYear = (globalYear ?? new Date().getFullYear()) - 1
   const [year, setYear] = useState<number>(initYear)
@@ -25,11 +26,8 @@ export const SelectSchoolPromYear = ({ onChange }: params) => {
       <Grid item xs={12} sm={6}>
         <SelectSchoolProm
           hook={proms}
-          onChange={async (id: ISchoolProm['id']) => {
-            const prom = await proms.findOne({ id })
-            if (!prom || !onChange) return
-            onChange(prom)
-          }}
+          onChange={onChange}
+          required={required}
         />
       </Grid>
       <Grid item xs={12} sm={6}>

@@ -10,9 +10,10 @@ import { useSchoolProm } from '../../../hooks/api/schools/useSchoolProm'
 interface params {
   onChange: (item?: ISectionProm) => void
   schoolId: ISchool['id']
+  required?: boolean
 }
 
-export const SelectSectionPromYear = ({ onChange, schoolId }: params) => {
+export const SelectSectionPromYear = ({ onChange, schoolId, required }: params) => {
   const globalYear = useContext(SchoolPromContext)?.year
   const [year, setYear] = useState<number>((globalYear ?? new Date().getFullYear()) - 1)
   const useSchoolProms = useSchoolProm({ initFetch: false })
@@ -44,11 +45,8 @@ export const SelectSectionPromYear = ({ onChange, schoolId }: params) => {
       <Grid item xs={12} sm={6}>
         <SelectSectionProm
           hook={useSectionProms}
-          onChange={async (id: ISectionProm['id']) => {
-            const section = await useSectionProms.findOne({ id })
-            if (!section || !onChange) return
-            onChange(section)
-          }}
+          onChange={onChange}
+          required={required}
           paginate={() => useSchoolProms.launchNextFetch()}
         />
       </Grid>

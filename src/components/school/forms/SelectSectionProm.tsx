@@ -5,17 +5,19 @@ import { SelectLazy } from '../../inputs/Select'
 import { useSectionProm } from '../../../hooks/api/schools/useSectionProm'
 
 interface Params {
-  onChange: (item?: ISectionProm['id']) => void
+  onChange: (item?: ISectionProm) => void
   hook?: ReturnType<typeof useSectionProm>
   defaultValue?: ISectionProm['id']
   paginate?: () => void
+  required?: boolean
 }
 
 export const SelectSectionProm = (params: Params) => {
   const {
     onChange,
     defaultValue,
-    paginate
+    paginate,
+    required
   } = params
   const useTitles = useTitle()
   const useGroups = useGroup()
@@ -32,6 +34,7 @@ export const SelectSectionProm = (params: Params) => {
     id="section-prom"
     name="section_prom_id"
     label="Sección"
+    required={required}
     hook={hook}
     itemLabelBy={nameFormat}
     defaultValue={defaultValue}

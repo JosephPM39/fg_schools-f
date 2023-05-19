@@ -38,8 +38,8 @@ export const EmployeePositionFormInputs = (params?: EPFIParams) => {
     }
   }, [params, useEmployees, usePositions, obj, useEmployeePositions])
 
-  const handleChange = (p?: IPosition['id']) => {
-    setPositionId(p)
+  const handleChange = (p?: IPosition) => {
+    setPositionId(p?.id)
   }
 
   const onTxtChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, nam: keyof IEmployee) => {
@@ -145,6 +145,7 @@ export const EmployeePositionFormInputs = (params?: EPFIParams) => {
       </Grid>
       <Grid item xs={12} sm={12}>
         <SelectPosition
+          required
           defaultValue={positionId}
           hook={usePositions}
           onChange={handleChange}

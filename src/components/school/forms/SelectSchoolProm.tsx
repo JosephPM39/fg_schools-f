@@ -4,13 +4,18 @@ import { useSchoolProm } from '../../../hooks/api/schools/useSchoolProm'
 import { SelectLazy } from '../../inputs/Select'
 
 interface params {
-  onChange?: (id?: ISchoolProm['id']) => void
+  onChange?: (item?: ISchoolProm) => void
   hook: ReturnType<typeof useSchoolProm>
   defaultValue?: ISchoolProm['id']
+  required?: boolean
 }
 
 export const SelectSchoolProm = (params: params) => {
-  const { onChange = () => { }, defaultValue } = params
+  const {
+    onChange,
+    defaultValue,
+    required
+  } = params
   const useSchoolProms = useSchoolProm()
   const useSchools = useSchool()
   const hook = params.hook ?? useSchoolProms
@@ -30,5 +35,6 @@ export const SelectSchoolProm = (params: params) => {
     itemValueBy="schoolId"
     omitCreateOption
     onChange={onChange}
+    required={required}
   />
 }

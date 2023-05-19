@@ -1,9 +1,7 @@
 import { Grid } from '@mui/material'
 import { useEffect, useState } from 'react'
-import { IGroup, ISectionProm, ITitle } from '../../../api/models_school'
-import { useGroup } from '../../../hooks/api/schools/useGroup'
+import { ISectionProm } from '../../../api/models_school'
 import { useSectionProm } from '../../../hooks/api/schools/useSectionProm'
-import { useTitle } from '../../../hooks/api/schools/useTitle'
 import { SelectGroup } from './SelectGroup'
 import { SelectTitle } from './SelectTitle'
 
@@ -19,9 +17,6 @@ export const SectionInputs = (params: Params) => {
   // const [titleSelected, setTitleSelected] = useState<ITitle>()
   // const [groupSelected, setGroupSelected] = useState<IGroup>()
   const [sectionSelected, setSectionSelected] = useState<ISectionProm | null>(null)
-
-  const useTitles = useTitle()
-  const useGroups = useGroup()
   const useSectionProms = useSectionProm()
 
   useEffect(() => {
@@ -57,29 +52,24 @@ export const SectionInputs = (params: Params) => {
   }, [idForUpdate, schoolPromId, useTitles.data, useGroups.data, useSectionProms.data])
   */
 
-  const onSelectTitle = (title?: ITitle) => {
+  /* const onSelectTitle = (title?: ITitle) => {
     // setTitleSelected(title)
   }
 
   const onSelectGroup = (group?: IGroup) => {
     // setGroupSelected(group)
-  }
+  } */
 
   return <div>
     <Grid container spacing={2}>
       <Grid item xs={12} sm={6}>
         <SelectTitle
           defaultValue={sectionSelected?.titleId}
-          list={useTitles.data}
-          onSelect={onSelectTitle}
-          count={useTitles.metadata?.count ?? 0}
-          paginationNext={useTitles.launchNextFetch}
         />
       </Grid>
       <Grid item xs={12} sm={6}>
         <SelectGroup
           defaultValue={sectionSelected?.groupId}
-          hook={useGroups}
         />
       </Grid>
     </Grid>
