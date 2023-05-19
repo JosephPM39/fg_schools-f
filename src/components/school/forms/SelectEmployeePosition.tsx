@@ -1,30 +1,73 @@
+import { useEffect } from 'react'
 import { IEmployeePosition } from '../../../api/models_school'
 import { PositionType } from '../../../api/models_school/schools/position.model'
-import { SelectFromList } from '../../inputs/SelectFromList'
+import { useEmployeePosition } from '../../../hooks/api/schools/useEmployeePosition'
+import { SelectLazy } from '../../inputs/Select'
+import { usePosition } from '../../../hooks/api/schools/usePosition'
+import { useEmployee } from '../../../hooks/api/schools/useEmployee'
 
-interface params {
-  onSelect?: (selected?: IEmployeePosition) => void
-  list: IEmployeePosition[]
-  type: PositionType
-  paginationNext: (p?: { offset?: number, limit?: number }) => void
-  count: number
+type Base = {
+  onChange?: (item?: IEmployeePosition) => void
+  type?: PositionType
 }
 
-export const SelectEmployeePosition = (params: params) => {
+type WithControl = {
+  hook: ReturnType<typeof useEmployeePosition>
+  paginate: () => void
+}
+
+type Params = Base | (Base & WithControl)
+
+function isWithControl(params: Params): params is (Base & WithControl) {
+  return typeof (params as (Base & WithControl)).hook !== 'undefined'
+}
+
+export const SelectEmployeePosition = (params: Params) => {
   const {
-    onSelect = () => {},
-    list,
-    type,
-    paginationNext,
-    count
+    onChange,
+    type
   } = params
 
-  const findEPName = (ep: IEmployeePosition) => {
-    const profesion = ep.employee?.profesion ?? 'Cargando...'
-    const firstName = ep.employee?.firstName ?? 'Cargando...'
-    const lastName = ep.employee?.lastName ?? 'Cargando...'
-    const position = ep?.position?.name ?? 'Cargando...'
-    return `${profesion} ${firstName} ${lastName} (${position})`
+  const useEmployeePositions = useEmployeePosition({ initFetch: false })
+  const usePositions = usePosition({ initFetch: false })
+  const useEmployees = useEmployee({ initFetch: false })
+  const hook = isWithControl(params) ? params.hook : useEmployeePositions
+  const paginate = isWithControl(params) ? params.paginate : useEmployeePositions.launchNextFetch
+
+  useEffect(() => {
+    if (isWithControl(params)) return
+    if (!type) {
+      void useEmployeePositions.fetch({})
+      return
+    }
+    const getData = async () => {
+      await usePositions.fetch({ searchBy: { type } })
+      const positions = usePositions.data
+      if (!positions) return
+      useEmployeePositions.clearRequests()
+      await Promise.all(positions?.map(async ({ id }) => {
+        await useEmployeePositions.fetch({
+          mode: 'merge',
+          searchBy: {
+            positionId: id
+          },
+          query: {
+            limit: 'NONE'
+          }
+        })
+      }))
+    }
+    void getData()
+  }, [])
+
+  const findEPName = async (ep: IEmployeePosition) => {
+    const employee = await useEmployees.findOne({ id: ep.employeeId })
+    const position = await usePositions.findOne({ id: ep.positionId })
+    const profesion = employee?.profesion ?? 'Cargando...'
+    const firstName = employee?.firstName ?? 'Cargando...'
+    const lastName = employee?.lastName ?? 'Cargando...'
+    const positionName = position?.name ?? 'Cargando...'
+    return `${profesion} ${firstName} ${lastName} (${positionName})`
   }
 
   const getLabel = () => {
@@ -33,15 +76,14 @@ export const SelectEmployeePosition = (params: params) => {
     return 'Encargado'
   }
 
-  return <SelectFromList
+  return <SelectLazy
     id="employee-position"
     name="employee_position_id"
-    title={getLabel()}
-    itemNameFormat={findEPName}
+    label={getLabel()}
+    hook={hook}
+    itemLabelBy={findEPName}
     omitCreateOption
-    onSelect={onSelect}
-    paginationNext={paginationNext}
-    count={count}
-    list={list}
+    onChange={onChange}
+    paginate={paginate}
   />
 }
