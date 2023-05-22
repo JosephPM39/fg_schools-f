@@ -14,7 +14,8 @@ export const Principal = () => {
 
   useEffect(() => {
     const cardsFinded: JSX.Element[] = []
-    const count = schoolProms?.metadata?.count ?? 0
+    console.log('updating')
+    const count = schoolProms?.metadata?.count ?? schoolProms?.data.length ?? 0
     for (let i = 0; i < count; i++) {
       const prom = schoolProms?.data.at(i)
       cardsFinded.push(
@@ -23,6 +24,7 @@ export const Principal = () => {
         </Grid>
       )
     }
+    console.log('cards', cardsFinded.length)
     setCards(cardsFinded)
   }, [schoolProms?.data, schoolProms?.metadata])
 
