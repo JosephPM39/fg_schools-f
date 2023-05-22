@@ -13,15 +13,19 @@ export const Principal = () => {
   const [cards, setCards] = useState<JSX.Element[]>([])
 
   useEffect(() => {
+    setCards([])
     const cardsFinded: JSX.Element[] = []
     console.log('updating')
     const count = schoolProms?.metadata?.count ?? schoolProms?.data.length ?? 0
-    for (let i = 0; i < count; i++) {
-      const prom = schoolProms?.data.at(i)
+    schoolProms?.data.forEach((prom) => {
       cardsFinded.push(
-        <Grid item key={i}>
-          <SchoolCard schoolProm={prom} paginationNext={() => schoolProms?.launchNextFetch()}/>
-        </Grid>
+        <SchoolCard schoolProm={prom} />
+      )
+    })
+    const rest = (count - (schoolProms?.data.length ?? 0) > 0)
+    if (rest) {
+      cardsFinded.push(
+        <SchoolCard paginationNext={schoolProms?.launchNextFetch}/>
       )
     }
     console.log('cards', cardsFinded.length)
@@ -31,18 +35,18 @@ export const Principal = () => {
   return (
     <>
       <NavBar>
-        <SearchField/>
+        <SearchField />
       </NavBar>
-      <PickDirDialog/>
+      <PickDirDialog />
 
-      <br/>
+      <br />
       <Container maxWidth='xl'>
         total: {schoolProms?.data.length}
         <Grid container justifyContent='center' spacing={2} >
-          {cards.map((card) => card)}
+          {cards.map((card, i) => <Grid item key={i}>{card}</Grid>)}
         </Grid>
       </Container>
-      <br/>
+      <br />
     </>
   )
 }
