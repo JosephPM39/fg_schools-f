@@ -5,7 +5,7 @@ import { PositionType } from '../../../../api/models_school/schools/position.mod
 import { Button, Divider, FormControlLabel, FormLabel, Radio, RadioGroup } from '@mui/material'
 import { ISchoolProm } from '../../../../api/models_school'
 import { SelectSchoolPromYear } from '../SelectSchoolProm-Year'
-import { SelectEmployeePositionPromYear } from '../SelectEmployeePosition-PromYear'
+import { SelectEmployeePositionPromYear } from '../SelectEmployeePositionProm-Year'
 import { useEmployee } from '../../../../hooks/api/schools/useEmployee'
 import { useEmployeePosition } from '../../../../hooks/api/schools/useEmployeePosition'
 import { SchoolPromContext } from '../../../../context/api/schools'
@@ -75,9 +75,7 @@ export const Form = (params?: { idForUpdate?: ISchoolProm['id'] }) => {
       if (principalOrigin !== 'previous') return {}
       if (schoolSelected == null) return {}
       return {
-        schoolProms: [schoolSelected],
-        paginationNext: () => {},
-        count: 1
+        schoolProms: schoolSelected
       }
     }
 
@@ -88,9 +86,8 @@ export const Form = (params?: { idForUpdate?: ISchoolProm['id'] }) => {
     return setPrincipalInput(
       <SelectEmployeePositionPromYear
         {...getSchoolProm()}
-        paginationNext={() => {}}
-        yearSelect={needYearSelect()}
         type={PositionType.PRINCIPAL}
+        yearSelect={needYearSelect()}
       />
     )
   }, [principalOrigin, schoolSelected, schoolPromForUpdate])

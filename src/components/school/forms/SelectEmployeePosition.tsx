@@ -13,12 +13,15 @@ type Base = {
 
 type WithControl = {
   hook: ReturnType<typeof useEmployeePosition>
-  paginate: () => void
+  paginate: {
+    next: () => void
+    count: number
+  }
 }
 
 type Params = Base | (Base & WithControl)
 
-function isWithControl(params: Params): params is (Base & WithControl) {
+function isWithControl (params: Params): params is (Base & WithControl) {
   return typeof (params as (Base & WithControl)).hook !== 'undefined'
 }
 
@@ -32,7 +35,11 @@ export const SelectEmployeePosition = (params: Params) => {
   const usePositions = usePosition({ initFetch: false })
   const useEmployees = useEmployee({ initFetch: false })
   const hook = isWithControl(params) ? params.hook : useEmployeePositions
-  const paginate = isWithControl(params) ? params.paginate : useEmployeePositions.launchNextFetch
+  const defaultPaginate = {
+    next: useEmployeePositions.launchNextFetch,
+    count: useEmployeePositions.metadata?.count ?? 0
+  }
+  const paginate = isWithControl(params) ? params.paginate : defaultPaginate
 
   useEffect(() => {
     if (isWithControl(params)) return

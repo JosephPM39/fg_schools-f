@@ -47,7 +47,10 @@ export const SelectSectionPromYear = ({ onChange, schoolId, required }: params) 
           hook={useSectionProms}
           onChange={onChange}
           required={required}
-          paginate={() => useSchoolProms.launchNextFetch()}
+          paginate={{
+            next: useSchoolProms.launchNextFetch,
+            count: useSchoolProms.metadata?.count ?? 0
+          }}
         />
       </Grid>
       <Grid item xs={12} sm={6}>

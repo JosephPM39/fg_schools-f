@@ -8,7 +8,10 @@ interface Params {
   onChange: (item?: ISectionProm) => void
   hook?: ReturnType<typeof useSectionProm>
   defaultValue?: ISectionProm['id']
-  paginate?: () => void
+  paginate?: {
+    next: () => void
+    count: number
+  }
   required?: boolean
 }
 

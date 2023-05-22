@@ -3,7 +3,7 @@ import { EmployeePositionFormInputs } from '../EmployeePositionFormInputs'
 import { PositionType } from '../../../../api/models_school/schools/position.model'
 import { Button, Divider, FormControlLabel, FormLabel, Radio, RadioGroup } from '@mui/material'
 import { ISchool, ISectionProm } from '../../../../api/models_school'
-import { SelectEmployeePositionPromYear } from '../SelectEmployeePosition-PromYear'
+import { SelectEmployeePositionPromYear } from '../SelectEmployeePositionProm-Year'
 import { SectionPromContext } from '../../../../context/api/schools'
 import { Alert, AlertProps, AlertWithError } from '../../../Alert'
 import { SelectSectionPromYear } from '../SelectSectionPromYear'
@@ -74,7 +74,7 @@ export const Form = (params: Params) => {
     const getSectionProm = () => {
       if (sectionSelected == null) return
       if (profesorOrigin !== 'previous') return
-      return [sectionSelected]
+      return params.schoolId
     }
 
     const needYearSelect = () => {
@@ -83,7 +83,7 @@ export const Form = (params: Params) => {
 
     return setProfesorInput(
       <SelectEmployeePositionPromYear
-        sectionProms={getSectionProm()}
+        schoolId={getSectionProm()}
         yearSelect={needYearSelect()}
         type={PositionType.PROFESOR}
       />

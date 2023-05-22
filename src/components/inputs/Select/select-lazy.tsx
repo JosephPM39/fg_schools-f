@@ -64,7 +64,7 @@ export const SelectLazy = <
           index
         }
       }))
-      const rest = ((hook.metadata?.count ?? 0) - op.length)
+      const rest = ((paginate?.count ?? hook.metadata?.count ?? 0) - op.length)
       const fill: LazyOption<T, KV> = ({
         label: 'Cargando...',
         value: 'loader',
@@ -119,7 +119,7 @@ export const SelectLazy = <
       if (!show) return
       if (option.value !== 'loader') return
       debounce(() => {
-        if (paginate) return paginate()
+        if (paginate) return paginate.next()
         return hook.launchNextFetch()
       }, 100)
     }, [show])
