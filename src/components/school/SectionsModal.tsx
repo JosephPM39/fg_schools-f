@@ -9,33 +9,37 @@ import { Button } from '@mui/material'
 
 interface Params {
   initOpen: boolean
-  schoolPromId: ISchoolProm['id']
+  schoolProm: ISchoolProm
   school?: ISchool | null
   btnProps: BtnPropsContainer['btnProps']
 }
 
 export const SectionsModal = (params: Params) => {
+  const {
+    schoolProm,
+    school
+  } = params
   const [proms, setProms] = useState<ISectionProm[]>([])
   const useSectionProm = useContext(SectionPromContext)
 
   useEffect(() => {
     const getData = async () => {
       const res = await useSectionProm?.findBy({
-        schoolPromId: params.schoolPromId
+        schoolPromId: schoolProm.id
       })
-      if ((res != null) && res?.length > 0) setProms(res)
+      setProms(res ?? [])
     }
-    if (proms.length < 1) void getData()
-  }, [params.schoolPromId, proms.length, useSectionProm?.data])
+    void getData()
+  }, [params.schoolProm, proms.length])
 
   return (
     <Modal
       fullScreen
       btnProps={params.btnProps}
-      title={`Escuela: ${params?.school?.name ?? 'Cargando...'}`}
+      title={`Escuela: ${school?.name ?? 'Cargando...'}`}
       actionsToolbar={<SectionPromFormModal btn={
         <Button variant='contained' color='info'> Agregar Sección </Button>
-      } schoolId={params?.school?.id} />}
+      } schoolId={school?.id} />}
     >
       <SectionsTabs sectionProms={proms} />
     </Modal>

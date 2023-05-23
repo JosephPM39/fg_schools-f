@@ -31,47 +31,24 @@ interface Params {
 }
 
 export const SchoolCard = (params: Params) => {
+  const {
+    schoolProm,
+    paginationNext
+  } = params
   const [school, setSchool] = useState<ISchool | null>(null)
-  const [principal, setPrincipal] = useState<IEmployeePosition | null>(null)
-  const [employee, setEmployee] = useState<IEmployee | null>(null)
-  const [position, setPosition] = useState<IPosition | null>(null)
 
-  const [icon, setIcon] = useState<string>()
-
-  const useEmployeePosition = useContext(EmployeePositionContext)
   const useSchool = useContext(SchoolContext)
-  const useEmployee = useContext(EmployeeContext)
-  const usePosition = useContext(PositionContext)
   const { element, show } = useNearScreen()
   const { promiseHelper } = useDebounce()
   const useStorageFile = useContext(StorageFileContext)
   const useStorage = useStorageFile?.newStorage(SubDir.schoolIcons)
 
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  const open = Boolean(anchorEl)
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget)
-  }
-  const handleClose = () => {
-    setAnchorEl(null)
-  }
-
   useEffect(() => {
     if (!show) return
-    if (params.schoolProm != null) return
-    if (params.paginationNext == null) return
-    params.paginationNext()
+    if (schoolProm != null) return
+    if (paginationNext == null) return
+    paginationNext()
   }, [show])
-
-  useEffect(() => {
-    const getData = async () => {
-      if (school == null) return
-      if (school.icon === 'default') return setIcon(DefaultIcon)
-      const iconUrl = await useStorage?.getPreviewUrl(school.icon)
-      setIcon(iconUrl ?? ImageError)
-    }
-    void getData()
-  }, [school])
 
   useEffect(() => {
     if (!show) return
@@ -88,124 +65,172 @@ export const SchoolCard = (params: Params) => {
     void get()
   }, [show, params, useSchool?.data, useSchool?.data.length])
 
-  useEffect(() => {
-    if (!show) return
-    const get = async () => {
-      if ((params.schoolProm == null) || (useEmployeePosition == null)) return
-      const principal = await useEmployeePosition.findOne({ id: params.schoolProm.principalId })
-      setPrincipal(principal)
-    }
-    void get()
-  }, [show, params, useEmployeePosition?.data])
+  const Header = () => {
+    const [icon, setIcon] = useState<string>()
+    useEffect(() => {
+      const getData = async () => {
+        if (school == null) return
+        if (school.icon === 'default') return setIcon(DefaultIcon)
+        const iconUrl = await useStorage?.getPreviewUrl(school.icon)
+        setIcon(iconUrl ?? ImageError)
+      }
+      void getData()
+    }, [school])
 
-  useEffect(() => {
-    if (!show || (useEmployee == null)) return
-    const get = async () => {
-      const employee = await useEmployee.findOne({ id: principal?.employeeId })
-      setEmployee(employee)
+    if (icon) {
+      return <CardMedia
+        component="img"
+        alt={school?.name}
+        height="140"
+        image={icon}
+      />
     }
-    void get()
-  }, [show, params, useEmployee?.data, principal])
+    return <Box height='140px' width='345px' display='flex' alignItems='center' justifyContent='center'>
+      <CircularProgress />
+    </Box>
+  }
 
-  useEffect(() => {
-    if (!show || (usePosition == null)) return
-    const get = async () => {
-      const position = await usePosition.findOne({ id: principal?.positionId })
-      setPosition(position)
+  const Body = () => {
+    const [principal, setPrincipal] = useState<IEmployeePosition | null>(null)
+    const [employee, setEmployee] = useState<IEmployee | null>(null)
+    const [position, setPosition] = useState<IPosition | null>(null)
+
+    const useEmployeePosition = useContext(EmployeePositionContext)
+    const useEmployee = useContext(EmployeeContext)
+    const usePosition = useContext(PositionContext)
+
+    useEffect(() => {
+      if (!show) return
+      const get = async () => {
+        if ((schoolProm == null) || (useEmployeePosition == null)) return
+        const principal = await useEmployeePosition.findOne({ id: schoolProm.principalId })
+        setPrincipal(principal)
+      }
+      void get()
+    }, [show, params, useEmployeePosition?.data])
+
+    useEffect(() => {
+      if (!show || (useEmployee == null)) return
+      const get = async () => {
+        const employee = await useEmployee.findOne({ id: principal?.employeeId })
+        setEmployee(employee)
+      }
+      void get()
+    }, [show, params, useEmployee?.data, principal])
+
+    useEffect(() => {
+      if (!show || (usePosition == null)) return
+      const get = async () => {
+        const position = await usePosition.findOne({ id: principal?.positionId })
+        setPosition(position)
+      }
+      void get()
+    }, [show, params, usePosition?.data, principal])
+
+    if (school && position && employee) {
+      return <>
+        <Typography gutterBottom variant="h5" component="div">
+          {school.name}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Dirección: {school?.location}
+          <br />
+          Código: {school?.code}
+          <br />
+          {`${position?.name}: `}
+          {`${employee?.profesion} `}
+          {`${employee?.firstName} `}
+          {`${employee?.lastName} `}
+        </Typography>
+      </>
     }
-    void get()
-  }, [show, params, usePosition?.data, principal])
+    return <>
+      <Typography gutterBottom variant="h5" component="div">
+        Loading...
+      </Typography>
+      <Typography variant="body2" color="text.secondary">
+        Loading...
+        <br />
+        <br />
+        <br />
+        <br />
+      </Typography>
+    </>
+  }
+
+  const Actions = () => {
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+    const open = Boolean(anchorEl)
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+      setAnchorEl(event.currentTarget)
+    }
+    const handleClose = () => {
+      setAnchorEl(null)
+    }
+
+    if (!show || !schoolProm) {
+      return <>
+        <br />
+        ...loading
+        <br />
+      </>
+    }
+
+    return <>
+      <SectionsModal
+        btnProps={{
+          children: 'Abrir',
+          startIcon: <Article />,
+          variant: 'contained',
+          color: 'info',
+          size: 'small',
+          disabled: !schoolProm
+        }}
+        initOpen={false}
+        schoolProm={schoolProm}
+        school={school}
+      />
+      <Button
+        id={`school-menu-button-${schoolProm.id ?? ''}`}
+        aria-controls={open ? 'basic-menu' : undefined}
+        aria-haspopup="true"
+        aria-expanded={open ? 'true' : undefined}
+        onClick={handleClick}
+        variant='outlined'
+        size='small'
+        disabled={!schoolProm}
+        endIcon={<KeyboardArrowDown />}
+      > Más opciones </Button>
+      <Menu
+        id={`school-menu-${schoolProm.id ?? ''}`}
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+      >
+        <SchoolPromFormModal
+          idForUpdate={schoolProm.id}
+          btn={
+            <MenuItem sx={{ color: 'grey' }} ><Edit />&#8288; Editar información</MenuItem>
+          }
+        />
+        <ChangeIconDialog school={school} btn={
+          <MenuItem sx={{ color: 'grey' }} ><Edit />&#8288; Cambiar Logo</MenuItem>
+        } />
+        <Divider />
+        <MenuItem onClick={handleClose} sx={{ color: 'red' }}><Delete />&#8288; Eliminar</MenuItem>
+      </Menu>
+    </>
+  }
 
   return (
     <Card ref={element} sx={{ maxWidth: 345 }}>
-      { icon
-        ? <CardMedia
-          component="img"
-          alt={school?.name}
-          height="140"
-          image={icon}
-        />
-        : <Box height='140px' width='345px' display='flex' alignItems='center' justifyContent='center'>
-          <CircularProgress/>
-        </Box>
-      }
+      <Header />
       <CardContent>
-        <Typography gutterBottom variant="h5" component="div">
-          {school?.name ?? 'Loading...'}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          { (school != null) && (position != null) && (employee != null)
-            ? <>
-            Dirección: {school?.location}
-              <br/>
-            Código: {school?.code}
-              <br/>
-              {`${position?.name}: `}
-              {`${employee?.profesion} `}
-              {`${employee?.firstName} `}
-              {`${employee?.lastName} `}
-            </>
-            : <>
-              Loading...
-              <br/>
-              <br/>
-              <br/>
-              <br/>
-            </> }
-        </Typography>
+        <Body />
       </CardContent>
-      {show && (params.schoolProm != null)
-        ? <CardActions>
-          <SectionsModal
-            btnProps={{
-              children: 'Abrir',
-              startIcon: <Article/>,
-              variant: 'contained',
-              color: 'info',
-              size: 'small',
-              disabled: !params.schoolProm
-            }}
-            initOpen={false}
-            schoolPromId={params.schoolProm.id}
-            school={school}
-          />
-          <Button
-            id={`school-menu-button-${params.schoolProm.id ?? ''}`}
-            aria-controls={open ? 'basic-menu' : undefined}
-            aria-haspopup="true"
-            aria-expanded={open ? 'true' : undefined}
-            onClick={handleClick}
-            variant='outlined'
-            size='small'
-            disabled={!params.schoolProm}
-            endIcon={<KeyboardArrowDown/>}
-          > Más opciones </Button>
-          <Menu
-            id={`school-menu-${params.schoolProm.id ?? ''}`}
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleClose}
-          >
-            <SchoolPromFormModal
-              idForUpdate={params.schoolProm.id}
-              btn={
-                <MenuItem sx={{ color: 'grey' }} ><Edit/>&#8288; Editar información</MenuItem>
-              }
-            />
-            <ChangeIconDialog school={school} btn={
-              <MenuItem sx={{ color: 'grey' }} ><Edit/>&#8288; Cambiar Logo</MenuItem>
-            } />
-            <Divider/>
-            <MenuItem onClick={handleClose} sx={{ color: 'red' }}><Delete/>&#8288; Eliminar</MenuItem>
-          </Menu>
-
-        </CardActions>
-        : <CardActions>
-          <br/>
-          ...loading
-          <br/>
-        </CardActions>
-      }
+      <CardActions>
+        <Actions />
+      </CardActions>
     </Card>
   )
 }
