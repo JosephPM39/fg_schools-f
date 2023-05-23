@@ -37,9 +37,9 @@ export const SelectLazy = <
 
   useEffect(() => {
     const getData = async () => {
+      console.log(dvId, 'default value')
       if (defaultValue) return
       if (!dvId) return
-      console.log(dvId, 'default value')
       const res = await hook.findOne({ id: dvId })
       if (!res) return
       console.log('setting')
@@ -53,7 +53,7 @@ export const SelectLazy = <
       return setOptionSelected(value)
     }
     void getData()
-  }, [options, defaultValue])
+  }, [options, defaultValue, dvId])
 
   useEffect(() => {
     const getData = async () => {

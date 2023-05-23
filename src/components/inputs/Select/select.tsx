@@ -29,7 +29,7 @@ export const Select = <
   useEffect(() => {
     if (!defaultValue) return
     setValue(defaultValue)
-  }, [])
+  }, [defaultValue])
 
   useEffect(() => {
     if (!onChangeExt) return
@@ -47,6 +47,7 @@ export const Select = <
       <SelectM
         labelId={`select-list-label-${id}`}
         id={`select-list-${id}`}
+        defaultValue={String(defaultValue?.value ?? '')}
         value={String(value?.value ?? '')}
         name={name}
         label={label}

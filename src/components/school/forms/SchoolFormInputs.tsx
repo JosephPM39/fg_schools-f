@@ -30,14 +30,14 @@ export const SchoolFormInputs = (params?: { idForUpdate?: ISchool['id'] }) => {
       name="school_id"
       type='text'
       onChange={() => {}}
-      value={data?.id}
+      value={data?.id ?? ''}
       hidden
     />
     <Grid container spacing={2}>
       <Grid item xs={12} sm={6}>
         <TextField
           fullWidth
-          value={data?.name}
+          value={data?.name ?? ''}
           onChange={(e) => onChange(e, 'name')}
           name="school_name"
           label="Nombre"
@@ -55,7 +55,7 @@ export const SchoolFormInputs = (params?: { idForUpdate?: ISchool['id'] }) => {
       <Grid item xs={12} sm={6}>
         <TextField
           fullWidth
-          value={data?.location}
+          value={data?.location ?? ''}
           onChange={(e) => onChange(e, 'location')}
           name="school_location"
           label="Dirección"
@@ -73,7 +73,7 @@ export const SchoolFormInputs = (params?: { idForUpdate?: ISchool['id'] }) => {
       <Grid item xs={12} sm={6}>
         <TextField
           fullWidth
-          value={data?.code}
+          value={data?.code ?? ''}
           onChange={(e) => onChange(e, 'code')}
           name="school_code"
           label="Código"

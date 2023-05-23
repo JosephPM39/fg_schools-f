@@ -11,68 +11,80 @@ interface EPFIParams {
   idForUpdate?: IEmployeePosition['id']
 }
 
-export const EmployeePositionFormInputs = (params?: EPFIParams) => {
-  const [obj, setObj] = useState<Partial<IEmployeePosition>>()
+export const EmployeePositionFormInputs = (params: EPFIParams) => {
+  const {
+    idForUpdate,
+    type
+  } = params
+  const [position, setPosition] = useState<IPosition>()
+  const [employeePosition, setEmployeePosition] = useState<IEmployeePosition>()
   const useEmployeePositions = useEmployeePosition()
   const usePositions = usePosition({ initFetch: false })
   const useEmployees = useEmployee()
-  const [positionId, setPositionId] = useState<IPosition['id'] | undefined>()
+
+  useEffect(() => {
+    if (!type) {
+      void usePositions.fetch({})
+      return
+    }
+    void usePositions.fetch({ searchBy: { type } })
+  }, [type])
 
   useEffect(() => {
     const getData = async () => {
-      const ep = await useEmployeePositions.findOne({ id: params?.idForUpdate })
-      const employee = await useEmployees.findOne({ id: ep?.employeeId })
-      const position = await usePositions.findOne({ id: ep?.positionId })
-      if (params?.type) {
-        await usePositions.fetch({ searchBy: { type: params.type } })
+      if (!idForUpdate) return
+      const employeePosition = await useEmployeePositions.findOne({ id: idForUpdate })
+      if (!employeePosition) return
+      const employee = await useEmployees.findOne({ id: employeePosition.employeeId }) ?? undefined
+      const position = await usePositions.findOne({ id: employeePosition.positionId }) ?? undefined
+      const ep: IEmployeePosition = {
+        ...employeePosition,
+        employee,
+        position
       }
-      setObj({
-        ...ep,
-        employee: employee ?? undefined,
-        position: position ?? undefined
-      })
-      setPositionId(position?.id)
+      setPosition(position)
+      setEmployeePosition(ep ?? undefined)
     }
-    if ((params != null) && (obj == null)) {
-      void getData()
-    }
-  }, [params, useEmployees, usePositions, obj, useEmployeePositions])
+    void getData()
+  }, [idForUpdate])
 
-  const handleChange = (p?: IPosition) => {
+  /* const handleChange = (p?: IPosition) => {
     setPositionId(p?.id)
-  }
+  } */
 
   const onTxtChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, nam: keyof IEmployee) => {
     const d = {
-      ...obj as IEmployeePosition,
+      ...employeePosition as IEmployeePosition,
       employee: {
-        ...obj?.employee as IEmployee,
+        ...employeePosition?.employee as IEmployee,
         [nam]: e.target.value
       }
     }
-    setObj(d)
+    setEmployeePosition(d)
   }
 
   return <>
     <input
       name="employee_position_id"
       type='text'
-      value={obj?.id}
+      value={employeePosition?.id ?? ''}
+      onChange={() => {}}
       hidden
     />
     <input
       name="employee_id"
       type='text'
-      value={obj?.employeeId}
+      value={employeePosition?.employeeId ?? ''}
+      onChange={() => {}}
       hidden
     />
     <Grid container spacing={2}>
       <Grid item xs={12} sm={6}>
         <TextField
           fullWidth
-          value={obj?.employee?.firstName}
+          value={employeePosition?.employee?.firstName ?? ''}
           InputLabelProps={{
-            shrink: !!obj?.employee?.firstName
+            shrink: !!employeePosition?.employee?.firstName
           }}
           name="employee_first_name"
           label="Nombre(s)"
@@ -89,10 +101,10 @@ export const EmployeePositionFormInputs = (params?: EPFIParams) => {
       <Grid item xs={12} sm={6}>
         <TextField
           fullWidth
-          value={obj?.employee?.lastName}
+          value={employeePosition?.employee?.lastName ?? ''}
           onChange={(e) => onTxtChange(e, 'lastName')}
           InputLabelProps={{
-            shrink: !!obj?.employee?.lastName
+            shrink: !!employeePosition?.employee?.lastName
           }}
           name="employee_last_name"
           label="Apellido(s)"
@@ -108,10 +120,10 @@ export const EmployeePositionFormInputs = (params?: EPFIParams) => {
       <Grid item xs={12} sm={6}>
         <TextField
           fullWidth
-          value={obj?.employee?.contact}
+          value={employeePosition?.employee?.contact ?? ''}
           onChange={(e) => onTxtChange(e, 'contact')}
           InputLabelProps={{
-            shrink: !!obj?.employee?.contact
+            shrink: !!employeePosition?.employee?.contact
           }}
           name="employee_contact"
           label="Contacto"
@@ -127,10 +139,10 @@ export const EmployeePositionFormInputs = (params?: EPFIParams) => {
       <Grid item xs={12} sm={6}>
         <TextField
           fullWidth
-          value={obj?.employee?.profesion}
+          value={employeePosition?.employee?.profesion ?? ''}
           onChange={(e) => onTxtChange(e, 'profesion')}
           InputLabelProps={{
-            shrink: !!obj?.employee?.profesion
+            shrink: !!employeePosition?.employee?.profesion
           }}
           name="employee_profesion"
           label="Profesión"
@@ -146,9 +158,8 @@ export const EmployeePositionFormInputs = (params?: EPFIParams) => {
       <Grid item xs={12} sm={12}>
         <SelectPosition
           required
-          defaultValue={positionId}
+          defaultValue={position?.id}
           hook={usePositions}
-          onChange={handleChange}
         />
       </Grid>
     </Grid>
