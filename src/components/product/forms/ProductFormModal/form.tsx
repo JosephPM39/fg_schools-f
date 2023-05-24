@@ -84,7 +84,7 @@ const Inputs = ({ data, onChange }: InputsParams<IProduct>) => {
           label='Tamaño'
           name='size_id'
           searchMaxLength={50}
-          // defaultValue={data?.sizeId}
+          defaultValue={data?.sizeId}
           id='size'
           required
           hook={useSizes}
@@ -97,7 +97,7 @@ const Inputs = ({ data, onChange }: InputsParams<IProduct>) => {
           label='Tipo'
           name='type_id'
           searchMaxLength={50}
-          // defaultValue={data?.typeId}
+          defaultValue={data?.typeId}
           id='type'
           required
           hook={useTypes}
@@ -110,7 +110,7 @@ const Inputs = ({ data, onChange }: InputsParams<IProduct>) => {
           label='Color'
           name='color_id'
           searchMaxLength={30}
-          // defaultValue={data?.colorId}
+          defaultValue={data?.colorId}
           id='color'
           required
           hook={useColors}
@@ -123,7 +123,7 @@ const Inputs = ({ data, onChange }: InputsParams<IProduct>) => {
           label='Borde'
           name='border_id'
           searchMaxLength={30}
-          // defaultValue={data?.borderId}
+          defaultValue={data?.borderId}
           id='border'
           required
           hook={useBorders}
