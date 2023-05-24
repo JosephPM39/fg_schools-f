@@ -151,6 +151,7 @@ export const ComboBoxLazy = <
     defaultValue={defaultValue}
     options={options}
     id={`lazy-${id}`}
+    isLoading={hook.isFetching}
     {...rest}
   />
 }

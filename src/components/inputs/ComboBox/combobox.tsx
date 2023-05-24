@@ -15,9 +15,9 @@ export const ComboBox = <
   const [searchValue, setSearchValue] = useState<string>('')
 
   useEffect(() => {
-    if (!defaultValue) return
+    if (!defaultValue || isLoading) return
     setValue(defaultValue)
-  }, [defaultValue])
+  }, [defaultValue, isLoading])
 
   useEffect(() => {
     onToggleOpen(open)
