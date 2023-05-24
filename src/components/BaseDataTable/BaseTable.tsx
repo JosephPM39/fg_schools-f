@@ -54,6 +54,12 @@ export const BaseTable = <T extends IBaseModel>(params: BaseTableParams<T>) => {
   }, [idForUpdate])
 
   useEffect(() => {
+    if (open) return
+    setIdForUpdate(undefined)
+    setIdForDelete(undefined)
+  }, [open])
+
+  useEffect(() => {
     if (!idForDelete) return
     void promiseHandleError((error) => {
       setNotify({ error })
@@ -99,10 +105,10 @@ export const BaseTable = <T extends IBaseModel>(params: BaseTableParams<T>) => {
       name={name}
       otherAction={otherAction}
       deleteAction={(id) => setIdForDelete(id)}
+      onAbortDeleteAction={() => setIdForDelete(undefined)}
       editAction={(id) => setIdForUpdate(id)}
       toolbar={{
         add: <Button startIcon={<Add />} onClick={() => {
-          setIdForUpdate(undefined)
           setOpen(true)
         }}>
           Nuevo

@@ -38,6 +38,7 @@ type Params<T extends IBaseModel> = {
 } | {
   disableDefaultActions?: false
   deleteAction: (id: T['id']) => void
+  onAbortDeleteAction: () => void
   editAction: (id: T['id']) => void
   otherAction?: (p: { id: T['id'] }) => JSX.Element
 })
@@ -72,6 +73,12 @@ export const Table = <T extends IBaseModel>(params: Params<T>) => {
       setOpenDeleteWarning(true)
     }
   }, [idToDelete])
+
+  useEffect(() => {
+    if (openDeleteWarning || params.disableDefaultActions) return
+    params.onAbortDeleteAction()
+    setIdToDelete(undefined)
+  }, [openDeleteWarning])
 
   const onPageChangeHandle = (newPage: number) => {
     if (page < 0 || newPage < 0) return setPage(0)

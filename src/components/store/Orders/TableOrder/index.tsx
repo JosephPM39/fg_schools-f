@@ -198,6 +198,7 @@ export const TableOrder = (params: Params) => {
       name="Bordes de productos"
       deleteAction={(id) => console.log(id)}
       editAction={(id) => console.log(id)}
+      onAbortDeleteAction={() => {}}
       toolbar={{
         add: <Button startIcon={<Add/>} onClick={() => {
           // setIdForUpdate(undefined)
