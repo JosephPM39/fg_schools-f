@@ -3,6 +3,7 @@ import { Modal } from '../containers/Modal'
 import { Tabs } from '../containers/Tabs'
 import { BtnContainer, BtnPropsContainer } from '../containers/types'
 import { ProductsTabs } from './product/ProductsTabs'
+import { TableCombo } from './product/tables/TableCombo'
 
 interface Params {
   btn?: React.ReactNode
@@ -16,7 +17,9 @@ export const SettingsModal = ({ btn }: Params) => {
     },
     {
       label: 'Combos',
-      content: <Box sx={{ p: 3 }}>Put here combos components</Box>
+      content: <Box sx={{ p: 2 }}>
+        <TableCombo/>
+      </Box>
     }
   ]
 
