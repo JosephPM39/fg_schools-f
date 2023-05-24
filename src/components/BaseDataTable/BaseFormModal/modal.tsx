@@ -17,6 +17,8 @@ interface Base<T extends IBaseModel> {
   onFail?: (error: ErrorCatched) => void
 }
 
+export type { Base as FormParams }
+
 export type BaseFormModalParams<T extends IBaseModel> = Base<T> & {
   state?: [boolean, Dispatch<SetStateAction<boolean>>]
   Form: (p: Base<T>) => JSX.Element
