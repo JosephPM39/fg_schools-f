@@ -8,6 +8,7 @@ import { Table } from '../../../Table'
 import { getDialogCell } from '../../../Table/renders'
 import { CombosByOrders, OnClickNestedParams } from './types'
 import { useGetComboPerOrders } from './useGetCombosPerOrder'
+import { OrderFormModal } from '../../forms/OrderFormModal'
 
 const DetailsDialogCell = getDialogCell<IOrder>({
   title: 'Detalles',
@@ -33,7 +34,7 @@ export const TableOrder = (params: Params) => {
     isLoading
   } = params
 
-  // const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false)
   // const [idForUpdate, setIdForUpdate] = useState<IOrder['id']>()
   const [orders, setOrders] = useState<IOrder[] | null>([])
   const [combosPerOrder, setCombosPerOrders] = useState<CombosByOrders>([])
@@ -181,7 +182,8 @@ export const TableOrder = (params: Params) => {
   ]
 
   return <>
-    {// <OrderFormModal state={[open, setOpen]} idForUpdate={idForUpdate} noButton/>
+    {
+      <OrderFormModal state={[open, setOpen]}/>
     }
     <Table
       columns={columns}
@@ -202,7 +204,7 @@ export const TableOrder = (params: Params) => {
       toolbar={{
         add: <Button startIcon={<Add/>} onClick={() => {
           // setIdForUpdate(undefined)
-          // setOpen(true)
+          setOpen(true)
         }}>
           Nuevo
         </Button>

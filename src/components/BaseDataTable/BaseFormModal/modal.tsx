@@ -23,6 +23,7 @@ export type BaseFormModalParams<T extends IBaseModel> = Base<T> & {
   state?: [boolean, Dispatch<SetStateAction<boolean>>]
   Form: (p: Base<T>) => JSX.Element
   name: string
+  fullScreen?: boolean
 } & ((BtnContainer | BtnPropsContainer | NoBtnContainer) | undefined)
 
 export const BaseFormModal = <T extends IBaseModel>(params: BaseFormModalParams<T>) => {
@@ -51,12 +52,17 @@ export const BaseFormModal = <T extends IBaseModel>(params: BaseFormModalParams<
     }
   }
 
-  return <Modal {...mBtn()} title={`${idForUpdate ? 'Editar' : 'Agregar'} ${name}`} state={params.state}>
+  return <Modal
+    {...mBtn()}
+    title={`${idForUpdate ? 'Editar' : 'Agregar'} ${name}`}
+    state={params.state}
+    fullScreen={params.fullScreen}
+  >
     <Box
       marginY={4}
       marginX={4}
     >
-      <Form onSuccess={onSuccess} onFail={onFail} idForUpdate={idForUpdate}/>
+      <Form onSuccess={onSuccess} onFail={onFail} idForUpdate={idForUpdate} />
     </Box>
   </Modal>
 }
