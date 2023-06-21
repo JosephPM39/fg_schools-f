@@ -1,15 +1,18 @@
 import { Checkbox, FormControlLabel } from '@mui/material'
-import { ChangeEvent, useEffect, useState } from 'react'
+import React, { ChangeEvent, SetStateAction, useEffect, useState } from 'react'
 
 interface Params {
   initState: boolean
   name: string
   label: string
+  hook?: [boolean, React.Dispatch<SetStateAction<boolean>>]
 }
 
 export const ControlledCheckbox = (params: Params) => {
   const { initState, name, label } = params
-  const [checked, setChecked] = useState(false)
+  const interHook = useState(false)
+  const hook = params.hook ?? interHook
+  const [checked, setChecked] = hook
 
   useEffect(() => {
     if (!initState) return

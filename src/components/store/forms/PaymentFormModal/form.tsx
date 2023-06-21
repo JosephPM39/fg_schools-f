@@ -53,7 +53,7 @@ export const Inputs = ({ data, onChange }: InputsParams<IPayment>) => {
               shrink: !!data?.total
             }}
             name="total"
-            label="Cantidad"
+            label="Pago"
             type='number'
             inputProps={{
               max: 9999.99,
