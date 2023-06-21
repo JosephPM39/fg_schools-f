@@ -1,8 +1,9 @@
-import { Grid, TextField } from '@mui/material'
+import { Grid, IconButton, InputAdornment, TextField } from '@mui/material'
 import { CardBox } from '../CardBox'
 import { useEffect, useState } from 'react'
+import { ContentPasteGo } from '@mui/icons-material'
 
-interface Data {
+export interface Data {
   firstName: string
   nickName: string
   lastName: string
@@ -77,6 +78,18 @@ export const Student = ({ onChange }: StudentParams) => {
           })}
           InputLabelProps={{
             shrink: !!data.nickName
+          }}
+          InputProps={{
+            endAdornment: <InputAdornment position='end'>
+              <IconButton onClick={() => {
+                setData({
+                  ...data,
+                  nickName: `${data.firstName.trim()} ${data.lastName.trim()}`
+                })
+              }}>
+                <ContentPasteGo />
+              </IconButton>
+            </InputAdornment>
           }}
           name="nick_name"
           label="Nombre para Cuadro"

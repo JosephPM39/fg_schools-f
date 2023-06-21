@@ -1,12 +1,13 @@
 import { Button, Divider, Grid } from '@mui/material'
-import { ChangeEvent, FormEvent, useRef, useState } from 'react'
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react'
 import { ErrorCatched, promiseHandleError } from '../../../../../api/handlers/errors'
 import { ImageList } from '../../../../ImageList'
 import { Photo } from '@mui/icons-material'
 import { CardBox } from './../CardBox'
-import { Products } from './product'
-import { Payments } from './payments'
-import { Student } from './student'
+import { Data as ProductsData, Products } from './product'
+import { Payments, Data as PaymentsData } from './payments'
+import { Student, Data as StudentData } from './student'
+import { useModel } from '../../../../../hooks/api/products/useModel'
 
 export interface FormParams {
   onSuccess?: () => void
@@ -52,16 +53,41 @@ interface InputsParams {
 }
 
 export const Inputs = (params: InputsParams) => {
+  const [products, setProducts] = useState<ProductsData>()
+  const [student, setStudent] = useState<StudentData>()
+  const [payment, setPayment] = useState<PaymentsData>()
+  const [total, setTotal] = useState<number>(NaN)
+  const useModels = useModel({ initFetch: false })
+
+  useEffect(() => {
+    const getData = async () => {
+      if (!products?.list) return
+      const total = await products.list.reduce(async (prev, current) => {
+        const previous = await prev
+        return await new Promise((resolve) => {
+          void useModels.findOne({ id: current.product.modelId }).then((res) => {
+            // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+            const price = (current.inOffer ? res?.offer : res?.price) || 0
+            const finalPrice = price + previous
+            resolve(finalPrice)
+          })
+        })
+      }, Promise.resolve<number>(0))
+      setTotal(total)
+    }
+    void getData()
+  }, [products])
+
   return <>
     <Grid container spacing={2}>
       <Grid item xs={12} sm={12}>
-        <Products onChange={() => { }} />
+        <Products onChange={(data) => setProducts(data)} />
       </Grid>
       <Grid item xs={12} sm={6}>
-        <Student onChange={() => { }} />
+        <Student onChange={(data) => setStudent(data)} />
       </Grid>
       <Grid item xs={12} sm={6}>
-        <Payments total={19} onChange={() => { }} />
+        <Payments total={total} onChange={(data) => setPayment(data)} />
       </Grid>
     </Grid>
   </>

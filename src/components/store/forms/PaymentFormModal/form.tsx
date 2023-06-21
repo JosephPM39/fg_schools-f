@@ -1,4 +1,4 @@
-import { Grid, TextField } from '@mui/material'
+import { Grid, InputAdornment, TextField } from '@mui/material'
 import { IPayment } from '../../../../api/models_school'
 import { getData } from './getData'
 import { usePayment } from '../../../../hooks/api/store/usePayment'
@@ -33,14 +33,14 @@ export const Inputs = ({ data, onChange }: InputsParams<IPayment>) => {
         name="payment_id"
         type='text'
         value={data?.id ?? ''}
-        onChange={() => {}}
+        onChange={() => { }}
         hidden
       />
       <input
         name="order_id"
         type='text'
         value={data?.orderId ?? ''}
-        onChange={() => {}}
+        onChange={() => { }}
         hidden
       />
       <Grid container spacing={2}>
@@ -50,14 +50,17 @@ export const Inputs = ({ data, onChange }: InputsParams<IPayment>) => {
             value={data?.total ?? ''}
             onChange={(e) => onChange(e, 'total')}
             InputLabelProps={{
-              shrink: !!data?.total
+              shrink: !isNaN(data?.total ?? NaN) && !!String(data?.total)
+            }}
+            InputProps={{
+              startAdornment: <InputAdornment position='start'>$</InputAdornment>
             }}
             name="total"
             label="Pago"
             type='number'
             inputProps={{
               max: 9999.99,
-              min: 0.01,
+              min: 0.00,
               step: 0.01
             }}
             variant="outlined"
@@ -103,6 +106,6 @@ export const Inputs = ({ data, onChange }: InputsParams<IPayment>) => {
 export const Form = (params: FormParams) => {
   const usePayments = usePayment({ initFetch: false })
   return (
-    <BaseForm {...params} Inputs={Inputs} dataFormatter={getData} hook={usePayments}/>
+    <BaseForm {...params} Inputs={Inputs} dataFormatter={getData} hook={usePayments} />
   )
 }

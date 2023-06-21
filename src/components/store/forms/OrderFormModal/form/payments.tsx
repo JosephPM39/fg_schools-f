@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import { CardBox } from '../CardBox'
 import { Inputs as PaymentInputs } from '../../PaymentFormModal/form'
-import { Grid, TextField } from '@mui/material'
+import { Grid, InputAdornment, TextField } from '@mui/material'
 import { IPayment } from '../../../../../api/models_school'
 
-interface Data {
+export interface Data {
   totalCount: number
   extraPay: number
   discount: number
@@ -18,23 +18,20 @@ interface PaymentsParams {
 
 export const Payments = ({ onChange, total }: PaymentsParams) => {
   const [data, setData] = useState<Data>({
-    discount: NaN,
-    extraPay: NaN,
+    discount: 0,
+    extraPay: 0,
     totalCount: total,
     payment: {
-      details: '',
+      details: 'Abono Inicial',
       date: new Date(),
-      total: NaN
+      total: -1
     }
   })
 
   useEffect(() => {
-    if (isNaN(data.extraPay)) return
-    if (isNaN(data.discount)) return
-    if (isNaN(total)) return
     setData({
       ...data,
-      totalCount: total + data.extraPay - data.discount
+      totalCount: total + (data.extraPay ?? 0) - (data.discount ?? 0)
     })
   }, [total, data.extraPay, data.discount])
 
@@ -47,20 +44,24 @@ export const Payments = ({ onChange, total }: PaymentsParams) => {
       <Grid item xs={12} sm={12}>
         <TextField
           fullWidth
-          value={data.totalCount ?? ''}
+          value={data.totalCount ?? 0}
           onChange={(e) => e}
           InputLabelProps={{
             shrink: !isNaN(data.totalCount) && !!String(data.totalCount)
+          }}
+          InputProps={{
+            startAdornment: <InputAdornment position='start'>$</InputAdornment>
           }}
           name="total_count"
           label="Total"
           type='number'
           inputProps={{
             max: 9999.99,
-            min: 0.01,
+            min: 0.00,
             step: 0.01
           }}
-          disabled
+          color='error'
+          focused
           variant="outlined"
           required
         />
@@ -68,23 +69,26 @@ export const Payments = ({ onChange, total }: PaymentsParams) => {
       <Grid item xs={12} sm={6}>
         <TextField
           fullWidth
-          value={data.extraPay ?? ''}
+          value={data.extraPay ?? 0}
           onChange={(e) => {
             const { value } = e.target
             setData({
               ...data,
-              extraPay: parseFloat(value)
+              extraPay: parseFloat(value) || 0
             })
           }}
           InputLabelProps={{
             shrink: !isNaN(data.extraPay) && !!String(data.extraPay)
+          }}
+          InputProps={{
+            startAdornment: <InputAdornment position='start'>$</InputAdornment>
           }}
           name="extra_pay"
           label="Costo extra"
           type='number'
           inputProps={{
             max: 9999.99,
-            min: 0.01,
+            min: 0.00,
             step: 0.01
           }}
           variant="outlined"
@@ -94,23 +98,26 @@ export const Payments = ({ onChange, total }: PaymentsParams) => {
       <Grid item xs={12} sm={6}>
         <TextField
           fullWidth
-          value={data.discount ?? ''}
+          value={data.discount ?? 0}
           onChange={(e) => {
             const { value } = e.target
             setData({
               ...data,
-              discount: parseFloat(value)
+              discount: parseFloat(value) || 0
             })
           }}
           InputLabelProps={{
-            shrink: !isNaN(data.discount) && !!String(data.discount)
+            shrink: !isNaN(data.discount) && !!String(data.discount),
+          }}
+          InputProps={{
+            startAdornment: <InputAdornment position='start'>$</InputAdornment>
           }}
           name="discount"
           label="Descuento"
           type='number'
           inputProps={{
             max: 9999.99,
-            min: 0.01,
+            min: 0.00,
             step: 0.01
           }}
           variant="outlined"

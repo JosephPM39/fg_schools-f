@@ -16,7 +16,7 @@ interface formParams {
   state: [boolean, React.Dispatch<SetStateAction<boolean>>]
 }
 
-export const ProductForm = ({ onSubmit }: Pick<formParams, 'onSubmit'>) => {
+const ProductForm = ({ onSubmit, close }: Pick<formParams, 'onSubmit'> & { close: () => void }) => {
   const useProducts = useProduct({ initFetch: false })
   const useModels = useModel()
   const useColors = useColor()
@@ -56,6 +56,7 @@ export const ProductForm = ({ onSubmit }: Pick<formParams, 'onSubmit'>) => {
     <form onSubmit={() => {
       if (!orderProduct) return
       onSubmit(orderProduct)
+      close()
     }}>
       <Grid container spacing={2}>
         <Grid item xs={12} sm={6}>
@@ -213,7 +214,7 @@ export const ProductFormModal = (params: formParams) => {
       marginY={4}
       marginX={4}
     >
-      <ProductForm onSubmit={params.onSubmit} />
+      <ProductForm close={() => params.state[1](false)} onSubmit={params.onSubmit} />
     </Box>
   </Modal>
 }

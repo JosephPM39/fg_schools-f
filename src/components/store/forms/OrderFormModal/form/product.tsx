@@ -13,13 +13,15 @@ import { CardBox } from './../CardBox'
 
 type Product = WithRequired<Omit<IProductOrder, 'orderId'>, 'product'>
 
+export interface Data {
+  list?: Product[]
+  combo?: ICombo
+  isCustom: boolean
+  extraInfo: string
+}
+
 interface ProductsParams {
-  onChange: (p: {
-    list?: Product[]
-    combo?: ICombo
-    isCustom: boolean
-    extraInfo: string
-  }) => void
+  onChange: (p: Data) => void
 }
 
 export const Products = ({ onChange }: ProductsParams) => {
