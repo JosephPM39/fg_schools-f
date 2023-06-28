@@ -55,7 +55,7 @@ export const SectionsTabs = (params: Params) => {
     const fillTabsData = () => {
       return params.sectionProms.map((prom) => ({
         label: getSectionName(getSection(prom)),
-        content: <Orders sectionPromId={prom.id} type={OrderType.SCHOOL} />
+        content: prom.id ? <Orders sectionPromId={prom.id} type={OrderType.SCHOOL} /> : <>Prom ID Error</>
       }))
     }
     const res = fillTabsData()

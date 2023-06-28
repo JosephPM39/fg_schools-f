@@ -11,10 +11,8 @@ import { useOrder } from '../../../hooks/api/store/useOrder'
 import { PaymentDialog } from './PaymentDialog'
 
 type Params = {
-  type: OrderType.STUDIO
-} | {
-  type: OrderType.SCHOOL
-  sectionPromId: IOrder['sectionPromId']
+  type: OrderType
+  sectionPromId: NonNullable<IOrder['sectionPromId']>
 }
 
 const ComboDetails = (params: Partial<GridRenderCellParams<any, IOrder>>) => {

@@ -8,7 +8,7 @@ export interface Data {
   totalCount: number
   extraPay: number
   discount: number
-  payment: Partial<IPayment>
+  payment: Omit<IPayment, 'orderId'>
 }
 
 interface PaymentsParams {
@@ -107,7 +107,7 @@ export const Payments = ({ onChange, total }: PaymentsParams) => {
             })
           }}
           InputLabelProps={{
-            shrink: !isNaN(data.discount) && !!String(data.discount),
+            shrink: !isNaN(data.discount) && !!String(data.discount)
           }}
           InputProps={{
             startAdornment: <InputAdornment position='start'>$</InputAdornment>
@@ -129,6 +129,15 @@ export const Payments = ({ onChange, total }: PaymentsParams) => {
           data={data.payment}
           onChange={(e, key) => {
             const { value } = e.target
+            if (key === 'total') {
+              return setData({
+                ...data,
+                payment: {
+                  ...data.payment,
+                  [key]: parseFloat(value || '0')
+                }
+              })
+            }
             setData({
               ...data,
               payment: {

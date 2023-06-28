@@ -10,15 +10,25 @@ import { useProductPerCombo } from '../../../../../hooks/api/store/useProductPer
 import { useCombo } from '../../../../../hooks/api/store/useCombo'
 import { ComboBoxLazy } from '../../../../inputs/ComboBox'
 import { CardBox } from './../CardBox'
+import { useModel } from '../../../../../hooks/api/products/useModel'
 
-type Product = WithRequired<Omit<IProductOrder, 'orderId'>, 'product'>
+export type Product = WithRequired<Omit<IProductOrder, 'orderId' | 'order'>, 'product' | 'inOffer' | 'amount'>
 
-export interface Data {
-  list?: Product[]
-  combo?: ICombo
+interface WithCustom {
+  isCustom: true
+  list: Product[]
+}
+
+interface WithoutCustom {
+  isCustom: false
+  combo: ICombo
+}
+
+export type Data = {
   isCustom: boolean
   extraInfo: string
-}
+  total: number
+} & (WithCustom | WithoutCustom)
 
 interface ProductsParams {
   onChange: (p: Data) => void
@@ -27,7 +37,9 @@ interface ProductsParams {
 export const Products = ({ onChange }: ProductsParams) => {
   const useProducts = useProduct({ initFetch: false })
   const useProductsPerCombo = useProductPerCombo({ initFetch: false })
+  const useModels = useModel({ initFetch: false })
   const useCombos = useCombo()
+
   const [orderProducts, setOrderProducts] = useState<Product[]>([])
   const [productsList, setProductsList] = useState<Product[] | null>([])
   const [comboProducts, setComboProducts] = useState<IProductCombo[]>([])
@@ -96,13 +108,44 @@ export const Products = ({ onChange }: ProductsParams) => {
     setIsCustom(orderProducts.length > 0)
   }, [orderProducts])
 
+  const getTotal = async () => {
+    if (!productsList) return
+    const total = await productsList.reduce(async (prev, current) => {
+      const previous = await prev
+      return await new Promise((resolve) => {
+        void useModels.findOne({ id: current.product.modelId }).then((res) => {
+          // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+          const price = (current.inOffer ? res?.offer : res?.price) || 0
+          const finalPrice = price + previous
+          resolve(finalPrice)
+        })
+      })
+    }, Promise.resolve<number>(0))
+    return total
+  }
+
   useEffect(() => {
-    onChange({
-      list: productsList ?? undefined,
-      combo,
-      isCustom,
-      extraInfo
-    })
+    const getData = async () => {
+      const total = await getTotal()
+      if (!total) return
+      if (isCustom) {
+        if (!productsList) return
+        return onChange({
+          list: productsList,
+          total,
+          isCustom,
+          extraInfo
+        })
+      }
+      if (!combo) return
+      return onChange({
+        combo,
+        isCustom,
+        total,
+        extraInfo
+      })
+    }
+    void getData()
   }, [productsList, combo, isCustom, extraInfo])
 
   return <>

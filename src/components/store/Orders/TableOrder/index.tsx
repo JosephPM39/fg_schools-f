@@ -2,7 +2,7 @@ import { Add, AttachMoney, OpenInFull, Photo } from '@mui/icons-material'
 import { Button, IconButton } from '@mui/material'
 import { GridColDef, GridRenderCellParams, GridValueGetterParams } from '@mui/x-data-grid'
 import { useEffect, useState } from 'react'
-import { IOrder } from '../../../../api/models_school'
+import { IOrder, ISectionProm } from '../../../../api/models_school'
 import { useStudent } from '../../../../hooks/api/store/useStudent'
 import { Table } from '../../../Table'
 import { getDialogCell } from '../../../Table/renders'
@@ -21,6 +21,7 @@ interface Params {
   onClickNested: (p: OnClickNestedParams) => void
   onPagination: (limit: number, offset: number) => void
   count: number
+  sectionPromId: NonNullable<ISectionProm['id']>
 }
 
 export const TableOrder = (params: Params) => {
@@ -183,7 +184,7 @@ export const TableOrder = (params: Params) => {
 
   return <>
     {
-      <OrderFormModal state={[open, setOpen]}/>
+      <OrderFormModal sectionPromId={params.sectionPromId} state={[open, setOpen]}/>
     }
     <Table
       columns={columns}
