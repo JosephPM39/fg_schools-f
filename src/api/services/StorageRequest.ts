@@ -50,11 +50,22 @@ export class StorageRequest<Model extends IBaseModel> implements Crud<Model> {
   private readonly local = new LocalRequest<Model>(this.config.path)
   private readonly api = new ApiRequest<Model>(this.config.path)
 
-  constructor (
+  // eslint-disable-next-line @typescript-eslint/space-before-function-paren
+  constructor(
     private readonly config: StorageRequestConfig<Model>
-  ) {}
+  ) { }
 
   validate = async ({ data: dto, version = EV.CREATE }: ValidateParams<Model>) => {
+    if (Array.isArray(dto)) {
+      const data = await Promise.all(dto.map(async (item) => {
+        return await validateDto<Model>({
+          model: this.config.model,
+          dto: item,
+          version
+        })
+      }))
+      return data
+    }
     const data = await validateDto<Model>({
       model: this.config.model,
       dto,
@@ -65,10 +76,9 @@ export class StorageRequest<Model extends IBaseModel> implements Crud<Model> {
 
   create = async (params: CreateParams<Model>) => {
     const { data: dto } = params
-    const { model, offline } = this.config
-    const data = await validateDto<Model>({
-      dto,
-      model,
+    const { offline } = this.config
+    const data = await this.validate({
+      data: dto,
       version: EV.CREATE
     })
 
