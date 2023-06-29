@@ -34,13 +34,16 @@ export const Orders = (params: Params) => {
   const [openCombos, setOpenCombos] = useState<boolean>(false)
   const [openPayments, setOpenPayments] = useState<boolean>(false)
   const [rowSelected, setRowSelected] = useState<GridRenderCellParams<any, IOrder>>()
+  const [needRefresh, setNeedRefresh] = useState(true)
 
   useEffect(() => {
+    if (!needRefresh) return
     void useOrders.fetch({ searchBy: { ...params } })
       .then((res) => {
         setOrders(res.data)
+        setNeedRefresh(false)
       })
-  }, [params])
+  }, [params, needRefresh])
 
   useEffect(() => {
     if (orders == null) return setIsLoading(false)
@@ -85,6 +88,7 @@ export const Orders = (params: Params) => {
     <TableOrder
       {...params}
       list={orders}
+      onNeedRefresh={() => setNeedRefresh(true)}
       onClickNested={onClickNested}
       isLoading={isLoading}
       onPagination={(limit, offset) => {

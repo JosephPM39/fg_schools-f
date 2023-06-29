@@ -5,11 +5,12 @@ import { useModel } from '../../../../hooks/api/products/useModel'
 import { useColor } from '../../../../hooks/api/products/useColor'
 import { useBorder } from '../../../../hooks/api/products/useBorder'
 import { useSize } from '../../../../hooks/api/products/useSize'
-import React, { SetStateAction, useEffect, useState } from 'react'
+import React, { SetStateAction, useEffect, useRef, useState } from 'react'
 import { IBorder, IColor, IModel, IProduct, IProductOrder, ISize } from '../../../../api/models_school'
 import { ControlledCheckbox } from '../../../inputs/ControlledCheckbox'
 import { Modal } from '../../../../containers/Modal'
 import { CardBox } from './CardBox'
+import { v4 as uuidV4 } from 'uuid'
 
 interface formParams {
   onSubmit: (product: Omit<IProductOrder, 'orderId'>) => void
@@ -31,6 +32,7 @@ const ProductForm = ({ onSubmit, close }: Pick<formParams, 'onSubmit'> & { close
   const [size, setSize] = useState<ISize>()
   const [inOffer, setInOffer] = useState<boolean>(false)
   const [amount, setAmount] = useState<number>(1)
+  const useFormRef = useRef<HTMLFormElement>(null)
 
   useEffect(() => {
     setProduct(undefined)
@@ -46,18 +48,23 @@ const ProductForm = ({ onSubmit, close }: Pick<formParams, 'onSubmit'> & { close
 
   useEffect(() => {
     setOrderProduct({
+      id: orderProduct?.id ?? uuidV4(),
       productId: product?.id,
       inOffer,
       amount
     })
   }, [product, amount, inOffer])
 
+  const onClick = () => {
+    const isValid = useFormRef.current?.checkValidity() ?? false
+    if (!isValid) return useFormRef.current?.reportValidity()
+    if (!orderProduct) return
+    onSubmit(orderProduct)
+    close()
+  }
+
   return <>
-    <form onSubmit={() => {
-      if (!orderProduct) return
-      onSubmit(orderProduct)
-      close()
-    }}>
+    <form ref={useFormRef}>
       <Grid container spacing={2}>
         <Grid item xs={12} sm={6}>
           <CardBox title='Filtrar producto'>
@@ -194,7 +201,7 @@ const ProductForm = ({ onSubmit, close }: Pick<formParams, 'onSubmit'> & { close
           </CardBox>
         </Grid>
         <Grid item xs={12} sm={6}>
-          <Button type='submit' variant='contained'>
+          <Button onClick={onClick} variant='contained'>
             Agregar
           </Button>
         </Grid>

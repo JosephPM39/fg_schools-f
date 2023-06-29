@@ -149,7 +149,6 @@ export const Form = (params: FormParams) => {
           isCustom,
           productsOrder: list.map((item): IProductOrder => ({
             ...item,
-            id: uuidV4(),
             orderId: order.id,
             productId: item.productId,
             inOffer: item.inOffer,

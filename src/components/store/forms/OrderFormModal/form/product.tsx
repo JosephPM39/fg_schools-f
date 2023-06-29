@@ -11,6 +11,7 @@ import { useCombo } from '../../../../../hooks/api/store/useCombo'
 import { ComboBoxLazy } from '../../../../inputs/ComboBox'
 import { CardBox } from './../CardBox'
 import { useModel } from '../../../../../hooks/api/products/useModel'
+import { v4 as uuidV4 } from 'uuid'
 
 export type Product = WithRequired<Omit<IProductOrder, 'orderId' | 'order'>, 'product' | 'inOffer' | 'amount'>
 
@@ -43,6 +44,7 @@ export const Products = ({ onChange }: ProductsParams) => {
   const [orderProducts, setOrderProducts] = useState<Product[]>([])
   const [productsList, setProductsList] = useState<Product[] | null>([])
   const [comboProducts, setComboProducts] = useState<IProductCombo[]>([])
+  const [originalComboProducts, setOriginalComboProducts] = useState<IProductCombo[]>([])
   const [combo, setCombo] = useState<ICombo>()
   const [newProduct, setNewProduct] = useState<Omit<IProductOrder, 'orderId'>>()
   const [isCustom, setIsCustom] = useState(false)
@@ -65,48 +67,83 @@ export const Products = ({ onChange }: ProductsParams) => {
 
   useEffect(() => {
     const getData = async () => {
-      console.log(combo, 'Combo TT')
       if (!combo) {
-        console.log(combo, 'bad Combo TT')
-        return setComboProducts([])
+        setComboProducts([])
+        setOriginalComboProducts([])
+        return
       }
-      console.log('good Combo TT')
       const productsCombo = await useProductsPerCombo.findBy({
         comboId: combo?.id
       })
       if (!productsCombo) return
       setComboProducts(productsCombo)
+      setOriginalComboProducts(productsCombo)
     }
     void getData()
   }, [combo])
 
   useEffect(() => {
     const getData = async () => {
-      const cProducts = await Promise.all(comboProducts.map(async (p) => ({
-        amount: p.amount,
-        inOffer: p.inOffer,
-        productId: p.productId,
-        product: await useProducts.findOne({ id: p.productId }) ?? undefined
-      })))
-      const oProducts = await Promise.all(orderProducts.map(async (p) => ({
-        amount: p.amount,
-        inOffer: p.inOffer,
-        productId: p.productId,
-        product: await useProducts.findOne({ id: p.productId }) ?? undefined
-      })))
-
+      const getProducts = async (list: IProductCombo[] | Product[], addID?: boolean) => {
+        if (list.length < 1) return []
+        return await Promise.all(list.map(async (p) => ({
+          id: addID ? uuidV4() : p.id,
+          amount: p.amount,
+          inOffer: p.inOffer,
+          productId: p.productId,
+          product: await useProducts.findOne({ id: p.productId }) ?? undefined
+        })))
+      }
+      const cProducts = await getProducts(comboProducts)
+      const oProducts = await getProducts(orderProducts, false)
       const products: Product[] = [...cProducts, ...oProducts] as Product[]
-      const productsId: Product[] = products.map((p, i) => ({ ...p, id: `${i}` })) as Product[]
-      console.log(productsId, ' pid Combo TT')
-      console.log(products, ' p Combo TT')
-      setProductsList(productsId)
+      setProductsList(products)
     }
     void getData()
   }, [comboProducts, orderProducts])
 
   useEffect(() => {
-    setIsCustom(orderProducts.length > 0)
-  }, [orderProducts])
+    const productEquals = (p: Product, c: IProductCombo) => {
+      const keys: Array<keyof Product> = ['amount', 'inOffer', 'productId']
+      let isEquals = true
+      const parity: string[] = []
+      keys.forEach((key) => {
+        isEquals = (c[key] === p[key])
+        parity.push(`${key}:${String(isEquals)}`)
+      })
+      console.table('Parity: ', parity)
+      return isEquals
+    }
+    const listProductsEquals = (pl: Product[], cl: IProductCombo[]) => {
+      if (pl.length !== cl.length) return false
+      const existInList = (p: Product) => {
+        const product = cl.find((c) => {
+          return productEquals(p, c)
+        })
+        console.log('Product', product)
+        const exists = !!product
+        return exists
+      }
+      return pl.every(existInList)
+    }
+    const isCustom = () => {
+      const listEquals = listProductsEquals(productsList ?? [], originalComboProducts)
+      console.log('Equals', listEquals)
+      return !listEquals
+    }
+    setIsCustom(isCustom())
+  }, [productsList, originalComboProducts])
+
+  const deleteAction = (id: Product['id']) => {
+    const orderList = (orderProducts ?? []).filter((v) => v.id !== id)
+    const comboList = (comboProducts ?? []).filter((v) => v.id !== id)
+    if (comboList.length < comboProducts.length) {
+      return setComboProducts(comboList)
+    }
+    if (orderList.length < orderProducts.length) {
+      return setOrderProducts(orderList)
+    }
+  }
 
   const getTotal = async () => {
     if (!productsList) return
@@ -180,6 +217,7 @@ export const Products = ({ onChange }: ProductsParams) => {
         <Grid item xs={12} sm={12}>
           <TableProduct
             list={productsList}
+            deleteAction={deleteAction}
             createButton={
               <Button startIcon={<Add />} onClick={() => {
                 setIsOpen(true)
@@ -189,6 +227,7 @@ export const Products = ({ onChange }: ProductsParams) => {
             }
           />
         </Grid>
+        {isCustom ? 'Custom' : 'Original'}
         <Grid item xs={12} sm={12}>
           <TextField
             fullWidth

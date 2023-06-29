@@ -1,6 +1,6 @@
 import { GridColDef, GridRenderCellParams, GridValueGetterParams } from '@mui/x-data-grid'
 import { ReactNode, useEffect, useState } from 'react'
-import { IProductCombo, IProductOrder } from '../../../../api/models_school'
+import { IProductOrder } from '../../../../api/models_school'
 import { useBorder } from '../../../../hooks/api/products/useBorder'
 import { useColor } from '../../../../hooks/api/products/useColor'
 import { useModel } from '../../../../hooks/api/products/useModel'
@@ -9,12 +9,17 @@ import { useType } from '../../../../hooks/api/products/useType'
 import { Table } from '../../../Table'
 import { getColorCell } from '../../../Table/renders'
 import { ArrayElement, WithRequired } from '../../../types'
+import { IconButton } from '@mui/material'
+import { Delete } from '@mui/icons-material'
 
-type List = Array<WithRequired<Omit<IProductCombo, 'id'> | Omit<IProductOrder, 'id' | 'orderId'>, 'product'>>
+type Product = WithRequired<Omit<IProductOrder, 'orderId' | 'order'>, 'product' | 'inOffer' | 'amount'>
+
+type List = Product[]
 
 interface Params {
   list?: List | null
   createButton?: ReactNode
+  deleteAction: (e: Product['id']) => void
 }
 
 export const TableProduct = (params: Params) => {
@@ -23,14 +28,13 @@ export const TableProduct = (params: Params) => {
   const useSizes = useSize({ initFetch: false })
   const useColors = useColor({ initFetch: false })
   const useBorders = useBorder({ initFetch: false })
-  const { list } = params
+  const { list, deleteAction } = params
   const [products, setProducts] = useState<List | null>([])
   const [isLoading, setLoading] = useState(true)
 
   useEffect(() => {
     if (!list) return setProducts(null)
     if (list.length < 1) return setProducts(null)
-    console.log(list, 'LI')
     void Promise.all(list.map(async (item) => ({
       ...item,
       product: {
@@ -138,6 +142,20 @@ export const TableProduct = (params: Params) => {
         return `$${row.product.model?.offer ?? 'Cargando...'}`
       },
       type: 'string'
+    },
+    {
+      field: 'actions',
+      type: 'actions',
+      headerName: 'Acciones',
+      width: 80,
+      renderCell: (params) => {
+        const { id } = params
+        return <>
+          <IconButton onClick={() => deleteAction(id as Product['id'])}>
+            <Delete />
+          </IconButton>
+        </>
+      }
     }
   ]
 

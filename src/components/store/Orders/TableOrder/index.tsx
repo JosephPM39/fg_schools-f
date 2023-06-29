@@ -22,6 +22,7 @@ interface Params {
   onPagination: (limit: number, offset: number) => void
   count: number
   sectionPromId: NonNullable<ISectionProm['id']>
+  onNeedRefresh: () => void
 }
 
 export const TableOrder = (params: Params) => {
@@ -32,7 +33,8 @@ export const TableOrder = (params: Params) => {
     list,
     onPagination,
     count,
-    isLoading
+    isLoading,
+    onNeedRefresh
   } = params
 
   const [open, setOpen] = useState(false)
@@ -57,12 +59,17 @@ export const TableOrder = (params: Params) => {
     })
   }, [orders])
 
+  const onSuccess = () => {
+    setOpen(false)
+    onNeedRefresh()
+  }
+
   const PaymentsButton = (p: GridRenderCellParams<any, IOrder>) => {
     const onClick = () => {
       onClickNested({ renderParams: p, field: 'payment' })
     }
     return <IconButton onClick={onClick} color='primary'>
-      <AttachMoney/>
+      <AttachMoney />
     </IconButton>
   }
 
@@ -71,7 +78,7 @@ export const TableOrder = (params: Params) => {
       onClickNested({ renderParams: p, field: 'photo' })
     }
     return <IconButton onClick={onClick} color='primary'>
-      <Photo/>
+      <Photo />
     </IconButton>
   }
 
@@ -138,7 +145,7 @@ export const TableOrder = (params: Params) => {
         const label = preview.length < String(p.value).length ? `${preview}...` : preview
 
         return <Button onClick={onClick} startIcon={
-          <OpenInFull/>
+          <OpenInFull />
         }>
           {label}
         </Button>
@@ -160,7 +167,7 @@ export const TableOrder = (params: Params) => {
       headerName: 'Pagos',
       type: 'actions',
       disableExport: true,
-      renderCell: (p: GridRenderCellParams<any, IOrder>) => <PaymentsButton {...p}/>,
+      renderCell: (p: GridRenderCellParams<any, IOrder>) => <PaymentsButton {...p} />,
       width: 65
     },
     {
@@ -168,7 +175,7 @@ export const TableOrder = (params: Params) => {
       headerName: 'Fotos',
       type: 'actions',
       disableExport: true,
-      renderCell: (p: GridRenderCellParams<any, IOrder>) => <PhotosButton {...p}/>,
+      renderCell: (p: GridRenderCellParams<any, IOrder>) => <PhotosButton {...p} />,
       width: 65
     },
     {
@@ -177,15 +184,17 @@ export const TableOrder = (params: Params) => {
       valueFormatter: (p) => {
         return p.value
       },
-      renderCell: (p) => <DetailsDialogCell {...p}/>,
+      renderCell: (p) => <DetailsDialogCell {...p} />,
       width: 150
     }
   ]
 
   return <>
-    {
-      <OrderFormModal sectionPromId={params.sectionPromId} state={[open, setOpen]}/>
-    }
+    <OrderFormModal
+      sectionPromId={params.sectionPromId}
+      state={[open, setOpen]}
+      onSuccess={onSuccess}
+    />
     <Table
       columns={columns}
       rows={orders ?? []}
@@ -201,9 +210,9 @@ export const TableOrder = (params: Params) => {
       name="Bordes de productos"
       deleteAction={(id) => console.log(id)}
       editAction={(id) => console.log(id)}
-      onAbortDeleteAction={() => {}}
+      onAbortDeleteAction={() => { }}
       toolbar={{
-        add: <Button startIcon={<Add/>} onClick={() => {
+        add: <Button startIcon={<Add />} onClick={() => {
           // setIdForUpdate(undefined)
           setOpen(true)
         }}>
