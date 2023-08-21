@@ -25,7 +25,8 @@ export interface FormParams {
 export const Photos = ({ onChange, photos }: { photos: File[], onChange: (e: ChangeEvent<HTMLInputElement>) => void }) => {
   const images = photos.map((photo) => ({
     imgUrl: URL.createObjectURL(photo),
-    title: photo.name
+    title: photo.name,
+    imgName: photo.name
   }))
   return <CardBox title='Fotos' actions={<>
     <Button

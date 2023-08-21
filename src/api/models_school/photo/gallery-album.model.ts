@@ -2,7 +2,7 @@ import { Exclude, Expose } from 'class-transformer'
 import { BaseModel } from '../base.model'
 import { EXPOSE_VERSIONS as EV } from '../../types'
 
-import { IsOptional, IsUUID, ValidateNested } from 'class-validator'
+import { IsBoolean, IsOptional, IsUUID, ValidateNested } from 'class-validator'
 import { Gallery, IGallery } from './gallery.model'
 import { Album, IAlbum } from './album.model'
 
@@ -15,6 +15,10 @@ export class GalleryAlbum extends BaseModel {
   @Expose({ since: EV.UPDATE, until: EV.CREATE_NESTED })
   @IsUUID()
     albumId: IAlbum['id']
+
+  @Expose({ since: EV.UPDATE, until: EV.CREATE_NESTED })
+  @IsBoolean()
+    public: boolean
 
   // RELATIONS
 

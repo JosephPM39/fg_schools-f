@@ -9,6 +9,7 @@ import { TableOrderProducts } from './TableOrderProducts'
 import { useGetComboPerOrders } from './TableOrder/useGetCombosPerOrder'
 import { useOrder } from '../../../hooks/api/store/useOrder'
 import { PaymentDialog } from './PaymentDialog'
+import { Gallery } from '../../photos/Gallery'
 
 type Params = {
   type: OrderType
@@ -21,7 +22,7 @@ const ComboDetails = (params: Partial<GridRenderCellParams<any, IOrder>>) => {
   const { isCustom, comboPerOrders } = useGetComboPerOrders(orderId)
 
   return <TableOrderProducts
-    { ... isCustom ? { orderId } : { comboId: comboPerOrders?.at(0)?.comboId } }
+    {...isCustom ? { orderId } : { comboId: comboPerOrders?.at(0)?.comboId }}
     studentName={studentName ?? ''}
   />
 }
@@ -33,6 +34,7 @@ export const Orders = (params: Params) => {
   const [isLoading, setIsLoading] = useState(true)
   const [openCombos, setOpenCombos] = useState<boolean>(false)
   const [openPayments, setOpenPayments] = useState<boolean>(false)
+  const [openPhotos, setOpenPhotos] = useState<boolean>(false)
   const [rowSelected, setRowSelected] = useState<GridRenderCellParams<any, IOrder>>()
   const [needRefresh, setNeedRefresh] = useState(true)
 
@@ -62,6 +64,11 @@ export const Orders = (params: Params) => {
       setRowSelected(p.renderParams)
       setOpenPayments(true)
     }
+
+    if (p.field === 'photo') {
+      setRowSelected(p.renderParams)
+      setOpenPhotos(true)
+    }
   }
 
   useEffect(() => {
@@ -85,6 +92,14 @@ export const Orders = (params: Params) => {
       title={`Pagos de: ${rowSelected?.row.student?.nickName ?? 'Cargando...'}`}
       orderId={rowSelected?.row.id}
     />
+    <Dialog
+      noButton
+      title='Galería de fotos'
+      state={[openPhotos, setOpenPhotos]}
+      actions={{ omitCancel: true }}
+    >
+      <Gallery orderId={rowSelected?.row.id} includePrivate/>
+    </Dialog>
     <TableOrder
       {...params}
       list={orders}

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { StorageFileRequest } from '../../api/services'
-import { LocalFilesRequest } from '../../api/services/files'
-import { useNetStatus } from '../useNetStatus'
+import { StorageFileRequest } from '../../../api/services'
+import { LocalFilesRequest } from '../../../api/services/files'
+import { useNetStatus } from '../../useNetStatus'
 
 export const useStorageFile = () => {
   const { isAppOffline } = useNetStatus()
@@ -21,7 +21,7 @@ export const useStorageFile = () => {
     void localFR.pickDir().then((h) => setDirHandler(h))
   }
 
-  const newStorage = (subDir: SubDir) => {
+  const newStorage = (subDir: SubDir | string) => {
     return new StorageFileRequest(subDir, isAppOffline(), dirHandler)
   }
 

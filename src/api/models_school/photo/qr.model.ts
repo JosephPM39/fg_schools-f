@@ -8,13 +8,12 @@ import { Gallery, IGallery } from './gallery.model'
 @Exclude()
 export class Qr extends BaseModel {
   @Expose({ since: EV.UPDATE, until: EV.DELETE })
-  @IsString()
-  @Length(1, 20)
+  @IsUUID()
     code: string
 
   @Expose({ since: EV.UPDATE, until: EV.DELETE })
   @IsString()
-  @Length(1, 100)
+  @Length(1, 255)
     url: string
 
   @Expose({ since: EV.UPDATE, until: EV.CREATE_NESTED })

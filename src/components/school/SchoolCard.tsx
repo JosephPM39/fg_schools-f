@@ -22,7 +22,7 @@ import DefaultIcon from '../../assets/signature.png'
 import ImageError from '../../assets/image-error.png'
 import { SchoolPromFormModal } from './forms/SchoolPromFormModal'
 import { StorageFileContext } from '../../context/files/StorageFilesContext'
-import { SubDir } from '../../hooks/files/useStorageFile'
+import { SubDir } from '../../hooks/api/files/useStorageFile'
 import { ChangeIconDialog } from './forms/ChangeSchoolIconDialog'
 
 interface Params {

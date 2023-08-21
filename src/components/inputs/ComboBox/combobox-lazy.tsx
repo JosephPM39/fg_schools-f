@@ -60,10 +60,10 @@ export const ComboBoxLazy = <
       if (searchValue === newOp.label) return
 
       if (dvId && !defaultValue) {
-        console.log(dvId, 'default value')
+        // console.log(dvId, 'default value')
         const res = await hook.findOne({ id: dvId })
         if (!res) return
-        console.log('setting')
+        // console.log('setting')
         const value: LazyOption<T, KV> = {
           label: String(res[itemLabelBy]),
           value: res[itemValueBy],
@@ -74,7 +74,7 @@ export const ComboBoxLazy = <
         return setOptionSelected(value)
       }
 
-      console.log(searchValue.length, 'length', searchValue)
+      // console.log(searchValue.length, 'length', searchValue)
 
       const searchBy: T = {
         [itemLabelBy]: `%${searchValue}%`

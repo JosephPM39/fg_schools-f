@@ -2,14 +2,21 @@ import { ApiFilesRequest, LocalFilesRequest } from './files'
 import { UploadFileParams, UploadFileReturn } from './types'
 
 export class StorageFileRequest {
-  local = new LocalFilesRequest(this.subDir, this.dirHandler)
-  api = new ApiFilesRequest(this.subDir)
+  private readonly local = new LocalFilesRequest(this.subDir, this.dirHandler)
+  private readonly api = new ApiFilesRequest(this.subDir)
 
   constructor (
     private readonly subDir: string,
     private readonly offline: boolean,
     private readonly dirHandler?: FileSystemDirectoryHandle
   ) {}
+
+  getList = async () => {
+    if (!this.offline) {
+      return await this.api.getList()
+    }
+    return await this.local.getList()
+  }
 
   save = async <T extends UploadFileParams>(p: T): Promise<UploadFileReturn<T>> => {
     if (!this.offline) {

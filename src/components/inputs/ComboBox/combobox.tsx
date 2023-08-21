@@ -43,14 +43,14 @@ export const ComboBox = <
   const isOptionEqualToValue = (option: O, value: O) => {
     const label = option.label === value.label
     const dataValue = option.value === value.value
-    console.log('O: ', option, ' V: ', value)
+    // console.log('O: ', option, ' V: ', value)
     if (isLazyOption<T, KV>(option) && isLazyOption<T, KV>(value)) {
       const index = option.index === value.index
-      console.log({
+      /* console.log({
         label,
         dataValue,
         index
-      })
+      }) */
       return label && index && dataValue
     }
     console.log({

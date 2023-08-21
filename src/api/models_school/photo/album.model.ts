@@ -8,6 +8,11 @@ import { IsBoolean, IsString, Length } from 'class-validator'
 export class Album extends BaseModel {
   @Expose({ since: EV.UPDATE, until: EV.DELETE })
   @IsString()
+  @Length(1, 30)
+    name: string
+
+  @Expose({ since: EV.UPDATE, until: EV.DELETE })
+  @IsString()
   @Length(1, 100)
     url: string
 

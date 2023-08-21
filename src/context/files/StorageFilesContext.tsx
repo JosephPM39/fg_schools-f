@@ -1,5 +1,5 @@
 import { createContext, ReactNode } from 'react'
-import { useStorageFile } from '../../hooks/files/useStorageFile'
+import { useStorageFile } from '../../hooks/api/files/useStorageFile'
 import { Provider } from '../ContextHelper'
 
 export const StorageFileContext = createContext<ReturnType<typeof useStorageFile> | undefined>(undefined)
